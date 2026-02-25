@@ -594,7 +594,11 @@ Metadata:
         return []
 
     def generate_comparison_with_project_docs(
-        self, question: str, process_name: str, user_file_ids: List[str]
+        self,
+        question: str,
+        process_name: str,
+        user_file_ids: List[str],
+        extract_visuals: bool = True,
     ) -> Dict:
         """
         Compare one (or more) user-uploaded files with project-relevant documents.
