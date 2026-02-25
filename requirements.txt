@@ -13,3 +13,4 @@ bleach==6.1.0
 Waitress==3.0.0
 Flask-Compress==1.14
 boto3>=1.35.0
+Pillow
