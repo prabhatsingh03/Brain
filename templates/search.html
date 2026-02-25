@@ -2443,8 +2443,10 @@
                     const imgContainer = document.createElement('div');
                     imgContainer.className = "visual-intel-img-container cursor-default"; // Changed from zoom-in as we have specific buttons
 
-                    const encodedPath = encodeURIComponent(vis.file_path);
-                    const imgSrc = `{{ url_for('main.serve_visual') }}?path=${encodedPath}&page=${pg}`;
+                    // Prefer the new stable visual identifier (?id=...) which is
+                    // represented by vis.file_path (backed by ProjectMetadata.file_path).
+                    const encodedId = encodeURIComponent(vis.file_path);
+                    const imgSrc = `{{ url_for('main.serve_visual') }}?id=${encodedId}&page=${pg}`;
 
                     const img = document.createElement('img');
                     img.src = imgSrc;

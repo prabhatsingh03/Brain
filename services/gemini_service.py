@@ -837,9 +837,14 @@ Provide a clear, technically accurate answer. Do not quote or mention reference 
         # For cross‑project mode, we optionally consider related processes as well.
         relevant_filenames: List[str] = []
         global_context = ""
-        
+
+        # attachment_ids: Gemini file IDs
+        # full_file_paths: resolved local filesystem paths (for logging / uploads)
+        # storage_paths: stable storage identifiers (ProjectMetadata.file_path / S3 key)
+        #                used externally (e.g. visuals, /api/visual) so we never depend on temp paths.
         attachment_ids: List[str] = []
         full_file_paths: List[str] = []
+        storage_paths: List[str] = []
         process_file_map: Optional[Dict[str, List[str]]] = None  # process_name -> [file_id]; used for parent/child labels
 
         # Single‑project routing (default path)
@@ -867,6 +872,8 @@ Provide a clear, technically accurate answer. Do not quote or mention reference 
                                     logging.info(f"[DEBUG] File uploaded to Gemini with ID: {fid}")
                                     attachment_ids.append(fid)
                                     full_file_paths.append(resolved_path)
+                                    # Store the stable storage identifier from metadata (not the temp/local path)
+                                    storage_paths.append(meta.file_path)
                                 else:
                                     logging.error(f"[DEBUG] Failed to upload file to Gemini: {resolved_path}")
                             else:
@@ -921,6 +928,8 @@ Provide a clear, technically accurate answer. Do not quote or mention reference 
                         logging.info(f"[DEBUG] File uploaded to Gemini with ID: {fid}")
                         attachment_ids.append(fid)
                         full_file_paths.append(resolved_path)
+                        # Use the underlying storage identifier (meta.file_path) for any external references
+                        storage_paths.append(meta.file_path)
                         relevant_filenames.append(fname)
                         process_file_map.setdefault(pname, []).append(fid)
                     else:
@@ -1117,13 +1126,16 @@ Answer style: {style_instruction}
             logging.info(f"[Visual Intel] Checking {len(attachment_ids)} files for visuals...")
             for idx, fid in enumerate(attachment_ids):
                 try:
-                    fpath = full_file_paths[idx] if idx < len(full_file_paths) else "Unknown"
-                    logging.info(f"[Visual Intel] Checking file: {fpath} (ID: {fid})")
+                    local_path = full_file_paths[idx] if idx < len(full_file_paths) else "Unknown"
+                    storage_id = storage_paths[idx] if idx < len(storage_paths) else local_path
+                    logging.info(f"[Visual Intel] Checking file: {local_path} (ID: {fid}, storage_id={storage_id})")
                     pages = self.identify_visual_pages(question, fid)
                     if pages:
-                        # Include all identified visual pages for this file
-                        visual_pages.append({"file_path": fpath, "pages": pages})
-                        logging.info(f"[Visual Intel] Found visuals in {fpath}: {pages}")
+                        # Include all identified visual pages for this file.
+                        # IMPORTANT: expose the stable storage identifier (storage_id) to the rest of the app,
+                        # so /api/visual can map it back to ProjectMetadata/file storage, even in S3 mode.
+                        visual_pages.append({"file_path": storage_id, "pages": pages})
+                        logging.info(f"[Visual Intel] Found visuals in {local_path}: {pages} (storage_id={storage_id})")
                 except Exception as e:
                     logging.error(f"[Visual Intel] Error checking file {fid}: {e}")
 
@@ -1152,6 +1164,7 @@ Answer style: {style_instruction}
         relevant_filenames: List[str] = []
         attachment_ids: List[str] = []
         full_file_paths: List[str] = []
+        storage_paths: List[str] = []
         process_file_map: Optional[Dict[str, List[str]]] = None
 
         if answer_mode != "cross_project" or not related_processes:
@@ -1171,6 +1184,7 @@ Answer style: {style_instruction}
                                 if fid:
                                     attachment_ids.append(fid)
                                     full_file_paths.append(resolved_path)
+                                    storage_paths.append(meta.file_path)
         else:
             process_file_map = {}
             all_projects = [process_name] + list({p for p in (related_processes or []) if p != process_name})
@@ -1199,6 +1213,7 @@ Answer style: {style_instruction}
                     if fid:
                         attachment_ids.append(fid)
                         full_file_paths.append(resolved_path)
+                        storage_paths.append(meta.file_path)
                         relevant_filenames.append(fname)
                         process_file_map.setdefault(pname, []).append(fid)
 
@@ -1355,12 +1370,13 @@ Answer style: {style_instruction}
             logging.info(f"[Visual Intel] Checking {len(attachment_ids)} files for visuals (Stream Mode)...")
             for idx, fid in enumerate(attachment_ids):
                 try:
-                    fpath = full_file_paths[idx] if idx < len(full_file_paths) else "Unknown"
+                    local_path = full_file_paths[idx] if idx < len(full_file_paths) else "Unknown"
+                    storage_id = storage_paths[idx] if idx < len(storage_paths) else local_path
                     pages = self.identify_visual_pages(question, fid)
                     if pages:
-                        # Include all identified visual pages for this file
-                        visual_pages.append({"file_path": fpath, "pages": pages})
-                        logging.info(f"[Visual Intel] Found visuals in {fpath}: {pages} (Stream)")
+                        # Include all identified visual pages for this file using the stable storage identifier.
+                        visual_pages.append({"file_path": storage_id, "pages": pages})
+                        logging.info(f"[Visual Intel] Found visuals in {local_path}: {pages} (Stream, storage_id={storage_id})")
                 except Exception as e:
                     logging.error(f"[Visual Intel] Stream Visual intellectual checking error: {e}")
 

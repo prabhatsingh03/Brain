@@ -157,7 +157,10 @@ def dap_3d_view():
 @limiter.exempt
 def serve_visual():
     try:
-        file_path = request.args.get('path')
+        # Prefer the new stable visual identifier (?id=...) but continue to
+        # support the legacy ?path=... parameter for backward compatibility.
+        file_id = request.args.get('id')
+        file_path = request.args.get('path') or file_id
         page_num = int(request.args.get('page', 0))
 
         if not file_path:
@@ -166,6 +169,7 @@ def serve_visual():
         # Authorisation: only allow serving documents that exist in ProjectMetadata
         meta = ProjectMetadata.query.filter_by(file_path=file_path).first()
         if not meta:
+            current_app.logger.warning(f"Visual access denied: no ProjectMetadata record for file_path='{file_path}'")
             return ("Unauthorized file access", 403)
 
         storage = get_document_storage()

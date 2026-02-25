@@ -408,8 +408,10 @@
                                 const imgContainer = document.createElement('div');
                                 imgContainer.className = "relative overflow-hidden rounded border border-white/10";
 
-                                const encodedPath = encodeURIComponent(vis.file_path);
-                                const imgSrc = `{{ url_for('main.serve_visual') }}?path=${encodedPath}&page=${pg}`;
+                                // Use the stable visual identifier (?id=...) derived
+                                // from the stored file_path field.
+                                const encodedId = encodeURIComponent(vis.file_path);
+                                const imgSrc = `{{ url_for('main.serve_visual') }}?id=${encodedId}&page=${pg}`;
 
                                 const img = document.createElement('img');
                                 img.src = imgSrc;
