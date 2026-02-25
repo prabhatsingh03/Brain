@@ -611,6 +611,13 @@
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.getElementById(`tab-${tabName}`).classList.remove('hidden');
 
+        // Persist active tab in localStorage for future visits
+        try {
+            window.localStorage.setItem('admin_active_tab', tabName);
+        } catch (e) {
+            // Ignore storage errors (e.g. privacy mode)
+        }
+
         document.querySelectorAll('.tab-link').forEach(el => {
             el.classList.remove('bg-accent/10', 'border-accent/20', 'text-white', 'border');
             el.classList.add('hover:bg-gray-100', 'dark:hover:bg-white/5', 'text-slate-600', 'dark:text-textSoft');
@@ -626,8 +633,23 @@
         setupCustomDropdown('admin-project-dropdown', 'admin-project-trigger', 'admin-project-options', 'admin-project-arrow', 'admin-project-select', 'admin-project-text');
         setupCustomDropdown('admin-role-dropdown', 'admin-role-trigger', 'admin-role-options', 'admin-role-arrow', 'admin-role-select', 'admin-role-text');
 
-        // Activate correct tab based on URL hash (e.g. #dependencies, #metadata, #users)
-        let initialTab = window.location.hash ? window.location.hash.replace('#', '') : 'projects';
+        // Activate correct tab based on URL hash first, then fall back to last-used tab in localStorage
+        let initialTab = 'projects';
+        const hash = window.location.hash ? window.location.hash.replace('#', '') : '';
+
+        if (hash) {
+            initialTab = hash;
+        } else {
+            try {
+                const stored = window.localStorage.getItem('admin_active_tab');
+                if (stored && document.getElementById(`tab-${stored}`)) {
+                    initialTab = stored;
+                }
+            } catch (e) {
+                // Ignore storage errors (e.g. privacy mode)
+            }
+        }
+
         if (!document.getElementById(`tab-${initialTab}`)) {
             initialTab = 'projects';
         }

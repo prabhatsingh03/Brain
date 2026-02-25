@@ -572,6 +572,101 @@
             border: 1px solid var(--simon-border) !important;
             box-shadow: 0 10px 30px -10px rgba(149, 157, 165, 0.1) !important;
         }
+
+        /* Toast notifications */
+        .toast-base {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            border-radius: 0.75rem;
+            border-width: 1px;
+            font-size: 0.875rem;
+            line-height: 1.3;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .toast-enter {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-leave {
+            opacity: 0;
+            transform: translateY(-4px);
+        }
+
+        .toast-message {
+            flex: 1;
+        }
+
+        .toast-close-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 0.25rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+        }
+
+        .toast-close-btn:hover {
+            background-color: rgba(148, 163, 184, 0.16);
+        }
+
+        html:not(.dark) .toast-success {
+            background-color: #ECFDF3;
+            border-color: #4ADE80;
+            color: #166534;
+        }
+
+        html:not(.dark) .toast-error {
+            background-color: #FEF2F2;
+            border-color: #F87171;
+            color: #991B1B;
+        }
+
+        html:not(.dark) .toast-warning {
+            background-color: #FFFBEB;
+            border-color: #FACC15;
+            color: #854D0E;
+        }
+
+        html:not(.dark) .toast-info {
+            background-color: #EFF6FF;
+            border-color: #60A5FA;
+            color: #1D4ED8;
+        }
+
+        html.dark .toast-success {
+            background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.24), rgba(15, 23, 42, 0.95));
+            border-color: rgba(34, 197, 94, 0.7);
+            color: #BBF7D0;
+        }
+
+        html.dark .toast-error {
+            background: radial-gradient(circle at top left, rgba(239, 68, 68, 0.3), rgba(15, 23, 42, 0.95));
+            border-color: rgba(248, 113, 113, 0.8);
+            color: #FCA5A5;
+        }
+
+        html.dark .toast-warning {
+            background: radial-gradient(circle at top left, rgba(234, 179, 8, 0.3), rgba(15, 23, 42, 0.95));
+            border-color: rgba(250, 204, 21, 0.9);
+            color: #FEF3C7;
+        }
+
+        html.dark .toast-info {
+            background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.3), rgba(15, 23, 42, 0.95));
+            border-color: rgba(96, 165, 250, 0.9);
+            color: #BFDBFE;
+        }
     </style>
     <script>
         // Critical: Apply theme immediately to prevent flicker
@@ -923,11 +1018,22 @@
         <main class="flex-grow w-full p-6">
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-            <div class="mb-6 space-y-2">
+            <div id="toast-container"
+                class="fixed top-4 right-4 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none">
                 {% for category, message in messages %}
                 <div
-                    class="p-3 rounded border-l-4 {{ 'bg-red-900 border-red-500' if category == 'danger' else 'bg-green-900 border-green-500' }} text-sm opacity-90">
-                    {{ message }}
+                    class="toast-base pointer-events-auto {% if category == 'danger' %}toast-error{% elif category == 'success' %}toast-success{% elif category == 'warning' %}toast-warning{% else %}toast-info{% endif %}"
+                    data-toast-autohide="true" data-toast-delay="5000">
+                    <div class="toast-message">
+                        {{ message }}
+                    </div>
+                    <button type="button" class="toast-close-btn" aria-label="Dismiss notification"
+                        data-toast-close="true">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
                 {% endfor %}
             </div>
@@ -1519,6 +1625,44 @@
             }
 
             initThemeToggle();
+        });
+        // Toast notification behaviour (animations, auto-dismiss, manual close)
+        document.addEventListener('turbo:load', () => {
+            const toasts = document.querySelectorAll('[data-toast-autohide]');
+            if (!toasts.length) return;
+
+            toasts.forEach((toast) => {
+                // Trigger entrance animation on next frame
+                requestAnimationFrame(() => {
+                    toast.classList.add('toast-enter');
+                });
+
+                const delayAttr = toast.getAttribute('data-toast-delay');
+                const delay = delayAttr ? parseInt(delayAttr, 10) || 5000 : 5000;
+
+                const scheduleHide = () => {
+                    toast.classList.add('toast-leave');
+                    const remove = () => {
+                        toast.removeEventListener('transitionend', remove);
+                        if (toast.parentElement) {
+                            toast.parentElement.removeChild(toast);
+                        }
+                    };
+                    toast.addEventListener('transitionend', remove);
+                };
+
+                if (delay > 0) {
+                    setTimeout(scheduleHide, delay);
+                }
+
+                const closeBtn = toast.querySelector('[data-toast-close]');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        scheduleHide();
+                    });
+                }
+            });
         });
     </script>
 
