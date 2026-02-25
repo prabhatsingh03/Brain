@@ -1,0 +1,813 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Dashboard-specific Background Override */
+
+
+    /* Enhanced Glass Card */
+    /* Enhanced Glass Card - Dark Mode */
+    html.dark .glass-card {
+        background: rgba(13, 25, 48, 0.6) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    }
+
+    /* Enhanced Glass Card - Light Mode */
+    html:not(.dark) .glass-card {
+        background: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(226, 232, 240, 0.8) !important;
+        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    }
+
+    /* DISABLE ALL FLOATING/TRANSFORM EFFECTS ON ADMIN ELEMENTS */
+    .glass-card,
+    .glass-card *,
+    button,
+    input,
+    select,
+    textarea {
+        transform: none !important;
+        translate: none !important;
+        rotate: none !important;
+        scale: none !important;
+    }
+</style>
+
+<div class="mb-8 pl-2 flex justify-between items-center">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white dark:neon-text">Admin Console</h1>
+    <div class="flex items-center gap-3">
+        {% include 'partials/user_dropdown.html' %}
+    </div>
+</div>
+
+<div class="flex flex-col md:flex-row gap-6">
+    <!-- Sidebar -->
+    <div class="w-full md:w-1/4 glass-card rounded-xl p-4 h-fit">
+        <ul class="space-y-2">
+            <li><a href="#projects" onclick="showTab('projects')"
+                    class="block p-3 rounded-lg hover:bg-accent/20 text-gray-900 dark:text-white font-medium tab-link bg-accent/10 border border-accent/20 transition-all"
+                    id="tab-btn-projects">Projects</a></li>
+            <li><a href="#metadata" onclick="showTab('metadata')"
+                    class="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white tab-link transition-all"
+                    id="tab-btn-metadata">Manage Data (Metadata)</a></li>
+            <li><a href="#users" onclick="showTab('users')"
+                    class="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white tab-link transition-all"
+                    id="tab-btn-users">Manage Users</a></li>
+            <li><a href="#dependencies" onclick="showTab('dependencies')"
+                    class="block p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white tab-link transition-all"
+                    id="tab-btn-dependencies">Dependencies</a></li>
+        </ul>
+    </div>
+
+    <!-- Content -->
+    <div class="w-full md:w-3/4 glass-card rounded-xl p-8 min-h-[500px]">
+
+        <!-- projects Tab -->
+        <div id="tab-projects" class="tab-content">
+            <h2
+                class="text-xl font-bold mb-6 border-b border-gray-200 dark:border-gray-700/50 pb-2 text-gray-900 dark:text-white">
+                Process Applications</h2>
+            <form action="{{ url_for('admin.add_project') }}" method="POST"
+                class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="md:col-span-1">
+                    <label class="block text-sm mb-1 text-slate-600 dark:text-textSoft">Project Name</label>
+                    <input type="text" name="name" placeholder="e.g. AMMONIA"
+                        class="w-full bg-white dark:bg-black/20 border border-gray-300 dark:border-white/10 p-3 rounded-lg text-gray-900 dark:text-white focus:border-accent outline-none transition">
+                </div>
+                <div class="md:col-span-1">
+                    <label class="block text-sm mb-1 text-slate-600 dark:text-textSoft">Description (optional)</label>
+                    <input type="text" name="description" placeholder="Brief process description"
+                        class="w-full bg-white dark:bg-black/20 border border-gray-300 dark:border-white/10 p-3 rounded-lg text-gray-900 dark:text-white focus:border-accent outline-none transition">
+                </div>
+                <div class="md:col-span-1">
+                    <button type="submit"
+                        class="w-full bg-accent text-white px-6 py-3 rounded-lg font-bold hover:brightness-110 shadow-lg shadow-accent/20 transition mt-1 md:mt-5">Add
+                        Project</button>
+                </div>
+            </form>
+
+            <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-white/5">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="text-slate-600 dark:text-textSoft bg-gray-50 dark:bg-black/20 border-b border-gray-200 dark:border-white/5">
+                            <th class="p-4 font-medium">ID</th>
+                            <th class="p-4 font-medium">Name</th>
+                            <th class="p-4 font-medium">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in projects %}
+                        <tr
+                            class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                            <td class="p-4 text-gray-900 dark:text-white">{{ p.id }}</td>
+                            <td class="p-4 font-mono text-accent font-bold">{{ p.name }}</td>
+                            <td class="p-4 space-x-2">
+                                <a href="{{ url_for('admin.edit_project', id=p.id) }}"
+                                    class="inline-flex items-center text-xs bg-blue-400/10 text-blue-400 px-3 py-1 rounded border border-blue-400/30 hover:bg-blue-400/20">
+                                    Edit
+                                </a>
+                                <form action="{{ url_for('admin.delete_project', id=p.id) }}" method="POST"
+                                    class="inline project-delete-form" data-project-name="{{ p.name }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                    <button type="button"
+                                        class="project-delete-trigger text-red-400 hover:text-red-300 text-xs bg-red-400/10 px-3 py-1 rounded border border-red-400/20">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- metadata Tab -->
+        <div id="tab-metadata" class="tab-content hidden">
+            <h2
+                class="text-xl font-bold mb-6 border-b border-gray-200 dark:border-gray-700/50 pb-2 text-gray-900 dark:text-white">
+                File Manager & Upload</h2>
+
+            <!-- Upload Section -->
+            <div class="mb-10 bg-white dark:bg-black/20 p-6 rounded-xl border border-gray-200 dark:border-white/5">
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Upload New Document</h3>
+                <form action="{{ url_for('admin.upload_metadata') }}" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">Select Project</label>
+                            <div class="simon-custom-dropdown w-full" id="admin-project-dropdown">
+                                <select name="project_id" id="admin-project-select" class="hidden">
+                                    {% for p in projects %}
+                                    <option value="{{ p.id }}">{{ p.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="simon-dropdown-trigger w-full justify-between bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white"
+                                    id="admin-project-trigger">
+                                    <div class="flex items-center gap-2 truncate">
+                                        <span id="admin-project-text" class="text-sm">Select Project...</span>
+                                    </div>
+                                    <svg class="h-4 w-4 text-textSoft" id="admin-project-arrow" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                                <div class="simon-dropdown-options w-full" id="admin-project-options">
+                                    {% for p in projects %}
+                                    <div class="simon-dropdown-option"
+                                        onclick="selectAdminProject('{{ p.id }}', '{{ p.name }}')">
+                                        {{ p.name }}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">Description</label>
+                            <input type="text" name="type_of_data" placeholder="e.g. PFD, Manual, Image"
+                                class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none">
+                        </div>
+                        <div class="col-span-full">
+                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">File (PDF only)</label>
+                            <input type="file" name="file" accept=".pdf,application/pdf"
+                                class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-slate-600 dark:text-textSoft file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent/10 file:text-accent hover:file:bg-accent/20">
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="mt-6 bg-accent text-white px-6 py-3 rounded-lg font-bold hover:brightness-110 shadow-lg shadow-accent/20 transition w-full md:w-auto">Upload
+                        &
+                        Index</button>
+                </form>
+            </div>
+
+            <!-- Management Section -->
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Uploaded Documents</h3>
+                    <div class="relative">
+                        <input type="text" id="file-search" placeholder="Search files..."
+                            class="bg-white dark:bg-black/20 border border-gray-300 dark:border-white/10 p-2 pl-8 rounded-lg text-sm text-gray-900 dark:text-white focus:border-accent outline-none w-64">
+                        <svg class="w-4 h-4 absolute left-2 top-2.5 text-gray-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-white/5">
+                    <table class="w-full text-left border-collapse" id="metadata-table">
+                        <thead>
+                            <tr
+                                class="text-slate-600 dark:text-textSoft bg-gray-50 dark:bg-black/20 border-b border-gray-200 dark:border-white/5 text-sm">
+                                <th class="p-3 font-medium w-16">S.No.</th>
+                                <th class="p-3 font-medium">File Name</th>
+                                <th class="p-3 font-medium">Project</th>
+                                <th class="p-3 font-medium">Type</th>
+                                <th class="p-3 text-right font-medium">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for m in metadata %}
+                            <tr class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition text-sm metadata-row"
+                                data-filename="{{ m.file_name|lower }}" data-project="{{ m.project.name|lower }}"
+                                data-type="{{ m.type_of_data|lower }}">
+                                <td class="p-3 text-gray-500 dark:text-textSoft font-mono text-xs">{{ loop.index }}</td>
+                                <td class="p-3 truncate max-w-[200px]" title="{{ m.file_name }}">{{ m.file_name }}</td>
+                                <td class="p-3 text-accent font-mono">{{ m.project.name }}</td>
+                                <td class="p-3"><span
+                                        class="px-2 py-1 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded text-[10px] uppercase tracking-wider text-gray-700 dark:text-white">{{
+                                        m.type_of_data }}</span></td>
+                                <td class="p-3 text-right">
+                                    <!-- Edit -->
+                                    <a href="{{ url_for('admin.edit_metadata', id=m.id) }}"
+                                        class="text-xs bg-blue-400/10 text-blue-400 px-2 py-1 rounded border border-blue-400/30 hover:bg-blue-400/20 mr-2 inline-flex items-center gap-1"
+                                        title="Edit Metadata">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                        Edit
+                                    </a>
+
+                                    <!-- Download -->
+                                    <a href="{{ url_for('admin.download_metadata', id=m.id) }}"
+                                        class="text-accent hover:text-accent-dark dark:hover:text-white transition mr-2 inline-block p-1 hover:bg-accent/20 rounded"
+                                        title="Download">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
+                                            </path>
+                                        </svg>
+                                    </a>
+                                    <form action="{{ url_for('admin.delete_metadata', id=m.id) }}" method="POST"
+                                        class="inline" onsubmit="return confirm('Delete this file?');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                        <button type="submit"
+                                            class="text-red-400 hover:text-red-300 transition p-1 hover:bg-red-400/20 rounded">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not metadata %}
+                            <tr>
+                                <td colspan="5" class="p-8 text-center text-slate-500 dark:text-textSoft italic">No
+                                    files uploaded yet.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Delete Confirmation Modal -->
+        <div id="project-delete-modal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+            <div
+                class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-white/10 w-full max-w-md mx-4">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-white/10">
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-500/10 text-red-400 border border-red-500/30">
+                            !
+                        </span>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Delete Project</h3>
+                    </div>
+                    <button type="button" id="project-delete-cancel-x"
+                        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                        ✕
+                    </button>
+                </div>
+                <div class="px-6 py-4 space-y-3">
+                    <p id="project-delete-modal-text" class="text-sm text-slate-700 dark:text-textSoft">
+                        Are you sure you want to delete this project? This will remove its metadata and access from the
+                        hub.
+                    </p>
+                    <p class="text-xs text-amber-600 dark:text-amber-400 flex items-start gap-2">
+                        <span class="mt-0.5">⚠</span>
+                        <span>This action cannot be undone.</span>
+                    </p>
+                </div>
+                <div class="px-6 py-4 flex justify-end gap-3 border-t border-gray-200 dark:border-white/10">
+                    <button type="button" id="project-delete-cancel"
+                        class="px-4 py-2 text-sm rounded-lg border border-gray-300 dark:border-white/20 text-gray-700 dark:text-textSoft hover:bg-gray-100 dark:hover:bg-white/5">
+                        Cancel
+                    </button>
+                    <button type="button" id="project-delete-confirm"
+                        class="px-4 py-2 text-sm rounded-lg bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-500/30">
+                        Delete Project
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Client-side search for metadata table
+            const searchInput = document.getElementById('file-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', function (e) {
+                    const term = e.target.value.toLowerCase();
+                    const rows = document.querySelectorAll('.metadata-row');
+                    rows.forEach(row => {
+                        const text = row.dataset.filename + row.dataset.project + row.dataset.type;
+                        if (text.includes(term)) {
+                            row.classList.remove('hidden');
+                        } else {
+                            row.classList.add('hidden');
+                        }
+                    });
+                });
+            }
+        </script>
+
+        <!-- users Tab -->
+        <div id="tab-users" class="tab-content hidden">
+            <h2 class="text-xl font-bold mb-6 border-b border-gray-200 dark:border-gray-700/50 pb-2 text-gray-900 dark:text-white">User
+                Management</h2>
+
+            <!-- Add User Section -->
+            <div class="mb-10 bg-white dark:bg-black/20 p-6 rounded-xl border border-gray-200 dark:border-white/5">
+                <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Create New User</h3>
+                <form action="{{ url_for('admin.add_user') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">Email Address</label>
+                            <input type="email" name="email" required placeholder="user@example.com"
+                                class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" name="password" id="create-user-password" required
+                                    placeholder="••••••••"
+                                    class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none pr-10">
+                                <button type="button" class="password-toggle-icon"
+                                    onclick="togglePasswordVisibility('create-user-password', 'create-user-password-icon')">
+                                    <svg id="create-user-password-icon" class="w-5 h-5 text-slate-500 transition-colors"
+                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">Role</label>
+                            <div class="simon-custom-dropdown w-full" id="admin-role-dropdown">
+                                <select name="role" id="admin-role-select" class="hidden">
+                                    <option value="user">User</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                                <div class="simon-dropdown-trigger w-full justify-between bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 text-gray-900 dark:text-white"
+                                    id="admin-role-trigger">
+                                    <div class="flex items-center gap-2 truncate">
+                                        <span id="admin-role-text" class="text-sm">User</span>
+                                    </div>
+                                    <svg class="h-4 w-4 text-textSoft" id="admin-role-arrow" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                                <div class="simon-dropdown-options w-full" id="admin-role-options">
+                                    <div class="simon-dropdown-option selected"
+                                        onclick="selectAdminRole('user', 'User')">
+                                        User
+                                    </div>
+                                    <div class="simon-dropdown-option" onclick="selectAdminRole('admin', 'Admin')">
+                                        Admin
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="mt-6 bg-accent text-white px-6 py-3 rounded-lg font-bold hover:brightness-110 shadow-lg shadow-accent/20 transition w-full md:w-auto">Create
+                        User</button>
+                </form>
+            </div>
+
+            <!-- User List Section -->
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">All Users</h3>
+                    <div class="relative">
+                        <input type="text" id="user-search" placeholder="Search users..."
+                            class="bg-white dark:bg-black/20 border border-gray-300 dark:border-white/10 p-2 pl-8 rounded-lg text-sm text-gray-900 dark:text-white focus:border-accent outline-none w-64">
+                        <svg class="w-4 h-4 absolute left-2 top-2.5 text-gray-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-white/5">
+                    <table class="w-full text-left border-collapse" id="users-table">
+                        <thead>
+                            <tr
+                                class="text-slate-600 dark:text-textSoft bg-gray-50 dark:bg-black/20 border-b border-gray-200 dark:border-white/5">
+                                <th class="p-4 font-medium">ID</th>
+                                <th class="p-4 font-medium">Email</th>
+                                <th class="p-4 font-medium">Role</th>
+                                <th class="p-4 text-right font-medium">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in users %}
+                            <tr class="border-b border-white/5 hover:bg-white/5 transition user-row"
+                                data-email="{{ u.email|lower }}" data-role="{{ u.role|lower }}">
+                                <td class="p-4 text-textSoft">{{ u.id }}</td>
+                                <td class="p-4 font-mono text-gray-900 dark:text-white">{{ u.email }}</td>
+                                <td class="p-4">
+                                    {% if u.role == 'admin' %}
+                                    <span
+                                        class="px-3 py-1 bg-accent/20 border border-accent/40 rounded-full text-accent text-xs font-bold uppercase tracking-wider">
+                                        Admin
+                                    </span>
+                                    {% else %}
+                                    <span
+                                        class="px-3 py-1 bg-green-400/20 border border-green-400/40 rounded-full text-green-400 text-xs font-bold uppercase tracking-wider">
+                                        User
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="p-4 text-right">
+                                    <div class="flex justify-end gap-2">
+                                        <!-- Role Toggle -->
+                                        {% if u.id != current_user.id %}
+                                        <form action="{{ url_for('admin.update_user_role', id=u.id) }}" method="POST"
+                                            class="inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                            {% if u.role == 'user' %}
+                                            <input type="hidden" name="role" value="admin">
+                                            <button type="submit"
+                                                class="text-xs bg-accent/10 text-accent px-3 py-1 rounded border border-accent/20 hover:bg-accent/20 transition"
+                                                title="Promote to Admin">
+                                                Promote
+                                            </button>
+                                            {% else %}
+                                            <input type="hidden" name="role" value="user">
+                                            <button type="submit"
+                                                class="text-xs bg-yellow-400/10 text-yellow-400 px-3 py-1 rounded border border-yellow-400/20 hover:bg-yellow-400/20 transition"
+                                                title="Demote to User">
+                                                Demote
+                                            </button>
+                                            {% endif %}
+                                        </form>
+
+                                        <!-- Delete -->
+                                        <form action="{{ url_for('admin.delete_user', id=u.id) }}" method="POST"
+                                            class="inline"
+                                            onsubmit="return confirm('Are you sure you want to delete user {{ u.email }}?');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                                            <button type="submit"
+                                                class="text-xs bg-red-400/10 text-red-400 px-3 py-1 rounded border border-red-400/20 hover:bg-red-400/20 transition"
+                                                title="Delete User">
+                                                Delete
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                        <span class="text-xs text-textSoft italic">(Current User)</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% if not users %}
+                            <tr>
+                                <td colspan="4" class="p-8 text-center text-textSoft italic">No users found.</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Client-side search for users table
+            const userSearchInput = document.getElementById('user-search');
+            if (userSearchInput) {
+                userSearchInput.addEventListener('input', function (e) {
+                    const term = e.target.value.toLowerCase();
+                    const rows = document.querySelectorAll('.user-row');
+                    rows.forEach(row => {
+                        const text = row.dataset.email + row.dataset.role;
+                        if (text.includes(term)) {
+                            row.classList.remove('hidden');
+                        } else {
+                            row.classList.add('hidden');
+                        }
+                    });
+                });
+            }
+        </script>
+
+
+        <!-- dependencies Tab -->
+        <div id="tab-dependencies" class="tab-content hidden">
+            <h2 class="text-xl font-bold mb-6 border-b border-gray-200 dark:border-gray-700/50 pb-2 text-gray-900 dark:text-white">Project
+                Dependencies</h2>
+
+            <!-- Existing Dependencies Table -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4 text-slate-600 dark:text-textSoft">Existing Mappings</h3>
+                <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-white/5">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-slate-600 dark:text-textSoft bg-gray-50 dark:bg-black/20 border-b border-gray-200 dark:border-white/5">
+                                <th class="p-4 font-medium">Project</th>
+                                <th class="p-4 font-medium">Depends On</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set deps_map = {} %}
+                            {% for dep in ProjectDependency.query.all() %}
+                            {% if deps_map.setdefault(dep.project_name, []) is not none %}
+                            {% if deps_map[dep.project_name].append(dep.dependency_name) %}{% endif %}
+                            {% endif %}
+                            {% endfor %}
+
+                            {% for p in projects %}
+                            {% set deps = deps_map.get(p.name, []) %}
+                            <tr class="border-b border-gray-200 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                                <td class="p-4 font-mono text-accent">{{ p.name }}</td>
+                                <td class="p-4 text-slate-600 dark:text-textSoft">
+                                    {% if deps %}
+                                    {{ ", ".join(deps) }}
+                                    {% else %}
+                                    <span class="text-xs italic text-slate-500 dark:text-textSoft/70">None</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Update Dependencies (also handles initial creation) -->
+                <div class="bg-white dark:bg-black/20 border border-gray-200 dark:border-white/5 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Manage Dependencies</h3>
+                    <p class="text-xs text-slate-600 dark:text-textSoft mb-4">
+                        Use this form to add or update dependencies for any project. If a project has no existing
+                        mapping, saving here will create it.
+                    </p>
+                    <form action="{{ url_for('admin.update_dependencies') }}" method="POST" class="space-y-4">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <div>
+                            <label class="block text-sm mb-1 text-slate-600 dark:text-textSoft">Project</label>
+                            <select name="project_name"
+                                class="w-full bg-white dark:bg-black/40 border border-gray-300 dark:border-white/10 rounded-lg p-2 text-sm text-gray-900 dark:text-white">
+                                {% for p in projects %}
+                                <option value="{{ p.name }}">{{ p.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1 text-slate-600 dark:text-textSoft">Depends On (multi‑select)</label>
+                            <select name="dependencies" multiple
+                                class="w-full bg-white dark:bg-black/40 border border-gray-300 dark:border-white/10 rounded-lg p-2 text-sm text-gray-900 dark:text-white h-32">
+                                {% for p in projects %}
+                                <option value="{{ p.name }}">{{ p.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <p class="text-xs text-slate-600 dark:text-textSoft mt-1">Hold Ctrl / Cmd to select multiple projects.</p>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-accent text-white px-4 py-2 rounded-lg font-bold hover:brightness-110 shadow-lg shadow-accent/20 transition text-sm">
+                            Save Dependencies
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+        document.querySelectorAll('.tab-link').forEach(el => {
+            el.classList.remove('bg-accent/10', 'border-accent/20', 'text-white', 'border');
+            el.classList.add('hover:bg-gray-100', 'dark:hover:bg-white/5', 'text-slate-600', 'dark:text-textSoft');
+        });
+
+        const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+        activeBtn.classList.remove('hover:bg-gray-100', 'dark:hover:bg-white/5', 'text-slate-600', 'dark:text-textSoft');
+        activeBtn.classList.add('bg-accent/10', 'border-accent/20', 'text-gray-900', 'dark:text-white', 'border');
+    }
+
+    // --- Admin Dropdown Logic & Delete Modal Wiring ---
+    document.addEventListener('turbo:load', () => {
+        setupCustomDropdown('admin-project-dropdown', 'admin-project-trigger', 'admin-project-options', 'admin-project-arrow', 'admin-project-select', 'admin-project-text');
+        setupCustomDropdown('admin-role-dropdown', 'admin-role-trigger', 'admin-role-options', 'admin-role-arrow', 'admin-role-select', 'admin-role-text');
+
+        // Activate correct tab based on URL hash (e.g. #dependencies, #metadata, #users)
+        let initialTab = window.location.hash ? window.location.hash.replace('#', '') : 'projects';
+        if (!document.getElementById(`tab-${initialTab}`)) {
+            initialTab = 'projects';
+        }
+        showTab(initialTab);
+
+        // Wire up project delete confirmation modal
+        const modal = document.getElementById('project-delete-modal');
+        const modalText = document.getElementById('project-delete-modal-text');
+        const btnCancel = document.getElementById('project-delete-cancel');
+        const btnCancelX = document.getElementById('project-delete-cancel-x');
+        const btnConfirm = document.getElementById('project-delete-confirm');
+        let formToSubmit = null;
+
+        if (modal) {
+            function openModal(message, form) {
+                formToSubmit = form;
+                if (modalText && message) {
+                    modalText.textContent = message;
+                }
+                modal.classList.remove('hidden');
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                formToSubmit = null;
+            }
+
+            document.querySelectorAll('.project-delete-trigger').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const form = btn.closest('form');
+                    if (!form) return;
+                    const name = form.dataset.projectName || 'this project';
+                    const message = `Are you sure you want to delete project ${name}? This will remove its metadata and access from the hub.`;
+                    openModal(message, form);
+                });
+            });
+
+            if (btnCancel) {
+                btnCancel.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    closeModal();
+                });
+            }
+
+            if (btnCancelX) {
+                btnCancelX.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    closeModal();
+                });
+            }
+
+            if (btnConfirm) {
+                btnConfirm.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (formToSubmit) {
+                        formToSubmit.submit();
+                    }
+                    closeModal();
+                });
+            }
+
+            // Close when clicking on backdrop
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Close on Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeModal();
+                }
+            });
+        }
+    });
+
+    function setupCustomDropdown(containerId, triggerId, optionsId, arrowId, selectId, textId) {
+        const container = document.getElementById(containerId);
+        const trigger = document.getElementById(triggerId);
+        const options = document.getElementById(optionsId);
+        const arrow = document.getElementById(arrowId);
+        const hiddenSelect = document.getElementById(selectId);
+        const textSpan = document.getElementById(textId);
+
+        if (!trigger || !options) return;
+
+        // Initial set text if value exists
+        if (hiddenSelect && hiddenSelect.value) {
+            // Try to find the option text for the current value
+            const initialOption = Array.from(hiddenSelect.options).find(opt => opt.value === hiddenSelect.value);
+            if (initialOption) {
+                textSpan.textContent = initialOption.text;
+            }
+            // Also mark specific option as selected
+            // Note: This simple loop assumes the onclick handlers are set up to expect specific values.
+        }
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = options.classList.contains('open');
+
+            // Close all other admin dropdowns first (simple approach)
+            document.querySelectorAll('.simon-dropdown-options.open').forEach(el => {
+                if (el.id !== optionsId) {
+                    el.classList.remove('open');
+                    // Find its trigger to remove active class if needed
+                    const parent = el.closest('.simon-custom-dropdown');
+                    if (parent) {
+                        const trig = parent.querySelector('.simon-dropdown-trigger');
+                        if (trig) trig.classList.remove('active');
+                    }
+                }
+            });
+
+            if (!isOpen) {
+                options.classList.add('open');
+                trigger.classList.add('active');
+                if (container) container.style.zIndex = '60';
+            } else {
+                options.classList.remove('open');
+                trigger.classList.remove('active');
+                if (container) container.style.zIndex = '';
+            }
+        });
+
+        // Close on click outside
+        document.addEventListener('click', (e) => {
+            if (!container.contains(e.target)) {
+                options.classList.remove('open');
+                trigger.classList.remove('active');
+                if (container) container.style.zIndex = '';
+            }
+        });
+    }
+
+    // Global selector functions called by inline onclicks
+    window.selectAdminProject = function (val, name) {
+        const select = document.getElementById('admin-project-select');
+        const text = document.getElementById('admin-project-text');
+        const options = document.getElementById('admin-project-options');
+        const trigger = document.getElementById('admin-project-trigger');
+        const container = document.getElementById('admin-project-dropdown');
+
+        if (select) select.value = val;
+        if (text) text.textContent = name;
+
+        // Visual updates
+        if (options) {
+            options.classList.remove('open');
+            // Update selected class
+            options.querySelectorAll('.simon-dropdown-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.textContent.trim() === name) opt.classList.add('selected');
+            });
+        }
+        if (trigger) trigger.classList.remove('active');
+        if (container) container.style.zIndex = '';
+    }
+
+    window.selectAdminRole = function (val, name) {
+        const select = document.getElementById('admin-role-select');
+        const text = document.getElementById('admin-role-text');
+        const options = document.getElementById('admin-role-options');
+        const trigger = document.getElementById('admin-role-trigger');
+        const container = document.getElementById('admin-role-dropdown');
+
+        if (select) select.value = val;
+        if (text) text.textContent = name;
+
+        if (options) {
+            options.classList.remove('open');
+            options.querySelectorAll('.simon-dropdown-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.textContent.trim() === name) opt.classList.add('selected');
+            });
+        }
+        if (trigger) trigger.classList.remove('active');
+        if (container) container.style.zIndex = '';
+    }
+</script>
+{% endblock %}

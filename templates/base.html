@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en"
+    class="{% if current_user.is_authenticated and current_user.theme_preference == 'dark' %}dark{% elif not current_user.is_authenticated or current_user.theme_preference == 'dark' %}dark{% endif %}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <title>SIA</title>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}?v=4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/simon_upgrade.css') }}?v=4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth_modal.css') }}?v=5">
+    <!-- Hotwired Turbo -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/dist/turbo.es2017-esm.js"></script>
+    <!-- Mermaid.js for Flow Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: false, theme: 'dark', flowchart: { htmlLabels: true, useMaxWidth: false }, themeVariables: { primaryColor: '#167cc1', primaryTextColor: '#e2e8f0', primaryBorderColor: '#2ee6ff', lineColor: '#2ee6ff', secondaryColor: '#0f1729', tertiaryColor: '#1a2332', background: '#0d1321', mainBkg: '#1a2332', nodeBorder: '#2ee6ff', clusterBkg: '#0f1729', clusterBorder: '#2ee6ff33', titleColor: '#e2e8f0', edgeLabelBackground: '#0d1321', fontSize: '14px', nodeTextColor: '#ffffff', textColor: '#ffffff' } });</script>
+    <style>
+        html {
+            font-size: 14px;
+        }
+
+        .sidebar-chat-item:hover .sidebar-chat-menu-btn {
+            opacity: 1;
+        }
+
+        /* ===== WORLD-CLASS SHOPIFY WINTER '24 LIGHT MODE ===== */
+        html:not(.dark) {
+            /* Palette: Industrial Silver & Electric Cobalt */
+            --simon-bg: #F6F8FA;
+            --simon-bg-panel: rgba(255, 255, 255, 0.75);
+            --simon-accent: #5C5FEE;
+            --simon-text: #1A1C1D;
+            --simon-border: rgba(0, 0, 0, 0.06);
+
+            /* Professional: solid background only (no mesh gradients) */
+            background-color: var(--simon-bg);
+            background-image: none;
+            color: var(--simon-text);
+        }
+
+        html:not(.dark) body {
+            font-family: 'Inter', -apple-system, sans-serif !important;
+            letter-spacing: -0.01em;
+            /* Tighter letter spacing for premium look */
+            background: var(--simon-bg);
+        }
+
+        html:not(.dark) h1,
+        html:not(.dark) h2,
+        html:not(.dark) .antigravity-text {
+            letter-spacing: -0.04em !important;
+            /* "Tight" heading style */
+            background: linear-gradient(180deg, #1A1C1D 0%, #454749 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* World-Class Glassmorphism (Bento Box Style) */
+        html:not(.dark) .glass-card,
+        html:not(.dark) .simon-glass-panel,
+        html:not(.dark) .bento-card {
+            background: var(--simon-bg-panel);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            /* More organic Shopify corners */
+            box-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.02),
+                0 8px 24px rgba(149, 157, 165, 0.1);
+        }
+
+        /* Interactive Hover - Shopify Elastic Feel */
+        html:not(.dark) .bento-card:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-4px) scale(1.01);
+            border-color: var(--simon-accent);
+            box-shadow: 0 20px 40px rgba(92, 95, 238, 0.08);
+        }
+
+        /* Scrollbar Styling */
+        html:not(.dark) * {
+            scrollbar-color: #CBD5E1 #F1F5F9;
+        }
+
+        html:not(.dark) *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        html:not(.dark) *::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+
+        html:not(.dark) *::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+        }
+
+        html:not(.dark) *::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        /* Premium Navigation */
+        html:not(.dark) #sidebar {
+            background: rgba(255, 255, 255, 0.5) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-right: 1px solid var(--simon-border) !important;
+        }
+
+        html:not(.dark) .nav-item.active {
+            background: white !important;
+            color: #764ba2 !important;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.1) !important;
+            border-radius: 12px;
+            border: 1px solid transparent !important;
+            background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) border-box !important;
+        }
+
+        /* Sidebar Logo Area */
+        html:not(.dark) #sidebar .border-b {
+            border-color: var(--simon-border);
+        }
+
+        html:not(.dark) #sidebar img {
+            filter: drop-shadow(0 0 10px rgba(92, 95, 238, 0.2));
+        }
+
+        /* Sidebar Toggle Button - VIBRANT */
+        html:not(.dark) #sidebar-toggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+            border: none !important;
+            color: white !important;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+
+        html:not(.dark) #sidebar-toggle:hover {
+            transform: scale(1.2) rotate(180deg);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5) !important;
+        }
+
+        html:not(.dark) #sidebar-toggle svg {
+            color: white !important;
+        }
+
+        /* Navigation Items */
+        html:not(.dark) .nav-item,
+        html:not(.dark) .sidebar-nav-item {
+            color: #475569;
+        }
+
+        html:not(.dark) .nav-item:hover,
+        html:not(.dark) .sidebar-nav-item:hover {
+            color: var(--simon-accent);
+            background: rgba(92, 95, 238, 0.08);
+        }
+
+        html:not(.dark) .sidebar-nav-item.active {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.12) 0%, transparent 100%) !important;
+            color: #764ba2 !important;
+            border-left: 4px solid transparent !important;
+            border-image: linear-gradient(to bottom, #667eea, #764ba2, #f093fb) 1 !important;
+            font-weight: 700 !important;
+        }
+
+        html:not(.dark) .nav-item .icon-wrapper,
+        html:not(.dark) .sidebar-nav-item .icon-wrapper {
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        html:not(.dark) .nav-item:hover .icon-wrapper,
+        html:not(.dark) .sidebar-nav-item:hover .icon-wrapper {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        html:not(.dark) .nav-item:hover .icon-wrapper svg,
+        html:not(.dark) .sidebar-nav-item:hover .icon-wrapper svg {
+            color: white;
+        }
+
+        /* Chat Items in Sidebar */
+        html:not(.dark) .sidebar-chat-item {
+            background: #FFFFFF;
+            border: 1px solid var(--simon-border);
+        }
+
+        html:not(.dark) .sidebar-chat-item:hover {
+            background: #F8FAFC;
+            border-left: 3px solid var(--simon-accent);
+        }
+
+        html:not(.dark) .sidebar-chat-item a {
+            color: var(--simon-text);
+        }
+
+        html:not(.dark) .sidebar-chat-item:hover a {
+            color: var(--simon-accent);
+        }
+
+        html:not(.dark) .sidebar-chat-pin {
+            color: var(--simon-accent) !important;
+        }
+
+        html:not(.dark) .sidebar-chat-menu-btn {
+            color: #64748B !important;
+        }
+
+        html:not(.dark) .sidebar-chat-menu-btn:hover {
+            color: var(--simon-accent) !important;
+            background: rgba(92, 95, 238, 0.08) !important;
+        }
+
+        /* Your Chats Header */
+        html:not(.dark) #your-chats-toggle span {
+            color: #475569 !important;
+            transition: color 0.3s ease;
+        }
+
+        html:not(.dark) #your-chats-toggle:hover span {
+            color: #764ba2 !important;
+            text-shadow: 0 0 10px rgba(118, 75, 162, 0.2);
+        }
+
+        html:not(.dark) #your-chats-arrow {
+            color: #475569 !important;
+            transition: all 0.3s ease;
+        }
+
+        html:not(.dark) #your-chats-toggle:hover #your-chats-arrow {
+            color: #764ba2 !important;
+        }
+
+        /* 3. New Chat Button Premium - EXTRA VIBRANT */
+        html:not(.dark) .new-chat-btn-premium {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) !important;
+            color: white !important;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4) !important;
+            border: none !important;
+            border-radius: 9999px !important;
+            padding: 12px 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        html:not(.dark) .new-chat-btn-premium:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5) !important;
+            filter: brightness(1.1);
+        }
+
+        /* Shopify "Pill" Buttons */
+        html:not(.dark) .btn-primary,
+        html:not(.dark) .auth-submit-btn {
+            background: var(--simon-accent) !important;
+            border-radius: 9999px !important;
+            /* Full pill shape */
+            padding: 10px 24px;
+            font-weight: 600;
+            color: white !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(92, 95, 238, 0.3);
+        }
+
+        html:not(.dark) .btn-primary:hover,
+        html:not(.dark) .auth-submit-btn:hover {
+            background: #4A4DD9 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(92, 95, 238, 0.35);
+        }
+
+        html:not(.dark) button.bg-cyber-primary {
+            background: var(--simon-accent) !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(92, 95, 238, 0.3);
+        }
+
+        html:not(.dark) button.bg-cyber-primary:hover {
+            background: #4A4DD9 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(92, 95, 238, 0.2);
+        }
+
+        html:not(.dark) .btn-secondary {
+            background: #FFFFFF;
+            color: var(--simon-accent);
+            border: 1px solid var(--simon-border);
+        }
+
+        html:not(.dark) .btn-secondary:hover {
+            background: #F8FAFC;
+            border-color: var(--simon-accent);
+        }
+
+        /* Theme Toggle Button */
+        html:not(.dark) #theme-toggle-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+            border: none !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3) !important;
+        }
+
+        html:not(.dark) #theme-toggle-header:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%) !important;
+            box-shadow: 0 6px 16px rgba(240, 147, 251, 0.4) !important;
+        }
+
+        html:not(.dark) #theme-toggle-header svg {
+            color: white !important;
+        }
+
+        /* Admin Dropdown Button */
+        html:not(.dark) .relative.group.z-50>button {
+            background: #FFFFFF !important;
+            border: 1px solid var(--simon-border) !important;
+            color: var(--simon-text) !important;
+        }
+
+        html:not(.dark) .relative.group.z-50>button:hover {
+            background: white !important;
+            border: 2px solid transparent !important;
+            background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%) border-box !important;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.15) !important;
+        }
+
+        html:not(.dark) .relative.group.z-50>button svg,
+        html:not(.dark) .relative.group.z-50>button span {
+            color: #475569 !important;
+        }
+
+        /* Admin Dropdown Button Dark Mode */
+        html.dark .relative.group.z-50>button:hover {
+            border-color: transparent !important;
+            background: linear-gradient(#1e293b, #1e293b) padding-box,
+                linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%) border-box !important;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3) !important;
+        }
+
+        /* Theme Toggle Dark Mode */
+        html.dark #theme-toggle-header {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%) !important;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4) !important;
+        }
+
+        html.dark #theme-toggle-header:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5) !important;
+        }
+
+        /* Cards */
+        html:not(.dark) .card,
+        html:not(.dark) .glass-card {
+            background: #FFFFFF;
+            border: 1px solid var(--simon-border);
+            box-shadow: 0 2px 8px rgba(149, 157, 165, 0.1);
+        }
+
+        html:not(.dark) .card:hover,
+        html:not(.dark) .glass-card:hover {
+            box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15);
+            border-color: var(--simon-accent);
+            transform: translateY(-2px);
+        }
+
+        /* Inputs */
+        html:not(.dark) input,
+        html:not(.dark) textarea,
+        html:not(.dark) select {
+            background: #FFFFFF;
+            border: 1px solid #CBD5E1;
+            color: var(--simon-text);
+        }
+
+        html:not(.dark) input:focus,
+        html:not(.dark) textarea:focus,
+        html:not(.dark) select:focus {
+            border-color: var(--simon-accent);
+            box-shadow: 0 0 0 3px rgba(92, 95, 238, 0.1);
+            outline: none;
+        }
+
+        html:not(.dark) input::placeholder,
+        html:not(.dark) textarea::placeholder {
+            color: #94A3B8;
+        }
+
+        /* Dropdowns */
+        html:not(.dark) .dropdown-menu,
+        html:not(.dark) [role="menu"] {
+            background: #FFFFFF;
+            border: 1px solid var(--simon-border);
+            box-shadow: 0 4px 12px rgba(149, 157, 165, 0.12);
+        }
+
+        html:not(.dark) .dropdown-item,
+        html:not(.dark) [role="menuitem"] {
+            color: var(--simon-text);
+        }
+
+        html:not(.dark) .dropdown-item:hover,
+        html:not(.dark) [role="menuitem"]:hover {
+            background: rgba(92, 95, 238, 0.08);
+            color: var(--simon-accent);
+        }
+
+        /* Context Menu */
+        html:not(.dark) #session-context-menu {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid var(--simon-border) !important;
+            box-shadow: 0 4px 12px rgba(149, 157, 165, 0.15) !important;
+        }
+
+        html:not(.dark) #session-context-menu .menu-item {
+            color: var(--simon-text);
+        }
+
+        html:not(.dark) #session-context-menu .menu-item:hover {
+            background: rgba(92, 95, 238, 0.08);
+            color: var(--simon-accent);
+        }
+
+        /* Transitions */
+        html:not(.dark) * {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Focus States */
+        html:not(.dark) *:focus-visible {
+            outline: 2px solid var(--simon-accent);
+            outline-offset: 2px;
+        }
+
+        /* ===== DASHBOARD CRAZY-CARDS LIGHT MODE ===== */
+        html:not(.dark) .crazy-card {
+            background: #FFFFFF;
+            border: 1px solid var(--simon-border);
+            box-shadow: 0 2px 8px rgba(149, 157, 165, 0.08);
+        }
+
+        html:not(.dark) .crazy-card:hover {
+            border-color: var(--simon-accent);
+            box-shadow: 0 12px 32px rgba(149, 157, 165, 0.15);
+        }
+
+        /* Card glow effect */
+        html:not(.dark) .crazy-card::before {
+            background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    rgba(92, 95, 238, 0.06), transparent 40%);
+        }
+
+        /* Icon Wrapper */
+        html:not(.dark) .crazy-card-icon-wrapper {
+            background: rgba(92, 95, 238, 0.08) !important;
+            border: 1px solid rgba(92, 95, 238, 0.2);
+        }
+
+        html:not(.dark) .crazy-card:hover .crazy-card-icon-wrapper {
+            background: rgba(92, 95, 238, 0.12) !important;
+            border-color: var(--simon-accent);
+        }
+
+        /* Live Indicator */
+        html:not(.dark) .live-indicator {
+            background: #F8FAFC;
+            color: #10B981;
+            border: 1px solid var(--simon-border);
+        }
+
+        html:not(.dark) .live-indicator .bg-green-500 {
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Sparkline */
+        html:not(.dark) .crazy-sparkline {
+            color: var(--simon-accent);
+            filter: drop-shadow(0 0 4px rgba(92, 95, 238, 0.3));
+        }
+
+        /* Tags */
+        html:not(.dark) .crazy-card .text-\[10px\] {
+            background: #F1F5F9 !important;
+            border-color: var(--simon-border) !important;
+            color: #475569 !important;
+        }
+
+        html:not(.dark) .crazy-card .text-accent {
+            color: var(--simon-accent) !important;
+        }
+
+        /* Dashboard Header */
+        html:not(.dark) .border-slate-200 {
+            border-color: var(--simon-border) !important;
+        }
+
+        html:not(.dark) h1.text-gray-900 {
+            color: var(--simon-text) !important;
+        }
+
+        /* 5. Professional Chat Bubbles */
+        html:not(.dark) .simon-chat-bubble.assistant {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%) !important;
+            color: #1e293b !important;
+            border: 2px solid transparent !important;
+            background-clip: padding-box;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(100, 116, 139, 0.15), 0 2px 8px rgba(15, 23, 42, 0.08) !important;
+        }
+
+        html:not(.dark) .simon-chat-bubble.assistant::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        html:not(.dark) .simon-chat-bubble.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            box-shadow: 0 12px 28px rgba(102, 126, 234, 0.35), 0 4px 12px rgba(118, 75, 162, 0.2) !important;
+            border: none !important;
+        }
+
+        /* Dark mode chat bubbles - enhanced with glow effects */
+        html.dark .simon-chat-bubble.assistant {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+            color: #e2e8f0 !important;
+            border: 1px solid rgba(6, 182, 212, 0.3) !important;
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15), 0 0 20px rgba(6, 182, 212, 0.05) !important;
+        }
+
+        html.dark .simon-chat-bubble.user {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%) !important;
+            color: white !important;
+            box-shadow: 0 12px 28px rgba(6, 182, 212, 0.4), 0 0 30px rgba(6, 182, 212, 0.2) !important;
+            border: 1px solid rgba(6, 182, 212, 0.4) !important;
+        }
+
+        /* The Input Area */
+        html:not(.dark) .simon-chat-form-inner {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border: 1px solid var(--simon-border) !important;
+            box-shadow: 0 10px 30px -10px rgba(149, 157, 165, 0.1) !important;
+        }
+    </style>
+    <script>
+        // Critical: Apply theme immediately to prevent flicker
+        (function () {
+            const currentClass = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            const savedTheme = localStorage.getItem('simon_theme');
+
+            // If we have a saved theme that contradicts the server-rendered class, sync it
+            if (savedTheme && savedTheme !== currentClass) {
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } else if (!savedTheme) {
+                // If no saved theme, use what server gave us as the baseline
+                localStorage.setItem('simon_theme', currentClass);
+            }
+        })();
+    </script>
+
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/simon_upgrade.js') }}" defer></script>
+
+    <!-- Authentication Modal JavaScript (Loaded in head to ensure availability) -->
+    <script>
+        // ===================================
+        // Authentication Modal Functions
+        // ===================================
+
+        // Auto-sliding carousel
+        var authModalCurrentSlide = 0;
+        var authModalSlideInterval;
+        const authModalSlideDelay = 4000; // 4 seconds
+
+        function showAuthModalSlide(index) {
+            const slides = document.querySelectorAll('.auth-slider-slide');
+            const dots = document.querySelectorAll('.auth-slider-dot');
+
+            // Remove active class from all slides and dots
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            // Add active class to current slide and dot
+            if (slides[index]) {
+                slides[index].classList.add('active');
+                dots[index].classList.add('active');
+            }
+
+            authModalCurrentSlide = index;
+        }
+
+        function nextAuthModalSlide() {
+            const slides = document.querySelectorAll('.auth-slider-slide');
+            let next = (authModalCurrentSlide + 1) % slides.length;
+            showAuthModalSlide(next);
+        }
+
+        function goToAuthModalSlide(index) {
+            showAuthModalSlide(index);
+            // Reset the interval
+            clearInterval(authModalSlideInterval);
+            authModalSlideInterval = setInterval(nextAuthModalSlide, authModalSlideDelay);
+        }
+
+        // Start auto-sliding when modal is opened
+        function startAuthModalSlideshow() {
+            authModalSlideInterval = setInterval(nextAuthModalSlide, authModalSlideDelay);
+        }
+
+        function stopAuthModalSlideshow() {
+            clearInterval(authModalSlideInterval);
+        }
+
+        // Open modal
+        function openAuthModal(tab = 'login') {
+            console.log('openAuthModal called with tab:', tab);
+            const modal = document.getElementById('authModal');
+            console.log('Modal element:', modal);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                clearAuthErrors();
+                switchAuthTab(tab);
+                startAuthModalSlideshow();
+                console.log('Modal opened successfully');
+            } else {
+                console.error('Modal element not found!');
+            }
+        }
+
+        // Close modal
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+                stopAuthModalSlideshow();
+            }
+        }
+
+        // Switch between login and signup tabs
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const tabBtns = document.querySelectorAll('.auth-tab-btn');
+
+            if (tab === 'login') {
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+                tabBtns[0].classList.add('active');
+                tabBtns[1].classList.remove('active');
+            } else if (tab === 'signup') {
+                signupForm.classList.add('active');
+                loginForm.classList.remove('active');
+                tabBtns[1].classList.add('active');
+                tabBtns[0].classList.remove('active');
+            }
+        }
+
+        // Toggle password visibility for auth modal
+        function toggleAuthPassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const svg = button.querySelector('svg');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                // Eye open icon
+                svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+                button.style.color = 'var(--simon-accent)';
+            } else {
+                input.type = 'password';
+                // Eye closed icon
+                svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>';
+                button.style.color = '';
+            }
+        }
+
+        // Social login placeholder
+        function socialLogin(provider) {
+            console.log('Social login with:', provider);
+            alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login coming soon!`);
+        }
+
+        // Set up event listeners when DOM is ready or Turbo loads
+        document.addEventListener('turbo:load', function () {
+            const modal = document.getElementById('authModal');
+            if (modal) {
+                // Close modal when clicking outside
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) {
+                        closeAuthModal();
+                    }
+                });
+            }
+
+            // Close modal on Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+                    closeAuthModal();
+                }
+            });
+
+            console.log('Auth modal functions loaded successfully');
+
+            // Handle Login Form Submission
+            const loginFormEl = document.querySelector('#loginForm form');
+            if (loginFormEl) {
+                loginFormEl.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const data = Object.fromEntries(formData.entries());
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+
+                    try {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span>Signing In...</span>';
+
+                        const response = await fetch(this.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            // Sync theme from localStorage before redirecting
+                            const localTheme = localStorage.getItem('simon_theme');
+                            if (localTheme === 'dark' || localTheme === 'light') {
+                                try {
+                                    await fetch('/api/user/theme', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-Requested-With': 'XMLHttpRequest',
+                                            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                                        },
+                                        body: JSON.stringify({ theme: localTheme })
+                                    });
+                                } catch (e) {
+                                    console.error('Theme sync error on login:', e);
+                                }
+                            }
+                            window.location.href = result.redirect_url || '/dashboard';
+                        } else {
+                            showAuthError('login', result.message || 'Invalid credentials');
+                        }
+                    } catch (error) {
+                        console.error('Login error:', error);
+                        showAuthError('login', 'An unexpected error occurred. Please try again.');
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                    }
+                });
+            }
+
+            // Handle Signup Form Submission
+            const signupFormEl = document.querySelector('#signupForm form');
+            if (signupFormEl) {
+                signupFormEl.addEventListener('submit', async function (e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const data = Object.fromEntries(formData.entries());
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+
+                    try {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span>Creating Account...</span>';
+
+                        const response = await fetch(this.action, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify(data)
+                        });
+
+                        const result = await response.json();
+                        if (result.success) {
+                            // Clear form
+                            this.reset();
+                            // Switch to login and show success message
+                            switchAuthTab('login');
+                            showAuthError('login', result.message, 'success');
+                        } else {
+                            showAuthError('signup', result.message || 'Registration failed');
+                        }
+                    } catch (error) {
+                        console.error('Signup error:', error);
+                        showAuthError('signup', 'An unexpected error occurred. Please try again.');
+                    } finally {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                    }
+                });
+            }
+        });
+
+        function showAuthError(formType, message, type = 'error') {
+            const form = document.getElementById(formType + 'Form');
+            let errorContainer = form.querySelector('.auth-error-message');
+
+            if (!errorContainer) {
+                errorContainer = document.createElement('div');
+                errorContainer.className = 'auth-error-message mb-4 p-3 rounded text-sm border-l-4';
+                form.insertBefore(errorContainer, form.querySelector('form'));
+            }
+
+            if (type === 'success') {
+                errorContainer.className = 'auth-error-message mb-4 p-3 rounded text-sm border-l-4 bg-green-900/50 border-green-500 text-green-200';
+            } else {
+                errorContainer.className = 'auth-error-message mb-4 p-3 rounded text-sm border-l-4 bg-red-900/50 border-red-500 text-red-200';
+            }
+
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+        }
+
+        function clearAuthErrors() {
+            document.querySelectorAll('.auth-error-message').forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+        }
+
+        // Global AJAX CSRF Setup
+        (function () {
+            const originalFetch = window.fetch;
+            window.fetch = function (url, options = {}) {
+                const method = (options.method || 'GET').toUpperCase();
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                if (!['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method) && csrfToken) {
+                    options.headers = options.headers || {};
+                    if (options.headers instanceof Headers) {
+                        options.headers.set('X-CSRFToken', csrfToken);
+                    } else if (Array.isArray(options.headers)) {
+                        // Handle array of arrays
+                        const hasToken = options.headers.some(([k]) => k.toLowerCase() === 'x-csrftoken');
+                        if (!hasToken) options.headers.push(['X-CSRFToken', csrfToken]);
+                    } else {
+                        // Handle plain object
+                        if (!options.headers['X-CSRFToken'] && !options.headers['x-csrftoken']) {
+                            options.headers['X-CSRFToken'] = csrfToken;
+                        }
+                    }
+                }
+                return originalFetch(url, options);
+            };
+        })();
+    </script>
+
+
+
+<body
+    class="text-gray-900 dark:text-textMain bg-slate-50 dark:bg-primary min-h-screen flex flex-col font-sans relative">
+    <!-- Global Glass Background (Excluded on Landing Page) -->
+    {% if request.endpoint != 'main.index' %}
+    <canvas id="neuro-bg-canvas"></canvas>
+    {% endif %}
+
+
+    <!-- Premium Glow Layer -->
+    <div class="simon-bg-glow-container">
+        <div class="simon-bg-blob blob-1"></div>
+        <div class="simon-bg-blob blob-2"></div>
+        <div class="simon-bg-blob blob-3"></div>
+    </div>
+
+    <!-- Navigation -->
+    {% block header %}{% endblock %}
+
+    {% block sidebar %}
+    {% include 'partials/_sidebar.html' %}
+    {% endblock %}
+
+    <!-- Main Content Wrapper -->
+    <div id="main-content"
+        class="flex-grow flex flex-col transition-all duration-500 {% block main_margin %}ml-16{% endblock %} w-auto relative">
+        <!-- Content -->
+        <main class="flex-grow w-full p-6">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for category, message in messages %}
+                <div
+                    class="p-3 rounded border-l-4 {{ 'bg-red-900 border-red-500' if category == 'danger' else 'bg-green-900 border-green-500' }} text-sm opacity-90">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+
+        {% if request.endpoint == 'main.index' %}
+        <footer class="text-center p-4 text-xs text-textSoft border-t border-gray-200 dark:border-gray-800 mt-auto">
+            &copy; {{ as_year }} SIA
+        </footer>
+        {% endif %}
+    </div>
+
+    <!-- Shared context menu for chat actions -->
+    <div id="session-context-menu"></div>
+
+    {% block scripts %}{% endblock %}
+
+    <script>
+        document.addEventListener('turbo:load', () => {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            const arrow = document.getElementById('sidebar-arrow');
+            const texts = document.querySelectorAll('.sidebar-text');
+
+            // Persistent Sidebar State
+            const savedState = localStorage.getItem('simon_sidebar_expanded');
+            let isExpanded = savedState === 'true';
+
+            // Initial State Apply
+            if (isExpanded && sidebar) {
+                expandSidebar(false);
+            }
+
+            if (sidebar && toggleBtn && mainContent) {
+                toggleBtn.addEventListener('click', () => {
+                    isExpanded = !isExpanded;
+                    localStorage.setItem('simon_sidebar_expanded', isExpanded);
+                    if (isExpanded) expandSidebar();
+                    else collapseSidebar();
+                });
+            }
+
+            function expandSidebar(animate = true) {
+                if (!sidebar || !mainContent) return;
+                sidebar.classList.remove('w-16');
+                sidebar.classList.add('w-64');
+                mainContent.classList.remove('ml-16');
+                mainContent.classList.add('ml-64');
+                if (arrow) {
+                    arrow.classList.remove('rotate-180');
+                    arrow.classList.add('rotate-0');
+                }
+                texts.forEach(text => {
+                    text.classList.remove('hidden');
+                    if (animate) setTimeout(() => text.classList.remove('opacity-0'), 50);
+                    else text.classList.remove('opacity-0');
+                });
+            }
+
+            function collapseSidebar() {
+                if (!sidebar || !mainContent) return;
+                sidebar.classList.remove('w-64');
+                sidebar.classList.add('w-16');
+                mainContent.classList.remove('ml-64');
+                mainContent.classList.add('ml-16');
+                if (arrow) {
+                    arrow.classList.remove('rotate-0');
+                    arrow.classList.add('rotate-180');
+                }
+                texts.forEach(text => {
+                    text.classList.add('opacity-0');
+                    setTimeout(() => text.classList.add('hidden'), 300);
+                });
+            }
+
+            // --- Sidebar Mode Selector Removed (now in chat header) ---
+            // Mode selector functionality moved to search.html chat header
+
+            // --- Advance Mode Selector Removed (now handled via '+' menu in chat interface) ---
+
+            // Helper to close all dropdowns (kept for compatibility, but no dropdowns to close now)
+            function closeAllDropdowns() {
+                // All dropdowns removed from sidebar
+            }
+
+
+            // --- Visual Intel Toggle Logic ---
+            const visToggle = document.getElementById('vis-intel-toggle');
+            const visKnob = document.getElementById('vis-intel-knob');
+            // Default to closed (user can open via sidebar toggle)
+            // Default to true if not set
+            let visEnabled = localStorage.getItem('simon_vis_enabled');
+            if (visEnabled === null) {
+                visEnabled = true;
+                localStorage.setItem('simon_vis_enabled', 'true');
+            } else {
+                visEnabled = visEnabled === 'true';
+            }
+
+            updateVisUI();
+
+            if (visToggle) {
+                visToggle.addEventListener('click', (e) => {
+                    e.preventDefault(); // Prevent any default button behavior
+                    visEnabled = !visEnabled;
+                    localStorage.setItem('simon_vis_enabled', visEnabled);
+                    console.log("[Base] Toggling Visual Intel to:", visEnabled);
+                    updateVisUI();
+                    window.dispatchEvent(new CustomEvent('vis-toggle', { detail: { enabled: visEnabled } }));
+                });
+            }
+
+            function updateVisUI() {
+                if (visKnob) {
+                    if (visEnabled) {
+                        visKnob.classList.add('translate-x-4');
+                        visKnob.classList.remove('translate-x-0');
+                    } else {
+                        visKnob.classList.remove('translate-x-4');
+                        visKnob.classList.add('translate-x-0');
+                    }
+                }
+            }
+
+            // Sync knob when panel is opened elsewhere (e.g. auto-open on image response)
+            window.addEventListener('vis-toggle', (e) => {
+                if (e.detail && typeof e.detail.enabled === 'boolean') {
+                    visEnabled = e.detail.enabled;
+                    updateVisUI();
+                }
+            });
+
+            // --- Flow Diagram Toggle Logic ---
+            const flowToggle = document.getElementById('flow-diagram-toggle');
+            const flowKnob = document.getElementById('flow-diagram-knob');
+            let flowEnabled = localStorage.getItem('simon_flow_diagram_enabled');
+            if (flowEnabled === null) {
+                flowEnabled = false;
+                localStorage.setItem('simon_flow_diagram_enabled', 'false');
+            } else {
+                flowEnabled = flowEnabled === 'true';
+            }
+
+            updateFlowUI();
+
+            if (flowToggle) {
+                flowToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    flowEnabled = !flowEnabled;
+                    localStorage.setItem('simon_flow_diagram_enabled', flowEnabled);
+                    console.log("[Base] Toggling Flow Diagram to:", flowEnabled);
+                    updateFlowUI();
+                    window.dispatchEvent(new CustomEvent('flow-diagram-toggle', { detail: { enabled: flowEnabled } }));
+                });
+            }
+
+            function updateFlowUI() {
+                if (flowKnob) {
+                    if (flowEnabled) {
+                        flowKnob.classList.add('translate-x-4');
+                        flowKnob.classList.remove('translate-x-0');
+                    } else {
+                        flowKnob.classList.remove('translate-x-4');
+                        flowKnob.classList.add('translate-x-0');
+                    }
+                }
+            }
+
+            window.addEventListener('flow-diagram-toggle', (e) => {
+                if (e.detail && typeof e.detail.enabled === 'boolean') {
+                    flowEnabled = e.detail.enabled;
+                    updateFlowUI();
+                }
+            });
+
+            // --- Your Chats Toggle Logic ---
+            const yourChatsToggle = document.getElementById('your-chats-toggle');
+            const yourChatsList = document.getElementById('your-chats-list');
+            const yourChatsArrow = document.getElementById('your-chats-arrow');
+            let yourChatsExpanded = localStorage.getItem('simon_your_chats_expanded') === 'true';
+
+            const sidebarContextMenu = document.getElementById('session-context-menu');
+            let activeSidebarChatId = null;
+
+            if (yourChatsToggle && yourChatsList && yourChatsArrow) {
+                // Initial state
+                if (yourChatsExpanded) {
+                    yourChatsList.classList.remove('hidden');
+                    yourChatsArrow.classList.add('rotate-90');
+                }
+
+                yourChatsToggle.addEventListener('click', () => {
+                    yourChatsExpanded = !yourChatsExpanded;
+                    localStorage.setItem('simon_your_chats_expanded', yourChatsExpanded);
+
+                    if (yourChatsExpanded) {
+                        yourChatsList.classList.remove('hidden');
+                        yourChatsArrow.classList.add('rotate-90');
+                        loadYourChats();
+                    } else {
+                        yourChatsList.classList.add('hidden');
+                        yourChatsArrow.classList.remove('rotate-90');
+                    }
+                });
+
+                // Load chats if expanded on page load
+                if (yourChatsExpanded) {
+                    loadYourChats();
+                }
+            }
+
+            // Load Your Chats
+            async function loadYourChats() {
+                const chatsList = document.getElementById('your-chats-list');
+                if (!chatsList) return;
+
+                try {
+                    // Get current project name from URL or use a default
+                    const currentPath = window.location.pathname;
+                    const projectMatch = currentPath.match(/\/project\/([^\/]+)/);
+                    const projectName = projectMatch ? projectMatch[1] : null;
+
+                    if (!projectName) {
+                        chatsList.innerHTML = '<div class="p-2 text-xs text-textSoft italic">No project selected</div>';
+                        return;
+                    }
+
+                    const res = await fetch(`/api/chat/sessions/${projectName}`);
+                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+                    const data = await res.json();
+                    if (!Array.isArray(data)) {
+                        chatsList.innerHTML = '<div class="p-2 text-xs text-textSoft italic">No chats available</div>';
+                        return;
+                    }
+
+                    if (data.length === 0) {
+                        chatsList.innerHTML = '<div class="p-2 text-xs text-textSoft italic">No chats yet</div>';
+                        return;
+                    }
+
+                    chatsList.innerHTML = '';
+                    data.forEach(chat => {
+                        const chatItem = document.createElement('div');
+                        chatItem.className = 'sidebar-chat-item group/chatitem flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors';
+                        chatItem.dataset.chatId = chat.id;
+
+                        const pinIconRight = chat.is_pinned
+                            ? '<span class="sidebar-chat-pin shrink-0 inline-flex items-center justify-center w-6 h-6 text-accent" title="Pinned"><svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 12V4H17V2H7V4H8V12L6 14V16H11V22H13V16H18V14L16 12Z" /></svg></span>'
+                            : '';
+
+                        const escapedTitle = chat.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        chatItem.innerHTML = `
+                            <a href="/project/${projectName}?chat=${chat.id}" 
+                               onclick="if(typeof window.switchSession === 'function') { event.preventDefault(); window.switchSession(${chat.id}); window.history.pushState({}, '', this.href); }"
+                               class="text-xs text-white truncate flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap" title="${escapedTitle}">
+                                ${chat.title}
+                            </a>
+                            <div class="flex items-center gap-0.5 flex-none">
+                                ${pinIconRight}
+                                <button
+                                    class="sidebar-chat-menu-btn w-6 h-6 flex items-center justify-center text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-white/10 opacity-0 transition-opacity"
+                                    title="More options"
+                                    onclick="event.stopPropagation(); openSidebarChatMenu(event, ${chat.id}, ${chat.is_pinned}, '${escapedTitle}')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+                        `;
+                        chatsList.appendChild(chatItem);
+                    });
+                } catch (error) {
+                    console.error('Error loading chats:', error);
+                    chatsList.innerHTML = '<div class="p-2 text-xs text-red-400">Failed to load chats</div>';
+                }
+            }
+
+            // Sidebar Chat Management Functions
+            window.sidebarTogglePin = async function (chatId) {
+                try {
+                    const res = await fetch(`/api/chat/session/${chatId}/pin`, { method: 'POST' });
+                    const data = await res.json();
+                    if (data.success) {
+                        loadYourChats();
+                    }
+                } catch (error) {
+                    console.error('Error toggling pin:', error);
+                }
+            };
+
+            window.sidebarEditChat = function (chatId, currentTitle) {
+                const chatItem = document.querySelector(`[data-chat-id="${chatId}"]`);
+                if (!chatItem) return;
+
+                const titleLink = chatItem.querySelector('a');
+                if (!titleLink) return;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'w-full px-2 py-1 text-xs bg-white/10 border border-white/20 rounded text-white focus:outline-none focus:border-accent';
+                input.value = currentTitle;
+                input.onclick = (e) => e.stopPropagation();
+
+                titleLink.replaceWith(input);
+                input.focus();
+                input.select();
+
+                const save = async () => {
+                    const newTitle = input.value.trim();
+                    if (newTitle && newTitle !== currentTitle) {
+                        try {
+                            const res = await fetch(`/api/chat/session/${chatId}/title`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ title: newTitle })
+                            });
+                            const data = await res.json();
+                            if (data.success) {
+                                loadYourChats();
+                            }
+                        } catch (error) {
+                            console.error('Error updating title:', error);
+                        }
+                    } else {
+                        loadYourChats();
+                    }
+                };
+
+                input.addEventListener('blur', save);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        input.blur();
+                    } else if (e.key === 'Escape') {
+                        loadYourChats();
+                    }
+                });
+            };
+
+            window.sidebarDeleteChat = async function (chatId) {
+                // Use premium modal if available, otherwise fallback to confirm
+                if (window.showPremiumConfirm) {
+                    const confirmed = await window.showPremiumConfirm({
+                        theme: 'danger',
+                        icon: 'trash',
+                        title: 'Delete this chat?',
+                        description: 'This action cannot be undone. All messages in this conversation will be permanently removed.',
+                        confirmText: 'Delete',
+                        cancelText: 'Keep'
+                    });
+                    if (!confirmed) return;
+                } else {
+                    if (!confirm('Are you sure you want to delete this chat?')) return;
+                }
+
+                try {
+                    const res = await fetch(`/api/chat/session/${chatId}`, { method: 'DELETE' });
+                    const data = await res.json();
+                    if (data.success) {
+                        loadYourChats();
+                    }
+                } catch (error) {
+                    console.error('Error deleting chat:', error);
+                }
+            };
+
+            // Share Chat from sidebar
+            window.sidebarShareChat = async function (chatId) {
+                try {
+                    const res = await fetch(`/api/chat/session/${chatId}/share`, { method: 'POST' });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        throw new Error(data.error || 'Could not create share link');
+                    }
+                    await navigator.clipboard.writeText(data.share_url);
+                    // Show a brief toast-like feedback
+                    const toast = document.createElement('div');
+                    toast.textContent = '✓ Share link copied!';
+                    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(16,185,129,0.95);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:opacity 0.3s;';
+                    document.body.appendChild(toast);
+                    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2000);
+                } catch (error) {
+                    console.error('Error sharing chat:', error);
+                    const toast = document.createElement('div');
+                    toast.textContent = '✗ ' + (error.message || 'Could not share');
+                    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(239,68,68,0.95);color:white;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:10000;box-shadow:0 4px 12px rgba(0,0,0,0.3);transition:opacity 0.3s;';
+                    document.body.appendChild(toast);
+                    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 2500);
+                }
+            };
+
+            // Shared context menu for sidebar chats (Pin / Rename / Share / Delete)
+            window.closeSidebarChatMenu = function () {
+                if (!sidebarContextMenu) return;
+                sidebarContextMenu.style.display = 'none';
+                activeSidebarChatId = null;
+                document.removeEventListener('click', window.closeSidebarChatMenu);
+            };
+
+            window.openSidebarChatMenu = function (e, chatId, isPinned, title) {
+                if (!sidebarContextMenu) return;
+
+                e.preventDefault();
+
+                // Toggle off if clicking same chat again
+                if (sidebarContextMenu.style.display === 'block' && activeSidebarChatId === chatId) {
+                    window.closeSidebarChatMenu();
+                    return;
+                }
+
+                activeSidebarChatId = chatId;
+
+                // Basic inline styles to ensure visibility (in case page CSS doesn't define them)
+                sidebarContextMenu.style.position = 'fixed';
+                sidebarContextMenu.style.zIndex = '1000';
+                sidebarContextMenu.style.background = 'rgba(15, 23, 42, 0.95)';
+                sidebarContextMenu.style.border = '1px solid rgba(46, 230, 255, 0.2)';
+                sidebarContextMenu.style.borderRadius = '12px';
+                sidebarContextMenu.style.padding = '6px';
+                sidebarContextMenu.style.minWidth = '160px';
+                sidebarContextMenu.style.backdropFilter = 'blur(12px)';
+                sidebarContextMenu.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.5)';
+
+                sidebarContextMenu.innerHTML = `
+                    <div class="menu-item" onclick="sidebarTogglePin(${chatId}); closeSidebarChatMenu();">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="${isPinned ? 'M3 3l18 18M16 12V4H17V2H7V4H8V12L6 14V16H11V22H13V16H18V14L16 12' : 'M16 12V4H17V2H7V4H8V12L6 14V16H11V22H13V16H18V14L16 12Z'}">
+                            </path>
+                        </svg>
+                        ${isPinned ? 'Unpin Chat' : 'Pin Chat'}
+                    </div>
+                    <div class="menu-item" onclick="sidebarEditChat(${chatId}, '${title}'); closeSidebarChatMenu();">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                            </path>
+                        </svg>
+                        Rename
+                    </div>
+                    <div class="menu-item" onclick="sidebarShareChat(${chatId}); closeSidebarChatMenu();">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
+                            </path>
+                        </svg>
+                        Share Chat
+                    </div>
+                    <div class="menu-item delete" onclick="sidebarDeleteChat(${chatId}); closeSidebarChatMenu();">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                            </path>
+                        </svg>
+                        Delete Chat
+                    </div>
+                `;
+
+                const menuWidth = 180;
+                const menuHeight = 180;
+                let x = e.clientX + 10;
+                let y = e.clientY + 10;
+
+                if (x + menuWidth > window.innerWidth) x = e.clientX - menuWidth - 10;
+                if (y + menuHeight > window.innerHeight) y = e.clientY - menuHeight - 10;
+
+                sidebarContextMenu.style.left = `${x}px`;
+                sidebarContextMenu.style.top = `${y}px`;
+                sidebarContextMenu.style.display = 'block';
+
+                // Close on outside click
+                setTimeout(() => {
+                    document.addEventListener('click', window.closeSidebarChatMenu);
+                }, 0);
+            };
+
+            // --- New Chat Button Logic ---
+            const sidebarNewChat = document.getElementById('sidebar-new-chat');
+            if (sidebarNewChat) {
+                sidebarNewChat.addEventListener('click', () => {
+                    window.dispatchEvent(new CustomEvent('new-chat-trigger'));
+                    // Refresh chats list after a short delay
+                    setTimeout(() => {
+                        if (yourChatsExpanded && yourChatsList && !yourChatsList.classList.contains('hidden')) {
+                            loadYourChats();
+                        }
+                    }, 500);
+                });
+            }
+
+            // Listen for chat updates to refresh sidebar
+            window.addEventListener('chat-updated', () => {
+                if (yourChatsExpanded && yourChatsList && !yourChatsList.classList.contains('hidden')) {
+                    loadYourChats();
+                }
+            });
+
+
+            // Toggle Pin
+            window.togglePin = async function (chatId) {
+                try {
+                    const response = await fetch(`/api/chat/pin/${chatId}`, { method: 'POST' });
+                    const result = await response.json();
+                    if (result.success) {
+                        window.location.reload(); // Reload to update the sidebar organization
+                    }
+                } catch (error) {
+                    console.error("Error pinning chat:", error);
+                }
+            }
+
+            // --- Theme Toggle Logic (Header) ---
+            function initThemeToggle() {
+                const themeToggleBtn = document.getElementById('theme-toggle-header');
+                const sunIcon = document.getElementById('theme-icon-sun-header');
+                const moonIcon = document.getElementById('theme-icon-moon-header');
+                const html = document.documentElement;
+
+                // Check for authenticated user (passed from template)
+                const isAuthenticated = JSON.parse('{{ current_user.is_authenticated | tojson }}');
+
+                function applyTheme(theme) {
+                    if (theme === 'dark') {
+                        html.classList.add('dark');
+                        if (sunIcon) sunIcon.classList.add('hidden');
+                        if (moonIcon) moonIcon.classList.remove('hidden');
+                    } else {
+                        html.classList.remove('dark');
+                        if (sunIcon) sunIcon.classList.remove('hidden');
+                        if (moonIcon) moonIcon.classList.add('hidden');
+                    }
+                    localStorage.setItem('simon_theme', theme);
+
+                    // Dispatch event
+                    window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: theme } }));
+                }
+
+                // Initial Load
+                let currentTheme = localStorage.getItem('simon_theme') || 'dark';
+                // Ensure initial visual state matches
+                applyTheme(currentTheme);
+
+                // If logged in, fetch from DB only if we don't have a reliable local state
+                if (isAuthenticated) {
+                    // We can skip this fetch if the page was just rendered with the correct class
+                    // but we do it once to ensure local/remote sync
+                    fetch('/api/user/theme')
+                        .then(res => {
+                            if (!res.ok) throw new Error('Network response was not ok');
+                            return res.json();
+                        })
+                        .then(data => {
+                            if (data.theme && (data.theme === 'light' || data.theme === 'dark')) {
+                                if (data.theme !== currentTheme) {
+                                    applyTheme(data.theme);
+                                }
+                            }
+                        })
+                        .catch(err => {
+                            console.warn('Error fetching theme sync:', err);
+                            // Even if fetch fails, we stay with currentTheme
+                        });
+                }
+
+                if (themeToggleBtn) {
+                    themeToggleBtn.addEventListener('click', () => {
+                        const isDark = html.classList.contains('dark');
+                        const newTheme = isDark ? 'light' : 'dark';
+                        applyTheme(newTheme);
+
+                        if (isAuthenticated) {
+                            fetch('/api/user/theme', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ theme: newTheme })
+                            }).catch(err => console.error('Error saving theme:', err));
+                        }
+                    });
+                }
+            }
+
+            initThemeToggle();
+        });
+    </script>
+
+    <!-- Authentication Modal -->
+    <div id="authModal" class="auth-modal-overlay">
+        <div class="auth-modal-container">
+            <!-- Close Button -->
+            <button class="auth-modal-close" onclick="closeAuthModal()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+
+            <!-- Split Layout -->
+            <div class="auth-modal-split">
+                <!-- Left Side - Image Slider -->
+                <div class="auth-modal-slider">
+                    <div class="auth-slider-track">
+                        <!-- Slide 1 -->
+                        <div class="auth-slider-slide active">
+                            <div class="auth-slide-overlay"></div>
+                            <div class="auth-slide-content">
+                                <div class="auth-slide-icon">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h3 class="auth-slide-title">Welcome to SIA</h3>
+                                <p class="auth-slide-description">
+                                    Experience the future of AI-powered conversations with cutting-edge technology and
+                                    intuitive design.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="auth-slider-slide">
+                            <div class="auth-slide-overlay"></div>
+                            <div class="auth-slide-content">
+                                <div class="auth-slide-icon">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="auth-slide-title">Lightning Fast</h3>
+                                <p class="auth-slide-description">
+                                    Get instant responses powered by advanced AI models. Work smarter, not harder with
+                                    real-time intelligence.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="auth-slider-slide">
+                            <div class="auth-slide-overlay"></div>
+                            <div class="auth-slide-content">
+                                <div class="auth-slide-icon">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h3 class="auth-slide-title">Secure & Private</h3>
+                                <p class="auth-slide-description">
+                                    Your data is encrypted and protected with enterprise-grade security. Privacy is our
+                                    priority.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="auth-slider-slide">
+                            <div class="auth-slide-overlay"></div>
+                            <div class="auth-slide-content">
+                                <div class="auth-slide-icon">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <h3 class="auth-slide-title">Powerful Tools</h3>
+                                <p class="auth-slide-description">
+                                    Access advanced features including research mode, analytical insights, and
+                                    cross-project comparisons.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slider Indicators -->
+                    <div class="auth-slider-indicators">
+                        <span class="auth-slider-dot active" onclick="goToAuthModalSlide(0)"></span>
+                        <span class="auth-slider-dot" onclick="goToAuthModalSlide(1)"></span>
+                        <span class="auth-slider-dot" onclick="goToAuthModalSlide(2)"></span>
+                        <span class="auth-slider-dot" onclick="goToAuthModalSlide(3)"></span>
+                    </div>
+                </div>
+
+                <!-- Right Side - Form -->
+                <div class="auth-modal-form-container">
+                    <!-- Fixed Header Wrapper -->
+                    <div class="auth-fixed-header">
+                        <!-- Form Header -->
+                        <div class="auth-form-header">
+                            <img src="{{ url_for('static', filename='images/simon_india_logo.png') }}" alt="SIA Logo"
+                                class="auth-form-logo">
+                            <h2 class="auth-form-title">SIA</h2>
+                            <p class="auth-form-subtitle">Your industrial knowledge partner</p>
+                        </div>
+
+                        <!-- Form Tabs -->
+                        <div class="auth-form-tabs">
+                            <button class="auth-tab-btn active" onclick="switchAuthTab('login')">Login</button>
+                            <button class="auth-tab-btn" onclick="switchAuthTab('signup')">Sign Up</button>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Content Wrapper -->
+                    <div class="auth-scrollable-content">
+                        <!-- Form Content -->
+                        <div class="auth-form-content">
+                            <!-- Login Form -->
+                            <div id="loginForm" class="auth-form-panel active">
+                                <form action="{{ url_for('auth.login') }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <div class="auth-form-group">
+                                        <label class="auth-form-label" for="login-email">Email Address</label>
+                                        <input type="email" id="login-email" name="email" class="auth-form-input"
+                                            placeholder="you@example.com" required>
+                                    </div>
+
+                                    <div class="auth-form-group">
+                                        <label class="auth-form-label" for="login-password">Password</label>
+                                        <div class="auth-password-wrapper">
+                                            <input type="password" id="login-password" name="password"
+                                                class="auth-form-input" placeholder="Enter your password" required>
+                                            <button type="button" class="auth-password-toggle"
+                                                onclick="toggleAuthPassword('login-password', this)">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="auth-form-row">
+                                        <label class="auth-checkbox-label">
+                                            <input type="checkbox" name="remember">
+                                            <span>Remember me</span>
+                                        </label>
+                                        <a href="#" class="auth-forgot-link">Forgot Password?</a>
+                                    </div>
+
+                                    <button type="submit" class="auth-submit-btn">
+                                        <span>Sign In</span>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Signup Form -->
+                            <div id="signupForm" class="auth-form-panel">
+                                <form action="{{ url_for('auth.register') }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <div class="auth-form-group">
+                                        <label class="auth-form-label" for="signup-name">Full Name</label>
+                                        <input type="text" id="signup-name" name="username" class="auth-form-input"
+                                            placeholder="" required>
+                                    </div>
+
+                                    <div class="auth-form-group">
+                                        <label class="auth-form-label" for="signup-email">Email Address</label>
+                                        <input type="email" id="signup-email" name="email" class="auth-form-input"
+                                            placeholder="@adventz.com" required>
+                                    </div>
+
+                                    <div class="auth-form-group">
+                                        <label class="auth-form-label" for="signup-password">Password</label>
+                                        <div class="auth-password-wrapper">
+                                            <input type="password" id="signup-password" name="password"
+                                                class="auth-form-input" placeholder="Create a strong password" required>
+                                            <button type="button" class="auth-password-toggle"
+                                                onclick="toggleAuthPassword('signup-password', this)">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="auth-form-group">
+                                        <label class="auth-form-label" for="signup-confirm-password">Confirm
+                                            Password</label>
+                                        <div class="auth-password-wrapper">
+                                            <input type="password" id="signup-confirm-password" name="confirm_password"
+                                                class="auth-form-input" placeholder="Re-enter your password" required>
+                                            <button type="button" class="auth-password-toggle"
+                                                onclick="toggleAuthPassword('signup-confirm-password', this)">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21">
+                                                    </path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="auth-form-group">
+                                        <label class="auth-checkbox-label">
+                                            <input type="checkbox" name="terms" required>
+                                            <span>I agree to the <a href="#" class="auth-forgot-link">Terms &
+                                                    Conditions</a></span>
+                                        </label>
+                                    </div>
+
+                                    <button type="submit" class="auth-submit-btn">
+                                        <span>Create Account</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+
+            if (input.type === "password") {
+                input.type = "text";
+                // Switch to Eye Slash (Hidden) icon - meaning "click to hide" or just showing opened eye
+                // Let's use an open eye for visible, and closed eye (or slash) for hidden.
+                // Currently it's hidden (password), so we are making it visible.
+                // Icon should change to indicate "visible" state or "click to hide".
+                // Let's use a clear "Eye Open" vs "Eye Slash" logic.
+
+                // SVG for Eye Open (Visible)
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+                icon.classList.add('text-accent');
+                icon.classList.remove('text-slate-500');
+            } else {
+                input.type = "password";
+                // Switch back to Eye Slash (Hidden) or just default closed look
+                // SVG for Eye Slash (Hidden)
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />';
+                icon.classList.remove('text-accent');
+                icon.classList.add('text-slate-500');
+            }
+        }
+    </script>
+    {% if request.endpoint != 'main.index' %}
+    <!-- Custom Visual Effects (Post-Login Only) -->
+    <script src="{{ url_for('static', filename='js/visual_effects.js') }}"></script>
+    {% endif %}
+</body>
+
+</html>

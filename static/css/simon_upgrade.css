@@ -1,0 +1,3258 @@
+/* --- 1. Core Variables & Utilities (Syncra AI / Future Generic Theme) --- */
+:root {
+    /* --- Professional Light Mode Color System --- */
+
+    /* Layered Backgrounds */
+    --simon-bg: #FAFBFC;
+    --simon-bg-secondary: #F6F8FA;
+    --simon-bg-panel: #FFFFFF;
+    --simon-bg-elevated: rgba(255, 255, 255, 0.98);
+
+    /* Text Hierarchy */
+    --simon-text-primary: #0F172A;
+    --simon-text-secondary: #475569;
+    --simon-text-muted: #64748B;
+    --simon-text-disabled: #94A3B8;
+    --simon-text-main: #0F172A;
+    --simon-text-dark: #020617;
+
+    /* Professional Blue Accents */
+    --simon-accent: #0066FF;
+    --simon-accent-hover: #0052CC;
+    --simon-accent-active: #003D99;
+    --simon-accent-glow: rgba(0, 102, 255, 0.15);
+
+    --simon-secondary: #0EA5E9;
+    --simon-secondary-dim: rgba(14, 165, 233, 0.08);
+
+    /* Multi-level Border System */
+    --simon-border-subtle: #E2E8F0;
+    --simon-border-medium: #CBD5E1;
+    --simon-border-strong: #94A3B8;
+    --simon-border: #E2E8F0;
+
+    /* Layered Shadow System */
+    --simon-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.08);
+    --simon-shadow-md: 0 4px 6px rgba(15, 23, 42, 0.08);
+    --simon-shadow-lg: 0 10px 15px rgba(15, 23, 42, 0.08);
+    --simon-shadow-xl: 0 20px 25px rgba(15, 23, 42, 0.08);
+
+    /* Status Colors */
+    --simon-success: #10B981;
+    --simon-warning: #F59E0B;
+    --simon-error: #EF4444;
+    --simon-info: #3B82F6;
+    --simon-market: #db2777;
+
+    /* Enhanced Glassmorphism */
+    --simon-glass-bg: rgba(255, 255, 255, 0.85);
+    --simon-glass-border: rgba(226, 232, 240, 0.8);
+    --simon-glass-border-light: rgba(226, 232, 240, 0.8);
+    --simon-glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.06);
+    --simon-glass-highlight: rgba(255, 255, 255, 1);
+    --simon-glass-blur: 24px;
+
+    /* Gradient System */
+    --simon-gradient-hero: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #F0FDFA 100%);
+    --simon-gradient-card: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+    --simon-gradient-accent: linear-gradient(135deg, #0066FF 0%, #0EA5E9 100%);
+    --simon-gradient-bg: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(14, 165, 233, 0.03) 0%, transparent 50%);
+
+    /* CRAZY HERO VARIABLES (Light Mode Only) - CYBER TECH VIBE */
+    --hero-crazy-gradient: linear-gradient(135deg, #4f46e5 0%, #06b6d4 25%, #0ea5e9 50%, #10b981 75%, #f59e0b 100%);
+    --hero-aurora-1: rgba(59, 130, 246, 0.08);
+    --hero-aurora-2: rgba(14, 165, 233, 0.06);
+    --hero-aurora-3: rgba(16, 185, 129, 0.05);
+    --hero-glass-prismatic: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(59, 130, 246, 0.1) 25%, rgba(14, 165, 233, 0.1) 50%, rgba(16, 185, 129, 0.08) 75%, rgba(245, 158, 11, 0.05) 100%);
+
+    /* Glows */
+    --simon-glow-sky: #0ea5e9;
+    --simon-glow-violet: #8b5cf6;
+    --simon-glow-cyan: #06b6d4;
+    --simon-glow-pink: #ec4899;
+    --simon-glow-amber: #f59e0b;
+    --simon-glow-emerald: #10b981;
+    --simon-glow-rose: #f43f5e;
+    --simon-glow-red: #ef4444;
+    --simon-glow-blue: #3b82f6;
+    --simon-glow-fuchsia: #d946ef;
+
+    /* Border Radius */
+    --simon-radius-lg: 24px;
+    --simon-radius-md: 16px;
+    --simon-radius-sm: 8px;
+
+    font-family: 'Inter', sans-serif;
+
+    /* --- Cyber Tech Upgrade Variables --- */
+    --cyber-primary: #06b6d4;
+    --cyber-secondary: #8b5cf6;
+    --cyber-accent: #22d3ee;
+    --cyber-glow: rgba(6, 182, 212, 0.4);
+    --cyber-msg-user: linear-gradient(135deg, #0066FF, #0EA5E9);
+    --cyber-msg-bot: rgba(15, 23, 42, 0.7);
+    --hud-border: 1px solid rgba(0, 102, 255, 0.15);
+}
+
+html.dark {
+    /* --- Dark Mode Overrides --- */
+    --simon-bg: #02040a;
+    /* was --simon-bg-dark */
+    --simon-bg-panel: #0b1020;
+    /* was --simon-bg-panel */
+
+    /* Gradients */
+    --simon-gradient-bg: radial-gradient(circle at 50% 0%, #1a1f35 0%, #02040a 60%);
+
+    /* Typography */
+    --simon-text-main: #e5e7eb;
+    --simon-text-muted: #9ca3af;
+
+    --simon-border: rgba(255, 255, 255, 0.08);
+
+    /* Accents */
+    --simon-accent: #6d5dfc;
+    --simon-accent-glow: rgba(109, 93, 252, 0.5);
+
+    --simon-secondary: #2ee6ff;
+    --simon-secondary-dim: rgba(46, 230, 255, 0.15);
+
+    /* Status Colors */
+    --simon-warning: #fbbf24;
+    --simon-success: #34d399;
+    --simon-market: #f472b6;
+
+    /* Glows (Brighter for dark mode) */
+    --simon-glow-sky: #38bdf8;
+    --simon-glow-violet: #6d5dfc;
+    --simon-glow-cyan: #2ee6ff;
+    --simon-glow-pink: #f472b6;
+    --simon-glow-amber: #fbbf24;
+    --simon-glow-emerald: #34d399;
+    --simon-glow-rose: #f43f5e;
+    --simon-glow-red: #ef4444;
+    --simon-glow-blue: #60a5fa;
+    --simon-glow-fuchsia: #d946ef;
+
+    /* Glass (Dark) */
+    --simon-glass-bg: rgba(255, 255, 255, 0.03);
+    --simon-glass-border: rgba(255, 255, 255, 0.08);
+    --simon-glass-highlight: rgba(255, 255, 255, 0.15);
+}
+
+/* --- World-Class Industrial Light Mode --- */
+html:not(.dark) {
+    /* 1. Core Palette: The "Cloud & Zinc" Foundation */
+    --simon-bg: #F6F8FA;
+    /* Cloud Dancer */
+    --simon-bg-panel: rgba(255, 255, 255, 0.85);
+    --simon-text-primary: #1A1C1D;
+    /* Deep Graphite */
+    --simon-text-secondary: #475569;
+    --simon-accent: #5C5FEE;
+    /* Cobalt Blueprint */
+    --simon-border-subtle: rgba(0, 0, 0, 0.05);
+    --simon-border-strong: rgba(0, 0, 0, 0.12);
+
+    background-color: var(--simon-bg);
+    /* 2. The Blueprint Grid */
+    background-image: none;
+    background-size: auto;
+    color: var(--simon-text-primary);
+}
+
+html:not(.dark) body {
+    background: transparent !important;
+    background-image: none !important;
+}
+
+/* 3. Light theme: no texture overlay (professional tone) */
+html:not(.dark) body::before {
+    display: none !important;
+}
+
+/* 4. The Elite Bento Card */
+html:not(.dark) .crazy-card {
+    background: #FFFFFF !important;
+    border: 0.5px solid var(--simon-border-strong) !important;
+    border-top: 1.5px solid rgba(255, 255, 255, 1) !important;
+    /* Specular Edge */
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.05),
+        0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    border-radius: 12px !important;
+    /* Industrial tight corners */
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+html:not(.dark) .crazy-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--simon-accent) !important;
+    box-shadow: 0 12px 24px rgba(92, 95, 238, 0.1) !important;
+}
+
+/* 5. Precision Typography */
+html:not(.dark) .technical-metadata {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: #64748B;
+    background: #F1F5F9;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+html:not(.dark) h1 {
+    letter-spacing: -0.04em !important;
+    font-weight: 800;
+    color: #1A1C1D !important;
+}
+
+html:not(.dark) .antigravity-text {
+    letter-spacing: -0.04em !important;
+    font-weight: 800;
+    /* Violet to Cyan Gradient (Dark Mode Style) */
+    background: linear-gradient(135deg, #6d5dfc 0%, #2ee6ff 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.font-display {
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background: var(--simon-bg);
+    background-image: var(--simon-gradient-bg);
+    background-attachment: fixed;
+    color: var(--simon-text-main);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+/* Noise Texture Overlay */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    /* Moving behind everything */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.3;
+    mix-blend-mode: overlay;
+}
+
+/* 🧊 Glassmorphism (Syncra Grade - Premium Upgrade) */
+.glass-card,
+.simon-glass,
+.simon-glass-panel {
+    background: var(--simon-glass-bg);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid var(--simon-glass-border);
+    border-top: 1px solid var(--simon-glass-highlight);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04), inset 0 0 10px rgba(255, 255, 255, 0.1);
+    border-radius: var(--simon-radius-lg);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover,
+.simon-glass-panel:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(2, 132, 199, 0.3);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+html.dark .glass-card:hover,
+html.dark .simon-glass-panel:hover {
+    background: rgba(11, 16, 32, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* 📦 Bento Grid Layouts (With Spotlight Support) */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-gap: 1.5rem;
+    width: 100%;
+}
+
+/* Spotlight Effect Container */
+.spotlight-group {
+    position: relative;
+}
+
+.bento-card {
+    background: var(--simon-glass-bg);
+    /* Slightly darker base for spotlight contrast */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(109, 93, 252, 0.15);
+    border-radius: var(--simon-radius-lg);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light mode bento cards with Slate-200 borders */
+html:not(.dark) .bento-card {
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+/* Spotlight Glow Element (Added via JS usually, but here's the style) */
+.bento-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+            rgba(109, 93, 252, 0.08),
+            transparent 40%);
+    opacity: 0;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Light mode spotlight with industrial blue */
+/* Light theme: no mouse-follow spotlight on bento cards (professional tone) */
+html:not(.dark) .bento-card::before {
+    display: none !important;
+}
+
+/* Border Spotlight */
+.bento-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--simon-radius-lg);
+    padding: 1.5px;
+    /* Thicker border for effect */
+    background: radial-gradient(600px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+            rgba(109, 93, 252, 0.5),
+            transparent 40%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0;
+    /* Hidden by default, shown on group hover */
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Show effects when hovering the GROUP (so adjacent cards light up too if we want, or just self) */
+.spotlight-group:hover .bento-card::after,
+.spotlight-group:hover .bento-card::before {
+    opacity: 1;
+}
+
+.bento-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 40px rgba(109, 93, 252, 0.1);
+}
+
+/* Light mode bento card hover */
+html:not(.dark) .bento-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+}
+
+/* Light theme: hide card background images (brain, graph, diagram, etc.) */
+html:not(.dark) .bento-card-bg {
+    display: none !important;
+}
+
+/* Light theme: hide blob container and neuro canvas globally (professional tone) */
+html:not(.dark) .simon-bg-glow-container {
+    display: none !important;
+}
+html:not(.dark) #neuro-bg-canvas {
+    display: none !important;
+}
+
+/* Shimmer Animation for Buttons */
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.animate-shimmer {
+    background: linear-gradient(90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.1) 50%,
+            rgba(255, 255, 255, 0) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite linear;
+}
+
+.bento-span-12 {
+    grid-column: span 12;
+}
+
+.bento-span-8 {
+    grid-column: span 8;
+}
+
+.bento-span-6 {
+    grid-column: span 6;
+}
+
+.bento-span-4 {
+    grid-column: span 4;
+}
+
+@media (max-width: 768px) {
+
+    .bento-span-8,
+    .bento-span-6,
+    .bento-span-4 {
+        grid-column: span 12;
+    }
+}
+
+/* 🧠 Animations */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(40px) scale(0.98);
+    filter: blur(10px);
+    will-change: transform, opacity, filter;
+}
+
+/* We let GSAP handle the transition/visible state now */
+
+/* Gradient Text Utility (Syncra) */
+.proton-text-gradient {
+    background: linear-gradient(135deg, #fff 0%, #b4b8c5 100%);
+    /* Premium white metal */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.accent-text-gradient {
+    background: linear-gradient(135deg, #6d5dfc 0%, #2ee6ff 100%);
+    /* Violet to Cyan */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* --- 2. Modal Enhancements --- */
+/* --- 2. Modal Enhancements --- */
+#login-modal,
+#signup-modal {
+    max-width: 1000px !important;
+    margin: auto;
+    position: relative;
+    z-index: 1001;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+
+    #login-modal,
+    #signup-modal {
+        max-width: 95% !important;
+    }
+}
+
+/* --- 3. Glow Utilities --- */
+.glow-on-hover:hover {
+    box-shadow: 0 0 40px var(--simon-accent-glow);
+}
+
+/* --- 4. Chat Interface --- */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-toggle-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #64748b;
+    /* slate-500 */
+    transition: color 0.2s;
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    z-index: 10;
+}
+
+.password-toggle-icon:hover {
+    color: var(--simon-text-main);
+}
+
+/* --- 4. Chat Interface (Premium Upgrade - Ultra CRAZY) --- */
+.simon-chat-container,
+.simon-visual-container {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(30px) saturate(200%);
+    -webkit-backdrop-filter: blur(30px) saturate(200%);
+    border: 1px solid rgba(109, 93, 252, 0.15);
+    box-shadow:
+        0 30px 70px -15px rgba(0, 0, 0, 0.1),
+        inset 0 0 40px rgba(99, 102, 241, 0.05);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+html.dark .simon-chat-container,
+html.dark .simon-visual-container {
+    background: rgba(8, 12, 26, 0.85);
+    border: var(--hud-border);
+    box-shadow:
+        0 30px 70px -15px rgba(0, 0, 0, 0.8),
+        inset 0 0 40px rgba(6, 182, 212, 0.05);
+}
+
+/* HUD Corner Accents */
+.simon-chat-container::after,
+.simon-chat-container::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--cyber-primary);
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Top Right */
+.simon-chat-container::before {
+    top: 15px;
+    right: 15px;
+    border-left: none;
+    border-bottom: none;
+}
+
+/* Bottom Left */
+.simon-chat-container::after {
+    bottom: 15px;
+    left: 15px;
+    border-right: none;
+    border-top: none;
+}
+
+/* Message Groups */
+.simon-message-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    z-index: 1;
+}
+
+.simon-message-group.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.simon-message-group.user {
+    flex-direction: row-reverse;
+}
+
+/* Animated Avatars */
+.simon-avatar {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    font-size: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.simon-avatar.assistant {
+    background: #0f172a;
+    border: 1px solid var(--cyber-primary);
+    color: var(--cyber-primary);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+}
+
+.simon-avatar.assistant::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 1.5rem;
+    background: conic-gradient(from 0deg, var(--cyber-primary), transparent, var(--cyber-secondary), transparent, var(--cyber-primary));
+    animation: rotate-conic 4s linear infinite;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+@keyframes rotate-conic {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.simon-avatar.user {
+    background: var(--cyber-msg-user);
+    color: white;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+/* Holographic Bubbles */
+.simon-chat-bubble {
+    padding: 1.5rem 2rem;
+    border-radius: 1.75rem;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 85%;
+    position: relative;
+    word-wrap: break-word;
+    letter-spacing: 0.015em;
+    /* overflow: hidden; -- Disabled to allow copy button */
+}
+
+/* Assistant Bubble: Holographic Glow */
+.simon-chat-bubble.assistant {
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(109, 93, 252, 0.1);
+    color: var(--simon-text-main);
+    border-top-left-radius: 0.5rem;
+    backdrop-filter: blur(15px);
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.05),
+        inset 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+html.dark .simon-chat-bubble.assistant {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    color: #cbd5e1;
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.3),
+        inset 0 0 20px rgba(6, 182, 212, 0.05);
+}
+
+/* Border Trace Animation for Bot Bubble */
+.simon-chat-bubble.assistant::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--cyber-primary);
+    border-radius: inherit;
+    opacity: 0.3;
+    animation: border-trace 3s linear infinite;
+}
+
+@keyframes border-trace {
+    0% {
+        clip-path: inset(0 0 95% 0);
+    }
+
+    25% {
+        clip-path: inset(0 0 0 95%);
+    }
+
+    50% {
+        clip-path: inset(95% 0 0 0);
+    }
+
+    75% {
+        clip-path: inset(0 95% 0 0);
+    }
+
+    100% {
+        clip-path: inset(0 0 95% 0);
+    }
+}
+
+/* User Bubble: Vibrant Cyber Gradient */
+.simon-chat-bubble.user {
+    background: var(--cyber-msg-user);
+    color: white;
+    border-top-right-radius: 0.5rem;
+    box-shadow:
+        0 15px 40px rgba(79, 70, 229, 0.4),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Scanline Overlay for Chat Area */
+.simon-chat-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0.15;
+}
+
+/* Input Area - Console Console */
+.simon-chat-input-wrapper {
+    position: relative;
+    z-index: 20;
+    padding: 2rem;
+    background: linear-gradient(to top, var(--simon-bg), transparent);
+}
+
+html.dark .simon-chat-input-wrapper {
+    background: linear-gradient(to top, rgba(8, 12, 26, 0.95), transparent);
+}
+
+.simon-chat-form-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(109, 93, 252, 0.2);
+    border-radius: 1.5rem;
+    padding: 0.75rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+html.dark .simon-chat-form-inner {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.simon-chat-form-inner:focus-within {
+    border-color: var(--cyber-primary);
+    box-shadow:
+        0 0 30px rgba(6, 182, 212, 0.2),
+        0 15px 40px rgba(0, 0, 0, 0.6);
+    transform: translateY(-4px) scale(1.01);
+}
+
+/* =========================================
+   10. REDESIGNED DASHBOARD LIGHT MODE
+   ========================================= */
+
+/* 1. Remove Neuro/Noise Overlay */
+html:not(.dark) body.dashboard-mode::before,
+html:not(.dark) body.dashboard-mode #neuro-bg-canvas {
+    display: none !important;
+    background: none !important;
+}
+
+/* 2. Clean Background Color */
+html:not(.dark) body.dashboard-mode {
+    background: #F8FAFC !important;
+    /* Clean industrial slate-50 */
+    background-image: none !important;
+}
+
+/* 3. Refined Card Styles - No inner glow, clean borders */
+html:not(.dark) body.dashboard-mode .crazy-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    /* Slate-200 */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 12px !important;
+    /* Remove any neuro/gradient overlays */
+}
+
+html:not(.dark) body.dashboard-mode .crazy-card::before {
+    display: none !important;
+    /* Kill the spotlight/glow effect */
+}
+
+/* 4. Card Hover State - Subtle Lift */
+html:not(.dark) body.dashboard-mode .crazy-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--simon-accent) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 5. Icons - Clean Slate Background */
+html:not(.dark) body.dashboard-mode .crazy-card-icon-wrapper {
+    background: #F1F5F9 !important;
+    /* Slate-100 */
+    border: none !important;
+    color: var(--simon-accent);
+}
+
+html:not(.dark) body.dashboard-mode .crazy-card:hover .crazy-card-icon-wrapper {
+    background: rgba(92, 95, 238, 0.1) !important;
+    color: var(--simon-accent);
+}
+
+.simon-chat-input {
+    background: transparent !important;
+    border: none !important;
+    color: var(--simon-text-main) !important;
+    padding: 1rem 1.5rem;
+    width: 100%;
+    font-size: 1.1rem;
+    box-shadow: none !important;
+}
+
+html.dark .simon-chat-input {
+    color: #e2e8f0 !important;
+}
+
+.simon-chat-input::placeholder {
+    color: rgba(100, 255, 218, 0.3);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.simon-send-btn {
+    background: var(--cyber-primary);
+    color: #080c1a;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+    border: none;
+    cursor: pointer;
+    margin-left: 0.75rem;
+}
+
+.simon-send-btn:hover {
+    background: #fff;
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+}
+
+/* Typing Dots CRAZY UPGRADE */
+.simon-typing-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--cyber-primary);
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--cyber-primary);
+    animation: typingSquare 1.5s infinite ease-in-out both;
+}
+
+@keyframes typingSquare {
+
+    0%,
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.5) rotate(45deg);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- 5. New Specific Utilities --- */
+.text-accent {
+    color: var(--simon-accent);
+}
+
+.text-secondary {
+    color: var(--simon-secondary);
+}
+
+.bg-accent {
+    background-color: var(--simon-accent);
+}
+
+.border-accent {
+    border-color: var(--simon-accent);
+}
+
+/* --- 6. Neural & Pulse Animations --- */
+.simon-bg-glow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.simon-bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.15;
+    animation: float 20s infinite alternate;
+}
+
+html.dark .simon-bg-blob {
+    opacity: 0.2;
+}
+
+.blob-1 {
+    width: 600px;
+    height: 600px;
+    background: #06b6d4;
+    /* Cyan-500 */
+    top: -10%;
+    left: -10%;
+    animation-duration: 15s;
+}
+
+.blob-2 {
+    width: 800px;
+    height: 800px;
+    background: #2563eb;
+    /* Blue-600 */
+    top: 20%;
+    right: -10%;
+    animation-duration: 20s;
+    animation-delay: 2s;
+}
+
+.blob-3 {
+    width: 700px;
+    height: 700px;
+    background: #4f46e5;
+    /* Indigo-600 */
+    bottom: -10%;
+    left: 20%;
+    animation-duration: 25s;
+    animation-delay: 5s;
+}
+
+.simon-neural-line {
+    position: absolute;
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--simon-accent), transparent);
+    opacity: 0;
+    filter: blur(2px);
+    box-shadow: 0 0 10px var(--simon-accent);
+}
+
+.simon-pulse-animation {
+    animation: neuralPulse 4s ease-in-out forwards;
+}
+
+@keyframes neuralPulse {
+    0% {
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(300px);
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulseSlow 5s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+
+    0%,
+    100% {
+        opacity: 0.5;
+        filter: drop-shadow(0 0 15px rgba(109, 93, 252, 0.2));
+    }
+
+    50% {
+        opacity: 0.9;
+        filter: drop-shadow(0 0 30px rgba(109, 93, 252, 0.5));
+    }
+}
+
+/* --- 7. Wavy Icons Slider --- */
+.wavy-icons-slider {
+    width: 100%;
+    padding: 40px 0;
+    overflow: hidden;
+    position: relative;
+    background: transparent;
+}
+
+
+.wavy-track {
+    display: flex;
+    gap: 80px;
+    width: max-content;
+    padding: 20px 0;
+}
+
+.wavy-icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 130px;
+    height: 130px;
+    background: transparent;
+    border: none;
+    border-radius: var(--simon-radius-md);
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: none;
+    position: relative;
+}
+
+.wavy-icon-item:hover {
+    background: transparent;
+    transform: scale(1.2) translateY(-10px);
+}
+
+.wavy-icon-item img,
+.wavy-icon-item svg {
+    width: 65px;
+    height: 65px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px currentColor);
+    opacity: 0.8;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wavy-icon-item svg {
+    stroke-width: 1.5;
+}
+
+.wavy-icon-item:hover svg {
+    opacity: 1;
+    filter: drop-shadow(0 0 20px currentColor);
+}
+
+.wavy-icon-label {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--simon-text-muted);
+    opacity: 0;
+    position: absolute;
+    bottom: 10px;
+    /* Total cycle 4s: ~1s visible, ~3s hidden */
+    animation: fadeLabelLoop 4s infinite;
+    animation-delay: 0s;
+    /* Start immediately or maybe offset if needed */
+    text-align: center;
+    width: 100%;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.wavy-icon-item:hover .wavy-icon-label {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    animation: none !important;
+}
+
+/* Wavy icons: black in light theme, white in dark theme (with matching glow) */
+html:not(.dark) .wavy-icons-slider .wavy-icon-item svg {
+    color: #1a1c1d !important;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.25));
+}
+html:not(.dark) .wavy-icons-slider .wavy-icon-item:hover svg {
+    filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.35));
+}
+html.dark .wavy-icons-slider .wavy-icon-item svg {
+    color: #ffffff !important;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.25));
+}
+html.dark .wavy-icons-slider .wavy-icon-item:hover svg {
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.35));
+}
+
+@keyframes fadeLabelLoop {
+    0% {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    10% {
+        /* Fade in by 0.4s */
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    35% {
+        /* Stay visible until 1.4s (total 1s visible) */
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    45% {
+        /* Fade out by 1.8s */
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    100% {
+        /* Stay hidden until 4s */
+        opacity: 0;
+        transform: translateY(5px);
+        /* Reset pos */
+    }
+}
+
+/* --- 8. Interactive Visual Effects (Canvas) --- */
+#dots-format-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Light theme: dots canvas hidden by default, visible on hero hover (blue grid) */
+html:not(.dark) #dots-format-canvas {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+html:not(.dark) #hero-section:hover #dots-format-canvas {
+    opacity: 0.55;
+}
+
+#neural-effect-container {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    background: linear-gradient(to bottom, transparent, rgba(15, 23, 42, 0.5));
+    overflow: hidden;
+    z-index: 5;
+    margin-top: -100px;
+    /* Overlap with previous section slightly */
+}
+
+#neural-effect-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Light theme: hide neural effect canvas and clean container (professional tone) */
+html:not(.dark) #neural-effect-canvas {
+    display: none !important;
+}
+html:not(.dark) #neural-effect-container {
+    background: transparent;
+}
+
+.hero-content-wrapper {
+    position: relative;
+    z-index: 10;
+}
+
+/* --- 9. Dashboard Crazy Cards --- */
+.crazy-card {
+    position: relative;
+    overflow: hidden;
+    background: var(--simon-glass-bg);
+    /* Default Dark */
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--simon-glass-border);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.crazy-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+html:not(.dark) .crazy-card {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+html:not(.dark) .crazy-card:hover {
+    background: rgba(255, 255, 255, 0.95) !important;
+    box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Glow effects */
+.crazy-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(255, 255, 255, 0.06), transparent 40%);
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+    z-index: 0;
+}
+
+html:not(.dark) .crazy-card::before {
+    background: radial-gradient(800px circle at var(--mouse-x, 0) var(--mouse-y, 0), rgba(109, 93, 252, 0.05), transparent 40%);
+}
+
+.crazy-card:hover::before {
+    opacity: 1;
+}
+
+.crazy-card-content {
+    position: relative;
+    z-index: 10;
+}
+
+/* --- 9. Circular Glass Form & Sliding Icons Background --- */
+.circular-glass-form {
+    width: 95vw;
+    max-width: 540px;
+    aspect-ratio: 1/1;
+    border-radius: 50% !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 3.5rem;
+    position: relative;
+    z-index: 1002;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none;
+    /* Hide scrollbar for IE/Edge */
+    gap: 0.25rem;
+    /* Added gap between items */
+
+    /* Enhanced Border & Background */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(15, 23, 42, 0.4) !important;
+    backdrop-filter: blur(50px) !important;
+    -webkit-backdrop-filter: blur(50px) !important;
+
+    /* Strong Glow Effects */
+    box-shadow:
+        0 0 80px rgba(109, 93, 252, 0.3),
+        0 0 150px rgba(46, 230, 255, 0.1),
+        inset 0 0 60px rgba(109, 93, 252, 0.2);
+
+    animation: fadeInCircle 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.5s ease;
+}
+
+.circular-glass-form::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar for Chrome/Safari/Webkit */
+}
+
+.circular-glass-form::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--simon-accent), transparent, var(--simon-secondary), transparent, var(--simon-accent));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+html.dark .circular-glass-form {
+    background: rgba(15, 23, 42, 0.4) !important;
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow:
+        0 0 80px rgba(109, 93, 252, 0.3),
+        0 0 150px rgba(46, 230, 255, 0.1),
+        inset 0 0 60px rgba(109, 93, 252, 0.2);
+}
+
+html:not(.dark) .circular-glass-form {
+    background: rgba(255, 255, 255, 0.7) !important;
+    border-color: rgba(99, 102, 241, 0.2);
+    box-shadow:
+        0 0 80px rgba(99, 102, 241, 0.15),
+        0 0 150px rgba(14, 165, 233, 0.05),
+        inset 0 0 60px rgba(255, 255, 255, 0.5);
+}
+
+.circular-glass-form:hover {
+    transform: scale(1.02);
+}
+
+html.dark .circular-glass-form:hover {
+    box-shadow:
+        0 0 120px rgba(0, 0, 0, 0.7),
+        0 0 60px var(--simon-accent-glow),
+        0 0 30px var(--simon-secondary-dim),
+        inset 0 0 40px rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+html:not(.dark) .circular-glass-form:hover {
+    box-shadow:
+        0 0 120px rgba(99, 102, 241, 0.1),
+        0 0 60px rgba(99, 102, 241, 0.2),
+        inset 0 0 40px rgba(255, 255, 255, 0.8);
+    border-color: var(--simon-accent);
+}
+
+@keyframes fadeInCircle {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) rotate(-10deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+
+/* Override for modern modals to support circular shape */
+.modal-circular-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Responsive adjustment for circular form */
+@media (max-width: 640px) {
+    .circular-glass-form {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1/1;
+        padding: 2.2rem;
+        border-radius: 2.5rem !important;
+    }
+
+    .sliding-icon {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Modal Input Refinement */
+.circular-glass-form input {
+    font-size: 0.9rem !important;
+    letter-spacing: 0.02em;
+    font-weight: 500;
+    color: var(--simon-text-main) !important;
+}
+
+.circular-glass-form input::placeholder {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    opacity: 0.4;
+    color: var(--simon-text-muted) !important;
+}
+
+.circular-glass-form h2 {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 40px var(--simon-accent-glow);
+    width: 100%;
+}
+
+.circular-glass-form button[type="submit"] {
+    font-size: 0.85rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 800;
+}
+
+/* --- 10. Legacy Utilities (Migrated from base.html) --- */
+.neon-text {
+    text-shadow: 0 0 10px rgba(22, 124, 193, 0.5);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0A192F;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #112240;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #167cc1;
+}
+
+/* --- 11. Sidebar Custom Styles --- */
+.simon-sidebar {
+    background: var(--simon-bg-panel);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html:not(.dark) .simon-sidebar {
+    background: rgba(255, 255, 255, 0.70);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-right: 1px solid #e2e8f0;
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.03);
+}
+
+/* --- 11. Sidebar Custom Dropdown --- */
+.simon-custom-dropdown {
+    position: relative;
+    width: 100%;
+    z-index: 50;
+}
+
+.simon-dropdown-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: rgba(11, 16, 32, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.simon-dropdown-trigger:hover,
+.simon-dropdown-trigger.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.simon-dropdown-trigger.active #sidebar-dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+#sidebar-dropdown-arrow {
+    transition: transform 0.2s ease;
+}
+
+.simon-dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    margin-top: 0.5rem;
+    background: #112240;
+    /* Fallback */
+    background: rgba(17, 34, 64, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transform-origin: top;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 100;
+}
+
+.simon-dropdown-options.open {
+    max-height: 300px;
+    /* Arbitrary large limit */
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+
+.simon-dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    /* text-xs */
+    color: var(--simon-text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.simon-dropdown-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.simon-dropdown-option.selected {
+    background: rgba(99, 102, 241, 0.15);
+    color: #fff;
+}
+
+html:not(.dark) .simon-dropdown-trigger {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+html:not(.dark) .simon-dropdown-options {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+html:not(.dark) .simon-dropdown-option {
+    color: #475569;
+}
+
+html:not(.dark) .simon-dropdown-option:hover {
+    background: rgba(99, 102, 241, 0.05);
+    color: #6366f1;
+}
+
+html:not(.dark) .simon-dropdown-option.selected {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    font-weight: 600;
+}
+
+/* --- 10. Neuro Background & Dot Cursor --- */
+#neuro-bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    /* Staying above blobs but below UI */
+    pointer-events: none;
+    opacity: 0.8;
+    /* Increased visibility */
+}
+
+.dot-cursor {
+    width: 8px;
+    /* Slightly larger */
+    height: 8px;
+    background-color: var(--simon-secondary);
+    border-radius: 50%;
+    position: fixed;
+    top: -4px;
+    left: -4px;
+    pointer-events: none;
+    z-index: 10000;
+    box-shadow: 0 0 15px var(--simon-secondary), 0 0 30px var(--simon-secondary-dim);
+    transition: transform 0.05s linear;
+}
+
+.dot-cursor-outline {
+    width: 40px;
+    /* Slightly larger */
+    height: 40px;
+    border: 2px solid var(--simon-accent);
+    /* Thicker border */
+    border-radius: 50%;
+    position: fixed;
+    top: -20px;
+    left: -20px;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 0 10px var(--simon-accent-glow);
+}
+
+/* Hide default cursor on body only when custom cursor is active */
+body.has-custom-cursor {
+    cursor: none;
+}
+
+/* Show default cursor on interactive elements if needed, or keep it custom when active */
+body.has-custom-cursor a,
+body.has-custom-cursor button,
+body.has-custom-cursor [role="button"],
+body.has-custom-cursor input,
+body.has-custom-cursor select,
+body.has-custom-cursor textarea {
+    cursor: none;
+}
+
+/* ============================================
+   CRAZY VISUAL EFFECTS - PREMIUM UPGRADE
+   ============================================ */
+
+/* Hero Container */
+.hero-container {
+    margin-bottom: 2rem;
+}
+
+.hero-container h1 {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    line-height: 1.2;
+    margin-bottom: 0;
+}
+
+/* Antigravity Text Effect */
+.antigravity-text {
+    display: inline-block;
+    font-weight: 900;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, #ffffff 0%, #4facfe 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* No shadow - removed per design */
+
+    /* The Antigravity Animation */
+    animation: float-up 6s ease-in-out infinite;
+    position: relative;
+}
+
+/* Light theme: dark text, no shadow */
+html:not(.dark) .antigravity-text {
+    background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    filter: none;
+    position: relative;
+    z-index: 1;
+    animation: text-vibe 5s ease-in-out infinite;
+    background-size: 200% auto;
+}
+
+@keyframes text-vibe {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Light theme: hide all hero aurora blobs (professional tone) */
+html:not(.dark) .hero-aurora-blob {
+    display: none !important;
+}
+
+@keyframes aurora-float {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    33% {
+        transform: translate(10%, 15%) scale(1.2);
+    }
+
+    66% {
+        transform: translate(-5%, 10%) scale(0.8);
+    }
+
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+}
+
+/* Override: keep hero blobs hidden in light (they share .hero-aurora-blob) */
+html:not(.dark) .hero-aurora-1,
+html:not(.dark) .hero-aurora-2,
+html:not(.dark) .hero-aurora-3 {
+    display: none !important;
+}
+
+/* Light theme: remove glass overlay (blur circles) from hero */
+html:not(.dark) .hero-glass-blur {
+    display: none !important;
+}
+
+/* Enhanced Neural Core for Light Mode */
+html:not(.dark) #hyper-neural-canvas {
+    filter: drop-shadow(0 0 40px rgba(2, 132, 199, 0.3)) drop-shadow(0 0 60px rgba(14, 165, 233, 0.2));
+}
+
+html:not(.dark) .core-inner-glow {
+    background: radial-gradient(circle, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%);
+    opacity: 0.6 !important;
+}
+
+@keyframes float-up {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+        filter: none;
+    }
+
+    50% {
+        transform: translateY(-20px) rotate(1deg);
+        filter: none;
+    }
+
+    100% {
+        transform: translateY(0px) rotate(0deg);
+        filter: none;
+    }
+}
+
+/* Optional: Particle-like glow behind the text (dark theme only; hidden in light to avoid shadow) */
+.antigravity-text::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(79, 172, 254, 0.15) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    animation: pulse-glow 4s ease-in-out infinite;
+}
+
+html:not(.dark) .antigravity-text::after {
+    display: none;
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+}
+
+/* Multiverse Description Styling */
+.description-container {
+    position: relative;
+    margin-top: 20px;
+    padding: 15px;
+    border-left: 3px solid var(--simon-secondary);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+}
+
+.multiverse-text {
+    font-size: 1.4rem;
+    color: #e0e0e0;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+}
+
+.sub-detail {
+    font-size: 1rem;
+    color: #a5a5a5;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.plant-tag {
+    color: #06b6d4;
+    text-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
+}
+
+html:not(.dark) .plant-tag {
+    color: #0284c7;
+    text-shadow: none;
+    font-weight: 700;
+}
+
+html:not(.dark) .multiverse-text {
+    color: #334155;
+}
+
+/* Light theme: no glass in hero – solid background, no backdrop blur */
+html:not(.dark) .description-container {
+    background: #ffffff;
+    border-left: 4px solid var(--simon-accent, #0284c7);
+    border-image: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+/* The Scanner Effect */
+.scanner-line {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(79, 172, 254, 0.2),
+            transparent);
+    animation: scan-move 4s infinite linear;
+}
+
+@keyframes scan-move {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 150%;
+    }
+}
+
+/* --- Advance Mode Nested Dropdown --- */
+.advance-mode-parent {
+    position: relative;
+    cursor: pointer;
+}
+
+.advance-mode-parent .advance-mode-arrow {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.advance-mode-parent.active .advance-mode-arrow {
+    transform: rotate(90deg);
+}
+
+.advance-mode-submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding-left: 1rem;
+}
+
+.advance-mode-submenu.open {
+    max-height: 200px;
+}
+
+.submenu-option {
+    padding-left: 1rem !important;
+    font-size: 0.9rem;
+}
+
+/* --- Crazy 3D Card Effects --- */
+.crazy-card-container {
+    perspective: 1000px;
+}
+
+.crazy-card {
+    background: var(--simon-glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: var(--simon-radius-lg);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    will-change: transform;
+    text-decoration: none;
+    /* Ensure link underline is removed */
+}
+
+/* Holographic dynamic gradient background */
+.crazy-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(255, 255, 255, 0.1),
+            transparent 40%);
+    opacity: 0;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Neon Border effect on hover */
+.crazy-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--simon-radius-lg);
+    padding: 1.5px;
+    background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            var(--simon-accent),
+            transparent 40%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.crazy-card:hover::before,
+.crazy-card:hover::after {
+    opacity: 1;
+}
+
+.crazy-card:hover {
+    box-shadow: 0 0 40px rgba(109, 93, 252, 0.1);
+    /* Transform handled by JS for tilt */
+}
+
+/* Inner 3D depth for content - targeting direct children or specific wrappers */
+.crazy-card>div {
+    transform: translateZ(20px);
+    position: relative;
+    z-index: 10;
+    pointer-events: none;
+    /* Let clicks pass through to card (if needed) or keep auto */
+}
+
+/* Floating Icon Animation */
+@keyframes floatIcon {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.crazy-card-icon-wrapper {
+    animation: floatIcon 4s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* LIVE animated tag text */
+.live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--simon-success);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+}
+
+/* Sparkline Pulse */
+@keyframes sparklineDraw {
+    0% {
+        stroke-dashoffset: 100;
+        opacity: 0.5;
+    }
+
+    50% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+
+    100% {
+        stroke-dashoffset: -100;
+        opacity: 0.5;
+    }
+}
+
+.crazy-sparkline path {
+    stroke-dasharray: 100;
+    animation: sparklineDraw 3s linear infinite;
+}
+
+/* --- 12. Crazy Dashboard Icon Animations --- */
+
+/* Base SVG styling */
+.crazy-icon-svg {
+    filter: drop-shadow(0 0 5px rgba(109, 93, 252, 0.3));
+    transition: all 0.5s ease;
+}
+
+.crazy-card:hover .crazy-icon-svg {
+    filter: drop-shadow(0 0 15px rgba(109, 93, 252, 0.8));
+    transform: scale(1.1);
+}
+
+/* Animations Keyframes */
+@keyframes spin-slow {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spin-reverse-slow {
+    0% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes pulse-neon {
+
+    0%,
+    100% {
+        opacity: 0.6;
+        filter: drop-shadow(0 0 2px currentColor);
+    }
+
+    50% {
+        opacity: 1;
+        filter: drop-shadow(0 0 8px currentColor);
+    }
+}
+
+@keyframes dash-draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes float-y {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes blink-random {
+
+    0%,
+    90% {
+        opacity: 1;
+    }
+
+    92% {
+        opacity: 0.2;
+    }
+
+    94% {
+        opacity: 1;
+    }
+
+    96% {
+        opacity: 0.2;
+    }
+
+    98% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Icon Parts Classes */
+.icon-ring {
+    transform-origin: center;
+    animation: spin-slow 12s linear infinite;
+}
+
+.icon-ring-reverse {
+    transform-origin: center;
+    animation: spin-reverse-slow 15s linear infinite;
+}
+
+.icon-core {
+    transform-origin: center;
+    animation: pulse-neon 3s ease-in-out infinite;
+}
+
+.icon-floater {
+    animation: float-y 4s ease-in-out infinite;
+}
+
+.icon-blink {
+    animation: blink-random 5s infinite;
+}
+
+/* Specific color themes for icon types */
+.crazy-icon-sap {
+    color: #f472b6;
+}
+
+/* Pink */
+.crazy-icon-dap {
+    color: #2ee6ff;
+}
+
+/* Cyan */
+.crazy-icon-pap {
+    color: #fbbf24;
+}
+
+/* Amber */
+.crazy-icon-ammonia {
+    color: #34d399;
+}
+
+/* Green */
+
+/* --- 13. Premium Dropdown Select (Simon Upgrade) --- */
+.simon-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+
+    /* Background & Glass Effect */
+    background-color: rgba(11, 16, 32, 0.6);
+    background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236d5dfc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 0px, 1.2rem;
+    /* Hide grid line if not needed, size arrow */
+
+    /* Border & Shape */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--simon-radius-sm);
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    /* Right padding for arrow space */
+
+    /* Typography */
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: var(--simon-text-main);
+    letter-spacing: 0.01em;
+
+    /* Transitions */
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.simon-select:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 15px rgba(109, 93, 252, 0.15);
+}
+
+.simon-select:focus {
+    outline: none;
+    border-color: var(--simon-accent);
+    background-color: var(--simon-bg-panel);
+    /* Darker on focus for contrast */
+    box-shadow: 0 0 0 2px rgba(109, 93, 252, 0.25), 0 0 20px rgba(109, 93, 252, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Option styling (limited support in some browsers, but good for defaults) */
+.simon-select option {
+    background-color: var(--simon-bg-panel);
+    /* Matches --simon-bg-panel */
+    color: var(--simon-text-main);
+    padding: 10px;
+}
+
+/* --- 14. Redesigned Premium Sidebar --- */
+.sidebar-premium {
+    background: rgba(228, 234, 255, 0.45) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border-right: 1px solid rgba(139, 92, 246, 0.08) !important;
+    box-shadow: 10px 0 40px rgba(0, 0, 0, 0.02) !important;
+}
+
+html.dark .sidebar-premium {
+    background: rgba(15, 23, 42, 0.85) !important;
+    border-right: 1px solid rgba(6, 182, 212, 0.1) !important;
+}
+
+.new-chat-btn-premium {
+    background: rgba(186, 196, 255, 0.4) !important;
+    color: #6d5dfc !important;
+    border: 1px solid rgba(109, 93, 252, 0.15) !important;
+    border-radius: 9999px !important;
+    padding: 0.85rem 1.25rem !important;
+    font-weight: 700 !important;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.6rem !important;
+    width: 100% !important;
+    font-size: 1rem !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* --- 15. Premium Custom Scrollbar --- */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(109, 93, 252, 0.2);
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(109, 93, 252, 0.4);
+}
+
+/* Firefox Support */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(109, 93, 252, 0.2) transparent;
+}
+
+.new-chat-btn-premium:hover {
+    background: rgba(186, 196, 255, 0.6) !important;
+    transform: translateY(-2px) scale(1.01) !important;
+    box-shadow: 0 10px 25px rgba(109, 93, 252, 0.1) !important;
+    border-color: rgba(109, 93, 252, 0.3) !important;
+}
+
+.sidebar-section-header {
+    font-size: 0.7rem !important;
+    font-weight: 800 !important;
+    color: #94a3b8 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    margin-top: 2.25rem !important;
+    margin-bottom: 1rem !important;
+    padding: 0 0.75rem !important;
+    opacity: 0.8 !important;
+}
+
+.session-item-premium {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.85rem !important;
+    padding: 0.75rem 0.85rem !important;
+    border-radius: 0.85rem !important;
+    color: #94a3b8 !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    margin-bottom: 0.15rem !important;
+}
+
+.session-item-premium:hover {
+    background: rgba(186, 196, 255, 0.15) !important;
+    color: #6366f1 !important;
+}
+
+.session-item-premium.active {
+    background: rgba(186, 196, 255, 0.25) !important;
+    color: #6d5dfc !important;
+    font-weight: 700 !important;
+}
+
+.session-icon-soft {
+    width: 1.15rem !important;
+    height: 1.15rem !important;
+    opacity: 0.6 !important;
+}
+
+.session-item-premium:hover .session-icon-soft,
+.session-item-premium.active .session-icon-soft {
+    opacity: 1 !important;
+}
+
+.session-title-text {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    letter-spacing: 0.01em !important;
+}
+
+/* --- 16. Technical Typography & Industrial Styling --- */
+.technical-metadata {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.625rem;
+    /* 10px */
+    letter-spacing: 0.05em;
+    color: #64748b;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.blueprint-text {
+    color: #0284c7;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+}
+
+html.dark .technical-metadata {
+    color: #94a3b8;
+}
+
+html.dark .blueprint-text {
+    color: #0ea5e9;
+}
+
+/* Listening Modal */
+.listening-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    /* Lighter backdrop */
+    backdrop-filter: blur(8px);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.listening-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.listening-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 2.5rem 3rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    min-width: 320px;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.listening-modal.active .listening-content {
+    transform: scale(1);
+}
+
+.listening-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: white;
+    letter-spacing: 0.02em;
+}
+
+.listening-dots {
+    display: flex;
+    gap: 16px;
+}
+
+.listening-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.listening-dot:nth-child(1) {
+    background-color: #4285F4;
+    animation-delay: -0.32s;
+}
+
+/* Blue */
+.listening-dot:nth-child(2) {
+    background-color: #EA4335;
+    animation-delay: -0.16s;
+}
+
+/* Red */
+.listening-dot:nth-child(3) {
+    background-color: #FBBC05;
+    animation-delay: 0s;
+}
+
+/* Yellow */
+.listening-dot:nth-child(4) {
+    background-color: #34A853;
+    animation-delay: 0.16s;
+}
+
+/* Green */
+
+@keyframes bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+
+    40% {
+        transform: scale(1.5);
+    }
+}
+
+/* Share Button Refinements */
+#share-session {
+    font-weight: 700 !important;
+    letter-spacing: 0.05em !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.4) !important;
+}
+
+#share-session:hover {
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    transform: translateY(-2px) scale(1.05) !important;
+    box-shadow: 0 0 30px rgba(124, 58, 237, 0.6) !important;
+}
+
+/* =========================================
+   10. REDESIGNED DASHBOARD LIGHT MODE
+   ========================================= */
+
+/* 1. Remove Neuro/Noise Overlay */
+html:not(.dark) body.dashboard-mode::before,
+html:not(.dark) body.dashboard-mode #neuro-bg-canvas {
+    display: none !important;
+    background: none !important;
+}
+
+/* 2. Clean Background Color */
+html:not(.dark) body.dashboard-mode {
+    background: #F8FAFC !important;
+    /* Clean industrial slate-50 */
+    background-image: none !important;
+}
+
+/* 3. Refined Card Styles - Attractive Premium Look */
+html:not(.dark) body.dashboard-mode .crazy-card {
+    /* Subtle gradient: White -> Very soft blue-grey */
+    background: linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%) !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    border-radius: 16px !important;
+    /* Slightly more rounded for "attractive" feel */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add a subtle top highlight for 3D feel */
+html:not(.dark) body.dashboard-mode .crazy-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+    display: block !important;
+}
+
+html:not(.dark) body.dashboard-mode .crazy-card::before {
+    display: none !important;
+    /* Kill the spotlight/glow effect */
+}
+
+/* 4. Card Hover State - Subtle Lift */
+html:not(.dark) body.dashboard-mode .crazy-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--simon-accent) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 5. Icons - Clean Slate Background */
+html:not(.dark) body.dashboard-mode .crazy-card-icon-wrapper {
+    background: #F1F5F9 !important;
+    /* Slate-100 */
+    border: none !important;
+    color: var(--simon-accent);
+}
+
+/* 6. Remove "LIVE" Text and "AI-ACTIVE" Badge in Light Mode */
+body.dashboard-mode .crazy-card .ai-active-badge,
+body.dashboard-mode .crazy-card .live-text-label {
+    display: none !important;
+}
+
+/* 7. Keep the "Green Bubble" but remove the container style */
+body.dashboard-mode .crazy-card .live-indicator {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* --- Enhanced New Chat Button (added via AI) --- */
+#sidebar-new-chat {
+    background: linear-gradient(145deg, var(--simon-bg-panel), var(--simon-bg-secondary));
+    border: 1px solid var(--simon-border-medium);
+    border-radius: 14px;
+    padding: 10px 14px !important;
+    /* Overriding Tailwind padding */
+    margin-bottom: 12px;
+    box-shadow: var(--simon-shadow-md);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+html.dark #sidebar-new-chat {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+#sidebar-new-chat:hover {
+    border-color: var(--simon-accent);
+    box-shadow: 0 8px 25px -5px var(--simon-accent-glow);
+    transform: translateY(-2px);
+}
+
+/* Text Styling */
+#sidebar-new-chat span.text-xs {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: linear-gradient(90deg, var(--simon-text-primary), var(--simon-text-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: all 0.3s ease;
+}
+
+html.dark #sidebar-new-chat span.text-xs {
+    background: linear-gradient(90deg, #fff, #cbd5e1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#sidebar-new-chat:hover span.text-xs {
+    background: var(--simon-gradient-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Icon Container Styling */
+#sidebar-new-chat .w-8.h-8 {
+    background: var(--simon-accent) !important;
+    color: white !important;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px var(--simon-accent-glow);
+    transition: all 0.3s ease;
+}
+
+html.dark #sidebar-new-chat .w-8.h-8 {
+    background: linear-gradient(135deg, var(--simon-accent), var(--cyber-secondary)) !important;
+}
+
+#sidebar-new-chat:hover .w-8.h-8 {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 15px var(--simon-accent-glow);
+}
+
+/* Right Arrow Icon Styling */
+#sidebar-new-chat .rounded-full.border {
+    border-color: transparent !important;
+    background: rgba(var(--simon-accent-rgb), 0.1);
+    color: var(--simon-accent);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+#sidebar-new-chat:hover .rounded-full.border {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* --- Visual Intel Grid (ChatGPT-style) --- */
+.visual-intel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.visual-intel-grid:has(> :only-child) {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+}
+
+.visual-intel-card {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+html:not(.dark) .visual-intel-card {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.visual-intel-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--cyber-primary);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.visual-intel-img-container {
+    position: relative;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: #000;
+}
+
+.visual-intel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.visual-intel-card:hover .visual-intel-img {
+    transform: scale(1.05);
+}
+
+/* =========================================
+   PREMIUM TABLE & COPY BUTTON STYLES
+   ========================================= */
+
+/* --- User Message Copy Button --- */
+.user-msg-content {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.copy-msg-btn {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.25s ease;
+    z-index: 5;
+}
+
+.simon-chat-bubble.user:hover .copy-msg-btn {
+    opacity: 1;
+}
+
+.copy-msg-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.copy-msg-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* --- Table Wrapper & Copy Button --- */
+.table-wrapper {
+    position: relative;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--simon-border-subtle, #e2e8f0);
+    margin: 1rem 0;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+html.dark .table-wrapper {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(15, 23, 42, 0.4);
+}
+
+.copy-table-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.65);
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.25s ease;
+    z-index: 10;
+}
+
+.table-wrapper:hover .copy-table-btn {
+    opacity: 1;
+}
+
+.copy-table-btn:hover {
+    background: rgba(15, 23, 42, 0.9);
+    color: #fff;
+    transform: scale(1.1);
+}
+
+html.dark .copy-table-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+html.dark .copy-table-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.copy-table-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* --- Premium Table Styles --- */
+.simon-markdown table,
+.simon-markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.simon-markdown table thead th,
+.simon-markdown-content table thead th {
+    background: #f1f5f9;
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    border-bottom: 2px solid #e2e8f0;
+    text-align: left;
+    white-space: nowrap;
+}
+
+html.dark .simon-markdown table thead th,
+html.dark .simon-markdown-content table thead th {
+    background: rgba(30, 41, 59, 0.8);
+    color: #e2e8f0;
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.simon-markdown table tbody td,
+.simon-markdown-content table tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--simon-text-primary, #1e293b);
+    vertical-align: top;
+}
+
+html.dark .simon-markdown table tbody td,
+html.dark .simon-markdown-content table tbody td {
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+    color: #cbd5e1;
+}
+
+/* Alternating Row Stripes */
+.simon-markdown table tbody tr:nth-child(even),
+.simon-markdown-content table tbody tr:nth-child(even) {
+    background: rgba(241, 245, 249, 0.5);
+}
+
+html.dark .simon-markdown table tbody tr:nth-child(even),
+html.dark .simon-markdown-content table tbody tr:nth-child(even) {
+    background: rgba(30, 41, 59, 0.3);
+}
+
+/* Row Hover */
+.simon-markdown table tbody tr:hover,
+.simon-markdown-content table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+html.dark .simon-markdown table tbody tr:hover,
+html.dark .simon-markdown-content table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+/* =========================================
+   FLOW DIAGRAM - PREMIUM BLOCK DIAGRAM STYLES
+   ========================================= */
+
+.flow-diagram-container {
+    margin-top: 1.25rem;
+    border-radius: 16px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.7) 0%, rgba(30, 27, 75, 0.5) 50%, rgba(13, 19, 33, 0.9) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 32px rgba(99, 102, 241, 0.08), 0 0 60px rgba(139, 92, 246, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.flow-diagram-container.loaded {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+html:not(.dark) .flow-diagram-container {
+    background: linear-gradient(145deg, rgba(241, 245, 249, 0.98) 0%, rgba(224, 231, 255, 0.6) 50%, rgba(255, 255, 255, 0.98) 100%);
+    border-color: rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 32px rgba(99, 102, 241, 0.08), 0 8px 16px rgba(0, 0, 0, 0.04);
+}
+
+/* Header */
+.flow-diagram-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.04) 100%);
+}
+
+html:not(.dark) .flow-diagram-header {
+    border-bottom-color: rgba(99, 102, 241, 0.12);
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.03) 100%);
+}
+
+.flow-diagram-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: linear-gradient(90deg, #818cf8, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+html:not(.dark) .flow-diagram-header-left {
+    background: linear-gradient(90deg, #6366f1, #7c3aed);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.flow-diagram-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.9;
+    stroke: #818cf8;
+}
+
+html:not(.dark) .flow-diagram-icon {
+    stroke: #6366f1;
+}
+
+.flow-diagram-badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #a78bfa;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.18);
+    padding: 3px 12px;
+    border-radius: 100px;
+    letter-spacing: 0.04em;
+}
+
+html:not(.dark) .flow-diagram-badge {
+    color: #6366f1;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.06) 100%);
+    border-color: rgba(99, 102, 241, 0.18);
+}
+
+/* Content */
+.flow-diagram-content {
+    padding: 2rem 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 180px;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.flow-diagram-content svg {
+    max-width: 100%;
+    height: auto;
+    min-height: 100px;
+}
+
+/* Mermaid node text color override for dark mode */
+.flow-diagram-content .nodeLabel,
+.flow-diagram-content .node rect,
+.flow-diagram-content .node circle,
+.flow-diagram-content .node polygon {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+}
+
+/* Edge labels */
+.flow-diagram-content .edgeLabel {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 12px !important;
+}
+
+/* Node label text for better readability */
+.flow-diagram-content .nodeLabel {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0.01em !important;
+}
+
+/* Arrow markers */
+.flow-diagram-content marker path {
+    fill: #a78bfa !important;
+}
+
+/* Light mode Mermaid overrides for legibility */
+html:not(.dark) .flow-diagram-content .nodeLabel {
+    color: #fff !important;
+    fill: #fff !important;
+}
+
+html:not(.dark) .flow-diagram-content .edgePath .path {
+    stroke: #6366f1 !important;
+    stroke-width: 2px !important;
+}
+
+html:not(.dark) .flow-diagram-content marker path {
+    fill: #6366f1 !important;
+}
+
+/* =========================================
+   PREMIUM MODAL STYLES (Delete, Hallucination Warning)
+   ========================================= */
+
+.premium-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.premium-modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.premium-modal-container {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.97) 0%, rgba(30, 41, 59, 0.98) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 2.5rem 2rem 2rem;
+    min-width: 380px;
+    max-width: 440px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+        0 0 80px rgba(99, 102, 241, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+html:not(.dark) .premium-modal-container {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.99) 100%);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15),
+        0 0 80px rgba(99, 102, 241, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.premium-modal-overlay.active .premium-modal-container {
+    transform: scale(1) translateY(0);
+}
+
+/* Top glow accent bar */
+.premium-modal-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 24px 24px 0 0;
+}
+
+/* Danger theme (delete) */
+.premium-modal-container.danger::before {
+    background: linear-gradient(90deg, #ef4444, #f97316, #ef4444);
+}
+
+/* Warning theme (hallucination) */
+.premium-modal-container.warning::before {
+    background: linear-gradient(90deg, #f59e0b, #a78bfa, #6366f1);
+}
+
+.premium-modal-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    position: relative;
+}
+
+/* Danger icon */
+.premium-modal-icon.danger {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(249, 115, 22, 0.1) 100%);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.1);
+}
+
+.premium-modal-icon.danger svg {
+    width: 32px;
+    height: 32px;
+    stroke: #f87171;
+}
+
+/* Warning icon */
+.premium-modal-icon.warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(167, 139, 250, 0.1) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.1);
+    animation: premium-modal-pulse 2s ease-in-out infinite;
+}
+
+.premium-modal-icon.warning svg {
+    width: 32px;
+    height: 32px;
+    stroke: #fbbf24;
+}
+
+@keyframes premium-modal-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 30px rgba(245, 158, 11, 0.1);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(245, 158, 11, 0.2);
+    }
+}
+
+.premium-modal-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 0.6rem;
+    letter-spacing: -0.01em;
+}
+
+html:not(.dark) .premium-modal-title {
+    color: #1e293b;
+}
+
+.premium-modal-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 1.75rem;
+    padding: 0 0.5rem;
+}
+
+html:not(.dark) .premium-modal-desc {
+    color: #64748b;
+}
+
+.premium-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.premium-modal-btn {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.7rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    letter-spacing: 0.02em;
+    min-width: 120px;
+}
+
+/* Cancel / secondary button */
+.premium-modal-btn.cancel {
+    background: rgba(255, 255, 255, 0.06);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html:not(.dark) .premium-modal-btn.cancel {
+    background: rgba(0, 0, 0, 0.04);
+    color: #64748b;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.premium-modal-btn.cancel:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    transform: translateY(-1px);
+}
+
+html:not(.dark) .premium-modal-btn.cancel:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #334155;
+}
+
+/* Danger / destructive button */
+.premium-modal-btn.danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+}
+
+.premium-modal-btn.danger:hover {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+}
+
+/* Primary / accent button */
+.premium-modal-btn.primary {
+    background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+}
+
+.premium-modal-btn.primary:hover {
+    background: linear-gradient(135deg, #818cf8 0%, #8b5cf6 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+}

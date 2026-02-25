@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Marked Reproduction</title>
+    <!-- Use the exact same CDN link as search.html -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        .output {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px;
+            background: #f9f9f9;
+        }
+
+        .debug {
+            color: blue;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Marked.js Reproduction</h1>
+
+    <div id="container"></div>
+
+    <script>
+        const text = 'The main components include raw material feeders, a Preneutralizer, Pipe Reactors, and a Granulator. Downstream processing involves a Dryer, Product Cooler, screens for sizing, and mills. The plant is also equipped with a Coater Drum for final product treatment and a comprehensive gas scrubbing system for emission control.';
+
+        const container = document.getElementById('container');
+
+        // 1. Direct Markdown Parsing
+        try {
+            const html = marked.parse(text);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'output';
+            wrapper.innerHTML = html;
+
+            const label = document.createElement('div');
+            label.textContent = 'Rendered Output:';
+            container.appendChild(label);
+            container.appendChild(wrapper);
+
+            const debug = document.createElement('div');
+            debug.className = 'debug';
+            debug.innerText = 'Raw HTML Output from marked.parse:\n' + html;
+            container.appendChild(debug);
+
+        } catch (e) {
+            container.innerText = 'Error: ' + e.message;
+        }
+    </script>
+</body>
+
+</html>

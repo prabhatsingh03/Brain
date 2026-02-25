@@ -1,0 +1,396 @@
+{
+    "metadata": {
+        "description": "Complete DAP Process Flow Diagram mapping for 3D visualization",
+        "version": "2.1",
+        "last_updated": "2026-02-06",
+        "equipment_count": 9,
+        "flow_count": 15
+    },
+    "equipment": [
+        {
+            "id": "pre_neutralizer",
+            "name": "PRE-NEUT",
+            "type": "reactor",
+            "position": {
+                "x": -70,
+                "y": 0,
+                "z": 40
+            },
+            "dimensions": {
+                "radius": 6,
+                "height": 14
+            },
+            "has_agitator": true,
+            "color": "#00f3ff"
+        },
+        {
+            "id": "pipe_reactor",
+            "name": "PIPE REACTOR 1",
+            "type": "pipe_reactor",
+            "position": {
+                "x": -25,
+                "y": 45,
+                "z": 30
+            },
+            "color": "#00f3ff"
+        },
+        {
+            "id": "pipe_reactor_2",
+            "name": "SULPHURIC PIPE REACTOR",
+            "type": "pipe_reactor",
+            "position": {
+                "x": -25,
+                "y": 55,
+                "z": 30
+            },
+            "color": "#00f3ff"
+        },
+        {
+            "id": "granulator",
+            "name": "GRANULATOR",
+            "type": "granulator",
+            "position": {
+                "x": 30,
+                "y": 0,
+                "z": 40
+            },
+            "dimensions": {
+                "radius": 5,
+                "length": 15
+            },
+            "color": "#00f3ff"
+        },
+        {
+            "id": "pr_tank",
+            "name": "PR TANK",
+            "type": "tank",
+            "position": {
+                "x": -90,
+                "y": 0,
+                "z": 85
+            },
+            "dimensions": {
+                "radius": 2.5,
+                "height": 5
+            },
+            "has_agitator": true,
+            "color": "#bc13fe"
+        },
+        {
+            "id": "defoamer_tank",
+            "name": "DEFOAMER",
+            "type": "tank",
+            "position": {
+                "x": -50,
+                "y": 0,
+                "z": 100
+            },
+            "dimensions": {
+                "radius": 1.5,
+                "height": 3
+            },
+            "color": "#ff0055"
+        },
+        {
+            "id": "pre_scrubber_tank",
+            "name": "PRE-SCRUB TANK",
+            "type": "tank",
+            "position": {
+                "x": 20,
+                "y": 0,
+                "z": 50
+            },
+            "dimensions": {
+                "radius": 3,
+                "height": 6
+            },
+            "color": "#ffff00"
+        },
+        {
+            "id": "fumes_pre_scrubber",
+            "name": "FUMES PRE",
+            "type": "scrubber",
+            "position": {
+                "x": 45,
+                "y": 0,
+                "z": -20
+            },
+            "dimensions": {
+                "height": 16
+            },
+            "color": "#0aff0a"
+        },
+        {
+            "id": "fumes_scrubber",
+            "name": "FUMES SCRUB",
+            "type": "scrubber",
+            "position": {
+                "x": 95,
+                "y": 0,
+                "z": -20
+            },
+            "dimensions": {
+                "height": 18
+            },
+            "color": "#0aff0a"
+        },
+        {
+            "id": "dedust_scrubber",
+            "name": "DEDUST & COOL",
+            "type": "scrubber",
+            "position": {
+                "x": 145,
+                "y": 0,
+                "z": -20
+            },
+            "dimensions": {
+                "height": 20
+            },
+            "color": "#0aff0a"
+        },
+        {
+            "id": "dryer_scrubber",
+            "name": "DRYER SCRUB",
+            "type": "scrubber",
+            "position": {
+                "x": 195,
+                "y": 0,
+                "z": -20
+            },
+            "dimensions": {
+                "height": 20
+            },
+            "color": "#0aff0a"
+        },
+        {
+            "id": "tail_gas_absorber",
+            "name": "TAIL GAS",
+            "type": "scrubber",
+            "position": {
+                "x": 250,
+                "y": 0,
+                "z": 0
+            },
+            "dimensions": {
+                "height": 32
+            },
+            "has_stack": true,
+            "color": "#0aff0a"
+        },
+        {
+            "id": "system_fan",
+            "name": "SYSTEM FAN",
+            "type": "fan",
+            "position": {
+                "x": 225,
+                "y": 35,
+                "z": -15
+            },
+            "color": "#00f3ff"
+        },
+        {
+            "id": "scrubber_tank",
+            "name": "SCRUBBER TANK",
+            "type": "horizontal_tank",
+            "position": {
+                "x": 120,
+                "y": 0,
+                "z": 50
+            },
+            "dimensions": {
+                "radius": 2.5,
+                "length": 10
+            },
+            "color": "#ffff00"
+        },
+        {
+            "id": "rotary_dryer",
+            "name": "ROTARY DRYER",
+            "type": "evaporator_dryer",
+            "position": {
+                "x": 100,
+                "y": 0,
+                "z": 40
+            },
+            "dimensions": {
+                "width": 8,
+                "height": 12,
+                "depth": 8
+            },
+            "color": "#ffff00"
+        }
+    ],
+    "flows": [
+        {
+            "id": "I1_liquid_ammonia",
+            "name": "Liquid NH3 Feed",
+            "type": "input",
+            "material": "liquid_ammonia",
+            "color": "#00f3ff",
+            "source": "external",
+            "destination": "pipe_reactor"
+        },
+        {
+            "id": "I2_gaseous_ammonia",
+            "name": "Gaseous NH3 Feed",
+            "type": "input",
+            "material": "gas_ammonia",
+            "color": "#0aff0a",
+            "source": "external",
+            "destination": "pre_neutralizer"
+        },
+        {
+            "id": "I3_phosphoric_acid",
+            "name": "H3PO4 Acid Feed",
+            "type": "input",
+            "material": "phosphoric_acid",
+            "color": "#ff0055",
+            "source": "external",
+            "destination": "pre_neutralizer"
+        },
+        {
+            "id": "I4_sulfuric_acid",
+            "name": "H2SO4 Feed",
+            "type": "input",
+            "material": "sulfuric_acid",
+            "color": "#ff0055",
+            "source": "external",
+            "destination": "pipe_reactor_2"
+        },
+        {
+            "id": "I5_upflow",
+            "name": "Recycle Stream",
+            "type": "input",
+            "material": "slurry",
+            "color": "#bc13fe",
+            "source": "external",
+            "destination": "granulator"
+        },
+        {
+            "id": "I6_mp_steam",
+            "name": "MP Steam",
+            "type": "input",
+            "material": "steam",
+            "color": "#ffffff",
+            "source": "external",
+            "destination": "rotary_dryer"
+        },
+        {
+            "id": "F3_to_granulator",
+            "name": "Pre-Neut → Granulator",
+            "type": "internal",
+            "material": "slurry",
+            "color": "#bc13fe",
+            "source": "pre_neutralizer",
+            "destination": "granulator"
+        },
+        {
+            "id": "F4_to_granulator",
+            "name": "Pipe Reactors → Granulator",
+            "type": "internal",
+            "material": "slurry",
+            "color": "#bc13fe",
+            "source": "pipe_reactor",
+            "destination": "granulator"
+        },
+        {
+            "id": "F5_to_dryer",
+            "name": "Granulator → Dryer",
+            "type": "internal",
+            "material": "slurry",
+            "color": "#bc13fe",
+            "source": "granulator",
+            "destination": "rotary_dryer"
+        },
+        {
+            "id": "F7_defoamer",
+            "name": "Defoamer Dosing",
+            "type": "internal",
+            "material": "defoamer",
+            "color": "#ff0055",
+            "source": "defoamer_tank",
+            "destination": "pre_neutralizer"
+        },
+        {
+            "id": "F8_scrubber_recycle",
+            "name": "Scrubber Recycle",
+            "type": "internal",
+            "material": "scrubber_liquor",
+            "color": "#ffff00",
+            "source": "scrubber_tank",
+            "destination": "fumes_pre_scrubber"
+        },
+        {
+            "id": "G1_reactor_fumes",
+            "name": "Reactor Fumes",
+            "type": "gas",
+            "material": "process_gas",
+            "color": "#0aff0a",
+            "source": "pre_neutralizer",
+            "destination": "fumes_pre_scrubber"
+        },
+        {
+            "id": "G2_scrubber_train",
+            "name": "Scrubber Train",
+            "type": "gas",
+            "material": "process_gas",
+            "color": "#0aff0a",
+            "source": "fumes_pre_scrubber",
+            "destination": "tail_gas_absorber"
+        },
+        {
+            "id": "G3_dryer_offgas",
+            "name": "Dryer Off-Gas",
+            "type": "gas",
+            "material": "steam",
+            "color": "#ffffff",
+            "source": "rotary_dryer",
+            "destination": "dryer_scrubber"
+        },
+        {
+            "id": "O1_dried_product",
+            "name": "Dried Product",
+            "type": "output",
+            "material": "dry_dap",
+            "color": "#ffff00",
+            "source": "rotary_dryer",
+            "destination": "external"
+        },
+        {
+            "id": "O2_stack_emission",
+            "name": "Stack FM1 Emission",
+            "type": "output",
+            "material": "clean_gas",
+            "color": "#ffffff",
+            "source": "tail_gas_absorber",
+            "destination": "atmosphere"
+        }
+    ],
+    "process_summary": {
+        "zones": {
+            "reaction": [
+                "pre_neutralizer",
+                "pipe_reactor",
+                "pipe_reactor_2",
+                "pr_tank",
+                "defoamer_tank",
+                "pre_scrubber_tank",
+                "granulator"
+            ],
+            "gas_treatment": [
+                "fumes_pre_scrubber",
+                "fumes_scrubber",
+                "dedust_scrubber",
+                "dryer_scrubber",
+                "tail_gas_absorber",
+                "system_fan"
+            ],
+            "product_finishing": [
+                "scrubber_tank",
+                "rotary_dryer"
+            ]
+        },
+        "main_flow_path": "NH3 + Acid → Pre-Neut → Pipe Reactors → Granulator → Dryer → Product",
+        "gas_treatment_path": "Fumes → Pre-Scrubber → Scrubber Train → Stack"
+    }
+}

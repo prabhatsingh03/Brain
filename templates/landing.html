@@ -1,0 +1,1723 @@
+{% extends "base.html" %}
+
+{% block header %}
+<!-- Proton Nav -->
+<nav
+    class="fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-[#0f172a]/20 backdrop-blur-md border-b border-slate-200 dark:border-white/10 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-24">
+            <!-- Logo area -->
+            <a href="/" class="flex items-center group">
+                <img src="{{ url_for('static', filename='images/simon_india_logo.png') }}" alt="SIA Logo"
+                    class="h-12 w-auto animate-float">
+                <span
+                    class="ml-3 text-2xl font-bold tracking-tight text-gray-900 dark:text-white group-hover:text-sky-400 transition-colors">
+                    SIA
+                </span>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-4">
+
+
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.dashboard') }}"
+                    class="text-slate-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">Dashboard</a>
+                <a href="{{ url_for('auth.logout') }}"
+                    class="text-slate-600 dark:text-slate-300 hover:text-gray-900 dark:hover:text-white transition-colors font-medium">Logout</a>
+                {% else %}
+                <button onclick="openAuthModal('login')"
+                    class="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all duration-300 shadow-lg shadow-blue-500/20">
+                    Login
+                </button>
+                {% endif %}
+
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle-landing"
+                    class="p-2 rounded-lg bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 border border-white/10 transition-all duration-300 group"
+                    title="Toggle Theme">
+                    <!-- Sun Icon (Light Mode) -->
+                    <svg id="theme-icon-sun-landing" class="w-5 h-5 text-yellow-400 hidden" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                        </path>
+                    </svg>
+                    <!-- Moon Icon (Dark Mode) -->
+                    <svg id="theme-icon-moon-landing" class="w-5 h-5 text-blue-300" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+{% block main_margin %}{% endblock %}
+
+{% block content %}
+<!-- Proton Theme CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/simon_upgrade.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="relative min-h-screen flex flex-col items-center overflow-x-hidden font-sans">
+
+    <!-- Background (Defined in simon_upgrade.css body, but adding deeper layer here if needed) -->
+
+    <!-- GSAP & Three.js for Premium Motion -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        window.simonAssets = {
+            logo: "{{ url_for('static', filename='images/simon_india_logo.png') }}",
+            ai_brain: "{{ url_for('static', filename='images/ai_brain.png') }}",
+            login_ai: "{{ url_for('static', filename='images/login_ai.png') }}",
+            signup_ai: "{{ url_for('static', filename='images/signup_ai.png') }}",
+            glass_bg: "{{ url_for('static', filename='images/glass_bg.png') }}",
+            diagram_ai: "{{ url_for('static', filename='images/diagram_ai.png') }}",
+            ghost_turbine: "{{ url_for('static', filename='images/ghost_turbine.png') }}"
+        };
+
+        // Spotlight Effect Logic
+        document.addEventListener('turbo:load', () => {
+            const wrapper = document.getElementById('cards-spotlight-wrapper');
+            if (wrapper) {
+                const cards = wrapper.querySelectorAll('.bento-card');
+
+                wrapper.addEventListener('mousemove', (e) => {
+                    cards.forEach(card => {
+                        const rect = card.getBoundingClientRect();
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
+
+                        card.style.setProperty('--mouse-x', `${x}px`);
+                        card.style.setProperty('--mouse-y', `${y}px`);
+                    });
+                });
+            }
+        });
+    </script>
+
+
+    <!-- 1. Hero Section (Syncra Style) -->
+    <section id="hero-section" class="w-full min-h-screen flex flex-col relative overflow-hidden pt-20">
+
+        <!-- Animated Background Elements -->
+        <div class="absolute inset-0 z-0">
+            <!-- Dots Format Canvas -->
+            <canvas id="dots-format-canvas"></canvas>
+
+            <!-- CRAZY AURORA BLOBS (Light Mode) -->
+            <div class="hero-aurora-blob hero-aurora-1"></div>
+            <div class="hero-aurora-blob hero-aurora-2"></div>
+            <div class="hero-aurora-blob hero-aurora-3"></div>
+
+            <!-- Hyper-Neural Core (The "Crazy" Thing) -->
+            <div
+                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] z-0 pointer-events-none flex items-center justify-center">
+
+                <!-- Cybernetic Orbital Rings -->
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="hyper-ring ring-1"></div>
+                    <div class="hyper-ring ring-2"></div>
+                    <div class="hyper-ring ring-3"></div>
+                    <div class="hyper-ring ring-4"></div>
+                </div>
+
+                <!-- HUD Hologram Elements -->
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="hud-element hud-top">
+                        <span class="hud-label"></span>
+                        <div class="hud-bar"></div>
+                    </div>
+                    <div class="hud-element hud-bottom">
+                        <span class="hud-label"></span>
+                        <div class="hud-bar"></div>
+                    </div>
+                </div>
+
+                <!-- The Neural Sphere Canvas -->
+                <div class="relative w-[600px] h-[600px] flex items-center justify-center">
+                    <canvas id="hyper-neural-canvas"
+                        class="w-full h-full filter drop-shadow-[0_0_50px_rgba(6,182,212,0.5)]"></canvas>
+
+                    <!-- Core Inner Glow -->
+                    <div
+                        class="absolute w-40 h-40 bg-cyan-400/40 rounded-full blur-[80px] animate-pulse core-inner-glow">
+                    </div>
+                </div>
+
+            </div>
+
+            <div
+                class="hero-glass-blur absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-cyan-600/20 rounded-full blur-[120px] animate-float">
+            </div>
+            <div class="hero-glass-blur absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] animate-float"
+                style="animation-duration: 8s; animation-delay: 1s;"></div>
+
+            <!-- Grid Overlay (Subtle) -->
+            <!-- Grid Overlay Removed -->
+        </div>
+
+        <div
+            class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center flex flex-col items-center flex-grow justify-center">
+
+
+
+            <!-- Headline -->
+            <div class="hero-container">
+                <h1 class="antigravity-text">
+                    Simon Intelligence <br>
+                    Assistant
+                </h1>
+            </div>
+
+
+
+
+        </div>
+
+        <div class="w-full text-center pb-12 relative z-10">
+            <div class="description-container max-w-3xl mx-auto">
+                <p class="multiverse-text">
+                    <span class="scanner-line"></span>
+                    Synthesizing the Industrial Multiverse.
+                    <br>
+                    <span class="sub-detail">
+                        Real-time Truth Extraction for
+                        <strong class="plant-tag">DAP</strong> •
+                        <strong class="plant-tag">PAP</strong> •
+                        <strong class="plant-tag">SAP</strong> Operations.
+                    </span>
+                </p>
+            </div>
+        </div>
+
+
+    </section>
+
+    <!-- Stats / Social Proof (Glass Strip) - Positioned BETWEEN Hero and Features -->
+    <div class="w-full z-20 flex justify-center pointer-events-none relative">
+        <div class="w-full max-w-5xl px-4 pointer-events-auto">
+            <div
+                class="grid grid-cols-2 md:grid-cols-4 gap-8 py-6 px-8 rounded-2xl bg-white/90 dark:bg-[#0f172a]/60 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-sm dark:shadow-2xl">
+                <div class="text-center group hover:-translate-y-1 transition-transform duration-300">
+                    <div class="text-3xl font-bold text-gray-900 dark:text-white mb-1">700+</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-widest">Documents</div>
+                </div>
+                <div
+                    class="text-center group hover:-translate-y-1 transition-transform duration-300 transition-delay-100">
+                    <div class="text-3xl font-bold text-accent mb-1">100%</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-widest">Verified</div>
+                </div>
+                <div
+                    class="text-center group hover:-translate-y-1 transition-transform duration-300 transition-delay-200">
+                    <div class="text-3xl font-bold text-gray-900 dark:text-white mb-1">3</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-widest">Project Types</div>
+                </div>
+                <div
+                    class="text-center group hover:-translate-y-1 transition-transform duration-300 transition-delay-300">
+                    <div class="text-3xl font-bold text-gray-900 dark:text-white mb-1">24/7</div>
+                    <div class="text-xs text-slate-400 uppercase tracking-widest">Uptime</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Features Grid (Syncra Glass) -->
+    <section id="how-it-thinks" class="w-full py-32 px-6 relative z-10">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Wavy Icons Horizontal Scroller -->
+            <div class="wavy-icons-slider mb-20">
+                <div class="wavy-track">
+                    <!-- Set 1 -->
+                    <div class="wavy-icon-item">
+                        <svg class="text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span class="wavy-icon-label">Identity</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Structure</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <span class="wavy-icon-label">Logic</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="wavy-icon-label">Verify</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 13h6m-6-4h2m2 4v4m-2 0v-4" />
+                        </svg>
+                        <span class="wavy-icon-label">Facility</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Safety</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                        <span class="wavy-icon-label">Flows</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Metrics</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span class="wavy-icon-label">Power</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Issues</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                        <span class="wavy-icon-label">Data</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-fuchsia-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Secure</span>
+                    </div>
+
+                    <!-- Set 2 (Duplicate for loop) -->
+                    <div class="wavy-icon-item">
+                        <svg class="text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span class="wavy-icon-label">Identity</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Structure</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        <span class="wavy-icon-label">Logic</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="wavy-icon-label">Verify</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 13h6m-6-4h2m2 4v4m-2 0v-4" />
+                        </svg>
+                        <span class="wavy-icon-label">Facility</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Safety</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                        </svg>
+                        <span class="wavy-icon-label">Flows</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Metrics</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span class="wavy-icon-label">Power</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Issues</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                        <span class="wavy-icon-label">Data</span>
+                    </div>
+                    <div class="wavy-icon-item">
+                        <svg class="text-fuchsia-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                            </path>
+                        </svg>
+                        <span class="wavy-icon-label">Secure</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-24 reveal-on-scroll">
+                <h2 class="text-3xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+                    Core Functional <span class="accent-text-gradient">Modules</span>
+                </h2>
+                <p class="text-xl text-slate-400 max-w-2xl mx-auto font-light">
+                    Seven powerful modules that drive industrial knowledge excellence.
+                </p>
+            </div>
+
+            <div id="cards-spotlight-wrapper"
+                class="spotlight-group grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bento-card group reveal-on-scroll">
+                    <!-- Background Schematic (hidden in light theme) -->
+                    <div
+                        class="bento-card-bg absolute inset-0 z-0 opacity-10 group-hover:opacity-30 transition-opacity duration-500 mix-blend-plus-lighter">
+                        <img src="{{ url_for('static', filename='images/ai_brain.png') }}"
+                            class="w-full h-full object-cover" alt="Background">
+                    </div>
+
+                    <div class="text-accent mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                        <svg class="w-12 h-12 drop-shadow-[0_0_15px_rgba(109,93,252,0.5)]" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3 relative z-10">Process
+                        Knowledge
+                        Hub</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed font-light relative z-10">
+                        Main working interface with contextual memory. Remembers previous questions for natural
+                        conversation. Save and revisit chat history. Query across multiple linked projects
+                        simultaneously.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bento-card group reveal-on-scroll transition-delay-100">
+                    <!-- Background Schematic (hidden in light theme) -->
+                    <div
+                        class="bento-card-bg absolute inset-0 z-0 opacity-10 group-hover:opacity-30 transition-opacity duration-500 mix-blend-plus-lighter">
+                        <img src="{{ url_for('static', filename='images/knowledge_graph.png') }}"
+                            class="w-full h-full object-cover" alt="Background">
+                    </div>
+
+                    <div
+                        class="text-secondary mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                        <svg class="w-12 h-12 drop-shadow-[0_0_15px_rgba(46,230,255,0.5)]" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3 relative z-10">Dynamic Workspace
+                        Creation</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed font-light relative z-10">
+                        Create new knowledge spaces instantly. Just enter project name and description—zero
+                        developer
+                        intervention required. Add, edit, or delete documents in real-time.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bento-card group reveal-on-scroll transition-delay-200">
+                    <!-- Background Schematic (hidden in light theme) -->
+                    <div
+                        class="bento-card-bg absolute inset-0 z-0 opacity-10 group-hover:opacity-30 transition-opacity duration-500 mix-blend-plus-lighter">
+                        <img src="{{ url_for('static', filename='images/diagram_ai.png') }}"
+                            class="w-full h-full object-cover" alt="Visual Tech">
+                    </div>
+
+                    <div class="relative z-10">
+                        <div class="text-pink-500 mb-6 group-hover:scale-110 transition-transform duration-500">
+                            <svg class="w-12 h-12 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Process Relationship
+                            Mapping
+                        </h3>
+                        <p class="text-slate-600 dark:text-slate-400 leading-relaxed font-light">
+                            Link project types to cross-leverage data. Connect DAP, PAP, and SAP to understand how
+                            material, energy, and costs flow between units.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bento-card group reveal-on-scroll">
+                    <!-- Background Schematic (hidden in light theme) -->
+                    <div
+                        class="bento-card-bg absolute inset-0 z-0 opacity-10 group-hover:opacity-30 transition-opacity duration-500 mix-blend-plus-lighter">
+                        <img src="{{ url_for('static', filename='images/neural_core.png') }}"
+                            class="w-full h-full object-cover" alt="Background">
+                    </div>
+
+                    <div
+                        class="text-amber-400 mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                        <svg class="w-12 h-12 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3 relative z-10">Search
+                        Intelligence
+                        Levels</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed font-light relative z-10">
+                        Choose your depth: Basic (3-5 lines), Analytical (comparisons & tables), Research (document
+                        deep-dives), Expert (technical insights with chemical reactions).
+                    </p>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="bento-card group reveal-on-scroll transition-delay-100">
+                    <!-- Background Schematic (hidden in light theme) -->
+                    <div
+                        class="bento-card-bg absolute inset-0 z-0 opacity-10 group-hover:opacity-30 transition-opacity duration-500 mix-blend-plus-lighter">
+                        <img src="{{ url_for('static', filename='images/analysis_dashboard.png') }}"
+                            class="w-full h-full object-cover" alt="Background">
+                    </div>
+
+                    <div
+                        class="text-emerald-400 mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                        <svg class="w-12 h-12 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)]" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3 relative z-10">Cross-Project
+                        Search
+                    </h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed font-light relative z-10">
+                        AI intelligently pulls data from interlinked databases to correct confusion. Example:
+                        explains
+                        phosphate rock is in PAP unit, not DAP reactor.
+                    </p>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="bento-card group reveal-on-scroll transition-delay-200">
+                    <!-- Background Schematic (hidden in light theme) -->
+                    <div
+                        class="bento-card-bg absolute inset-0 z-0 opacity-10 group-hover:opacity-30 transition-opacity duration-500 mix-blend-plus-lighter">
+                        <img src="{{ url_for('static', filename='images/circuit_bg.png') }}"
+                            class="w-full h-full object-cover" alt="Background">
+                    </div>
+
+                    <div
+                        class="text-red-500 mb-6 group-hover:scale-110 transition-transform duration-500 relative z-10">
+                        <svg class="w-12 h-12 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-3 relative z-10">Innovation
+                        Roadmap
+                    </h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed font-light relative z-10">
+                        Coming soon: Visual answers with PFDs, automated verification against standards, real-time
+                        performance optimization with plant data integration.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Visual Showcase Section -->
+    <section id="visual-showcase" class="w-full py-24 overflow-hidden relative z-10 bg-slate-50 dark:bg-black/20">
+        <div class="max-w-7xl mx-auto px-6 reveal-on-scroll">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+                <!-- Left Column: Intelligence Content -->
+                <div class="space-y-8 reveal-on-scroll">
+                    <div>
+                        <h2 class="text-3xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+                            Intelligent <span class="accent-text-gradient">Search Modes</span>
+                        </h2>
+                        <div class="w-20 h-1 bg-gradient-to-r from-accent to-secondary rounded-full mb-8"></div>
+                        <p class="text-xl text-slate-600 dark:text-slate-300 font-light leading-relaxed max-w-xl">
+                            Choose your depth of analysis. From quick <span
+                                class="text-gray-900 dark:text-white font-medium">basic
+                                answers</span> to
+                            deep <span class="text-gray-900 dark:text-white font-medium">expert insights</span> with
+                            chemical reactions and
+                            process engineering data—Simon adapts to your needs.
+                        </p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4 group">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0 group-hover:bg-accent group-hover:text-white transition-all duration-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Basic Mode</h4>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Get short, direct
+                                    3-5 line answers.
+                                    Perfect for quick lookups like listing process routes for DAP production.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 group">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary shrink-0 group-hover:bg-secondary group-hover:text-white transition-all duration-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Analytical & Research
+                                    Modes</h4>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Compare processes
+                                    with tables and
+                                    reasoning.
+                                    Research mode provides detailed document-based answers for deep investigation.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 group">
+                            <div
+                                class="w-12 h-12 rounded-xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center text-pink-500 shrink-0 group-hover:bg-pink-500 group-hover:text-white transition-all duration-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Expert Mode</h4>
+                                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Access deep
+                                    technical insights with
+                                    chemical reactions, process engineering data, and cross-linked project intelligence.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Image Slider (no outer container – only images move) -->
+                <div
+                    class="relative flex items-center overflow-hidden reveal-on-scroll">
+                    <div class="image-slider-wrapper flex items-center justify-start gap-8 px-4 w-max">
+                        <!-- Set 1 -->
+                        <div
+                            class="sliding-card group flex-shrink-0 w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card border border-white/10 relative">
+                            <img src="{{ url_for('static', filename='images/diagram_ai.png') }}"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                alt="Process Logic">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                <span class="text-accent text-[10px] font-bold tracking-widest uppercase mb-1">Module
+                                    Alpha</span>
+                                <p class="text-white font-mono text-xs">PROCESSED_SCHEMA_V1.0</p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="sliding-card group flex-shrink-0 w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card border border-white/10 relative">
+                            <img src="{{ url_for('static', filename='images/ghost_turbine.png') }}"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                alt="Turbine Analysis">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                <span
+                                    class="text-secondary text-[10px] font-bold tracking-widest uppercase mb-1">Thermal
+                                    Core</span>
+                                <p class="text-white font-mono text-xs">TURBINE_THERMAL_SCAN</p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="sliding-card group flex-shrink-0 w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card border border-white/10 relative">
+                            <img src="{{ url_for('static', filename='images/knowledge_graph.png') }}"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                alt="Knowledge Graph">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                <span class="text-pink-400 text-[10px] font-bold tracking-widest uppercase mb-1">Neural
+                                    Net</span>
+                                <p class="text-white font-mono text-xs">NEURAL_DEPENDENCY_MAP</p>
+                            </div>
+                        </div>
+
+                        <!-- Set 2 (Duplicate for Seamless Loop) -->
+                        <div
+                            class="sliding-card group flex-shrink-0 w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card border border-white/10 relative">
+                            <img src="{{ url_for('static', filename='images/diagram_ai.png') }}"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                alt="Process Logic">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                <p class="text-white font-mono text-xs">PROCESSED_SCHEMA_V1.0</p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="sliding-card group flex-shrink-0 w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card border border-white/10 relative">
+                            <img src="{{ url_for('static', filename='images/ghost_turbine.png') }}"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                alt="Turbine Analysis">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                <p class="text-white font-mono text-xs">TURBINE_THERMAL_SCAN</p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="sliding-card group flex-shrink-0 w-[400px] aspect-[4/3] rounded-2xl overflow-hidden glass-card border border-white/10 relative">
+                            <img src="{{ url_for('static', filename='images/knowledge_graph.png') }}"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                alt="Knowledge Graph">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                <p class="text-white font-mono text-xs">NEURAL_DEPENDENCY_MAP</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gradient Fade Edges for the container -->
+                    <div
+                        class="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#0f172a]/20 to-transparent pointer-events-none">
+                    </div>
+                    <div
+                        class="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#0f172a]/20 to-transparent pointer-events-none">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Neural Effect Section -->
+    <section id="bottom-neural-effect" class="w-full relative z-10">
+        <div id="neural-effect-container">
+            <canvas id="neural-effect-canvas"></canvas>
+        </div>
+    </section>
+
+    <!-- 3. Footer (Proton Style) -->
+    <footer class="w-full py-12 bg-slate-100 dark:bg-black/40 border-t border-gray-200 dark:border-white/10 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-center md:text-left">
+                    <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
+                        <img src="{{ url_for('static', filename='images/simon_india_logo.png') }}" alt="SIA Logo"
+                            class="h-8 w-auto">
+
+                        <span class="text-lg font-bold text-gray-900 dark:text-white tracking-wide">SIA</span>
+                    </div>
+                    <p class="text-slate-500 text-sm">
+                        Developed by Simon India<br>This software is the property of Simon India Limited.
+                    </p>
+                </div>
+
+                <div class="flex gap-6 text-slate-400 text-sm">
+                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                    <a href="#" class="hover:text-white transition-colors">Contact</a>
+                </div>
+
+                <div class="text-slate-500 text-xs text-center md:text-right">
+                    © 2026 Simon India Limited. <br>All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<!-- Modals (Preserved from original) -->
+<div id="modal-overlay"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] hidden flex items-center justify-center"
+    onclick="handleOverlayClick(event)">
+    <!-- Login and Signup Modals Reuse Existing IDs for JS compatibility -->
+    <!-- Login Modal -->
+    <div id="login-modal" class="hidden transform transition-all duration-500 scale-95 opacity-0">
+        <div class="modal-circular-wrapper">
+            <div class="circular-glass-form">
+
+
+                <div class="relative w-full mb-4 flex justify-center">
+                    <h2
+                        class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-widest uppercase italic text-center">
+                        Login
+                    </h2>
+                    <button onclick="closeModals()"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-3xl transition-all duration-300 transform hover:rotate-90">&times;</button>
+                </div>
+
+                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6 w-full relative z-20">
+                    <div class="group">
+                        <label
+                            class="block text-[10px] font-bold text-sky-400 uppercase tracking-[0.2em] mb-2 px-1 opacity-80">Neural
+                            Core ID</label>
+                        <input type="email" name="email" required placeholder="name@company.ai"
+                            class="w-full bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-2xl p-4 text-gray-900 dark:text-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600">
+                    </div>
+                    <div class="group">
+                        <label
+                            class="block text-[10px] font-bold text-sky-400 uppercase tracking-[0.2em] mb-2 px-1 opacity-80">Access
+                            Key</label>
+                        <div class="password-wrapper">
+                            <input type="password" name="password" id="login-password" required placeholder="••••••••"
+                                class="w-full bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-2xl p-4 text-gray-900 dark:text-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 pr-10">
+                            <button type="button" class="password-toggle-icon"
+                                onclick="togglePasswordVisibility('login-password', 'login-password-icon')">
+                                <svg id="login-password-icon" class="w-5 h-5 text-slate-500 transition-colors"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-sky-500/20 transform active:scale-95">
+                        Authenticate Access
+                    </button>
+                </form>
+
+                <p class="mt-4 text-center text-xs text-slate-500 tracking-wide font-medium">
+                    New Architect? <a href="#" onclick="switchToSignup()"
+                        class="text-sky-400 font-bold hover:text-sky-300 transition-colors underline decoration-sky-400/30 underline-offset-4">Initialize
+                        Account</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="hidden transform transition-all duration-500 scale-95 opacity-0">
+        <div class="modal-circular-wrapper">
+            <div class="circular-glass-form">
+
+
+                <div class="relative w-full mb-4 flex justify-center">
+                    <h2
+                        class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-widest uppercase italic text-center">
+                        Register
+                    </h2>
+                    <button onclick="closeModals()"
+                        class="absolute right-0 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-3xl transition-all duration-300 transform hover:rotate-90">&times;</button>
+                </div>
+
+                <form id="signup-form" onsubmit="handleRegister(event)" class="space-y-3 w-full relative z-20">
+                    <div class="group">
+                        <label
+                            class="block text-[10px] font-bold text-secondary uppercase tracking-[0.2em] mb-1 px-1 opacity-80">Neural
+                            ID</label>
+                        <input type="email" name="email" required placeholder="architect@simon.ai"
+                            class="w-full bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-2xl p-3 text-gray-900 dark:text-white focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600">
+                    </div>
+                    <div class="group">
+                        <label
+                            class="block text-[10px] font-bold text-secondary uppercase tracking-[0.2em] mb-1 px-1 opacity-80">Access
+                            Key</label>
+                        <div class="password-wrapper">
+                            <input type="password" name="password" id="signup-password" required placeholder="••••••••"
+                                class="w-full bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-2xl p-3 text-gray-900 dark:text-white focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 pr-10">
+                            <button type="button" class="password-toggle-icon"
+                                onclick="togglePasswordVisibility('signup-password', 'signup-password-icon')">
+                                <svg id="signup-password-icon" class="w-5 h-5 text-slate-500 transition-colors"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label
+                            class="block text-[10px] font-bold text-secondary uppercase tracking-[0.2em] mb-1 px-1 opacity-80">Verify
+                            Key</label>
+                        <div class="password-wrapper">
+                            <input type="password" name="confirm_password" id="signup-confirm-password" required
+                                placeholder="••••••••"
+                                class="w-full bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-2xl p-3 text-gray-900 dark:text-white focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 pr-10">
+                            <button type="button" class="password-toggle-icon"
+                                onclick="togglePasswordVisibility('signup-confirm-password', 'signup-confirm-password-icon')">
+                                <svg id="signup-confirm-password-icon" class="w-5 h-5 text-slate-500 transition-colors"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-gradient-to-r from-secondary to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-bold py-3 rounded-2xl transition-all shadow-lg shadow-secondary/20 transform active:scale-95 mt-2">
+                        Initialize Access
+                    </button>
+                </form>
+
+                <p class="mt-4 text-center text-xs text-slate-500 tracking-wide font-medium">
+                    Already Authenticated? <a href="#" onclick="switchToLogin()"
+                        class="text-secondary font-bold hover:text-cyan-300 transition-colors underline decoration-secondary/30 underline-offset-4">Neural
+                        Sync</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Modal -->
+    <div id="demo-modal"
+        class="hidden transform transition-all duration-500 scale-95 opacity-0 w-full max-w-5xl mx-auto px-6 z-[1010]">
+        <div
+            class="relative bg-[#0f172a]/90 backdrop-blur-2xl border border-white/10 rounded-3xl p-4 md:p-6 shadow-2xl overflow-hidden">
+
+            <!-- Close Button -->
+            <button onclick="closeModals()"
+                class="absolute right-6 top-6 z-50 text-white/50 hover:text-white transition-colors bg-black/20 rounded-full p-2 hover:bg-black/40">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+
+            <!-- Slider Content -->
+            <div class="relative w-full aspect-video rounded-2xl overflow-hidden group max-h-[70vh]">
+                <!-- Slides Container -->
+                <div id="demo-slider-track" class="flex transition-transform duration-500 ease-out h-full">
+                    <!-- Slide 1 -->
+                    <div class="min-w-full h-full relative">
+                        <img src="{{ url_for('static', filename='images/analysis_dashboard.png') }}"
+                            class="w-full h-full object-cover" alt="Dashboard">
+                        <div
+                            class="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/80 to-transparent pt-32">
+                            <h3 class="text-3xl md:text-4xl font-bold text-white mb-3">Comprehensive Analysis Dashboard
+                            </h3>
+                            <p class="text-slate-300 text-lg max-w-2xl">Real-time insights into your engineering data,
+                                tracking key metrics and project health at a glance.</p>
+                        </div>
+                    </div>
+                    <!-- Slide 2 -->
+                    <div class="min-w-full h-full relative">
+                        <img src="{{ url_for('static', filename='images/knowledge_graph.png') }}"
+                            class="w-full h-full object-cover" alt="Knowledge Graph">
+                        <div
+                            class="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/80 to-transparent pt-32">
+                            <h3 class="text-3xl md:text-4xl font-bold text-white mb-3">Neural Knowledge Graph</h3>
+                            <p class="text-slate-300 text-lg max-w-2xl">Visualizing complex dependencies across 700+
+                                documents to prevent conflicts before they happen.</p>
+                        </div>
+                    </div>
+                    <!-- Slide 3 -->
+                    <div class="min-w-full h-full relative">
+                        <img src="{{ url_for('static', filename='images/diagram_ai.png') }}"
+                            class="w-full h-full object-cover" alt="Diagram AI">
+                        <div
+                            class="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/80 to-transparent pt-32">
+                            <h3 class="text-3xl md:text-4xl font-bold text-white mb-3">P&ID Logic Processing</h3>
+                            <p class="text-slate-300 text-lg max-w-2xl">Automated extraction and verification of
+                                schematic logic, ensuring fidelity between design and implementation.</p>
+                        </div>
+                    </div>
+                    <!-- Slide 4: Login -->
+                    <div class="min-w-full h-full relative">
+                        <img src="{{ url_for('static', filename='images/login_ai.png') }}"
+                            class="w-full h-full object-cover" alt="Login Screen">
+                        <div
+                            class="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/80 to-transparent pt-32">
+                            <h3 class="text-3xl md:text-4xl font-bold text-white mb-3">Secure Neural Access</h3>
+                            <p class="text-slate-300 text-lg max-w-2xl">Enterprise-grade authentication protecting your
+                                sensitive engineering IPs and decision logs.</p>
+                        </div>
+                    </div>
+                    <!-- Slide 5: Signup -->
+                    <div class="min-w-full h-full relative">
+                        <img src="{{ url_for('static', filename='images/signup_ai.png') }}"
+                            class="w-full h-full object-cover" alt="Signup Screen">
+                        <div
+                            class="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/80 to-transparent pt-32">
+                            <h3 class="text-3xl md:text-4xl font-bold text-white mb-3">Architect Onboarding</h3>
+                            <p class="text-slate-300 text-lg max-w-2xl">Seamless initialization for new architects
+                                joining the neural network.</p>
+                        </div>
+                    </div>
+                    <!-- Slide 6: Neural Core -->
+                    <div class="min-w-full h-full relative">
+                        <img src="{{ url_for('static', filename='images/neural_core.png') }}"
+                            class="w-full h-full object-cover" alt="Neural Core">
+                        <div
+                            class="absolute bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/80 to-transparent pt-32">
+                            <h3 class="text-3xl md:text-4xl font-bold text-white mb-3">The Neural Core</h3>
+                            <p class="text-slate-300 text-lg max-w-2xl">The central processing unit connecting all
+                                documents, logic, and safety standards.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <button onclick="prevDemoSlide()"
+                    class="absolute left-6 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-accent text-white p-4 rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 transform -translate-x-4 group-hover:translate-x-0 border border-white/10 hover:scale-110">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                </button>
+                <button onclick="nextDemoSlide()"
+                    class="absolute right-6 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-accent text-white p-4 rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 border border-white/10 hover:scale-110">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+
+                <!-- Indictors -->
+                <div class="absolute bottom-8 right-12 flex gap-3">
+                    <button onclick="goToDemoSlide(0)"
+                        class="w-3 h-3 rounded-full bg-white transition-all duration-300 demo-dot active ring-4 ring-white/20"></button>
+                    <button onclick="goToDemoSlide(1)"
+                        class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition-all duration-300 demo-dot"></button>
+                    <button onclick="goToDemoSlide(2)"
+                        class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition-all duration-300 demo-dot"></button>
+                    <button onclick="goToDemoSlide(3)"
+                        class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition-all duration-300 demo-dot"></button>
+                    <button onclick="goToDemoSlide(4)"
+                        class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition-all duration-300 demo-dot"></button>
+                    <button onclick="goToDemoSlide(5)"
+                        class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition-all duration-300 demo-dot"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    // Scroll Reveal replaces basic IntersectionObserver
+    // Handled by GSAP ScrollTrigger below
+
+    // Modal Logic (Preserved)
+    // Modal Logic
+    const modalOverlay = document.getElementById('modal-overlay');
+    const loginModal = document.getElementById('login-modal');
+    const signupModal = document.getElementById('signup-modal');
+    const demoModal = document.getElementById('demo-modal');
+
+    function openLoginModal() {
+        modalOverlay.classList.remove('hidden');
+        loginModal.classList.remove('hidden');
+        setTimeout(() => {
+            loginModal.classList.remove('scale-95', 'opacity-0');
+        }, 10);
+        signupModal.classList.add('hidden', 'scale-95', 'opacity-0'); // ensure signup is closed
+    }
+
+    function openSignupModal() {
+        modalOverlay.classList.remove('hidden');
+        signupModal.classList.remove('hidden');
+        setTimeout(() => {
+            signupModal.classList.remove('scale-95', 'opacity-0');
+        }, 10);
+        loginModal.classList.add('hidden', 'scale-95', 'opacity-0');
+    }
+
+    function switchToSignup() {
+        loginModal.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            loginModal.classList.add('hidden');
+            signupModal.classList.remove('hidden');
+            setTimeout(() => {
+                signupModal.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }, 300);
+    }
+
+    function switchToLogin() {
+        signupModal.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            signupModal.classList.add('hidden');
+            loginModal.classList.remove('hidden');
+            setTimeout(() => {
+                loginModal.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }, 300);
+    }
+
+    function closeModals() {
+        loginModal.classList.add('scale-95', 'opacity-0');
+        signupModal.classList.add('scale-95', 'opacity-0');
+
+        if (demoModal) {
+            demoModal.classList.add('scale-95', 'opacity-0');
+        }
+
+        setTimeout(() => {
+            modalOverlay.classList.add('hidden');
+            loginModal.classList.add('hidden');
+            signupModal.classList.add('hidden');
+            if (demoModal) demoModal.classList.add('hidden');
+        }, 300);
+    }
+
+    function handleOverlayClick(e) {
+        if (e.target === modalOverlay) {
+            closeModals();
+        }
+    }
+
+    // Demo Modal & Slider Logic
+    let currentSlide = 0;
+    const totalSlides = 6; // Updated slide count
+
+    function openDemoModal() {
+        modalOverlay.classList.remove('hidden');
+        if (demoModal) {
+            demoModal.classList.remove('hidden');
+            setTimeout(() => {
+                demoModal.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        }
+        // Ensure other modals are closed
+        loginModal.classList.add('hidden', 'scale-95', 'opacity-0');
+        signupModal.classList.add('hidden', 'scale-95', 'opacity-0');
+
+        // Reset slider to start
+        goToDemoSlide(0);
+    }
+
+    function updateDemoSlider() {
+        const track = document.getElementById('demo-slider-track');
+        if (track) {
+            track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+            // Update dots
+            document.querySelectorAll('.demo-dot').forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.remove('bg-white/30');
+                    dot.classList.add('bg-white', 'scale-125', 'ring-4', 'ring-white/20');
+                } else {
+                    dot.classList.add('bg-white/30');
+                    dot.classList.remove('bg-white', 'scale-125', 'ring-4', 'ring-white/20');
+                }
+            });
+        }
+    }
+
+    function nextDemoSlide() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateDemoSlider();
+    }
+
+    function prevDemoSlide() {
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        updateDemoSlider();
+    }
+
+    function goToDemoSlide(index) {
+        currentSlide = index;
+        updateDemoSlider();
+    }
+
+    // Preserve original Auth Logic
+    function handleLogin(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const email = formData.get('email');
+        const password = formData.get('password');
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ email, password })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect_url || '/dashboard';
+                } else {
+                    alert(data.message || 'Login failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+    }
+
+    function handleRegister(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const confirm_password = formData.get('confirm_password');
+
+        if (password !== confirm_password) {
+            alert("Passwords do not match");
+            return;
+        }
+
+        fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ email, password, confirm_password })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Account created! Please login.');
+                    switchToLogin();
+                } else {
+                    alert(data.message || 'Signup failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+    }
+</script>
+<script>
+    document.addEventListener('turbo:load', () => {
+        // Ensure GSAP and ScrollTrigger are available
+        if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Infinite Marquee Timeline
+            // Move xPercent to -50 which represents exactly half the width (the first set of items)
+            // The duplicate set takes its place, creating a seamless loop
+            gsap.to(".image-slider-wrapper", {
+                xPercent: -50,
+                ease: "none",
+                duration: 25, // Adjust speed here (higher = slower)
+                repeat: -1
+            });
+
+            // Gentle "Breathing" Pulse for cards (Continuous)
+            // Replaces the scroll-based expansion to fit the infinite flow
+            gsap.utils.toArray(".sliding-card").forEach((card, i) => {
+                gsap.to(card, {
+                    scale: 1.02,
+                    duration: 2,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: "sine.inOut",
+                    delay: i * 0.2 // Stagger the breathing slightly
+                });
+            });
+
+            // Modal Slider Animation
+            gsap.to(".modal-slider-wrapper", {
+                xPercent: -50,
+                ease: "none",
+                duration: 30, // Slow smooth scroll
+                repeat: -1
+            });
+            // Wavy Icons Horizontal Scroll
+            gsap.to(".wavy-track", {
+                xPercent: -50,
+                ease: "none",
+                duration: 20,
+                repeat: -1
+            });
+
+            // Scroll-Triggered Reveals (Global)
+            gsap.utils.toArray(".reveal-on-scroll").forEach((element) => {
+                gsap.fromTo(element,
+                    {
+                        opacity: 0,
+                        y: 50,
+                        filter: "blur(10px)",
+                        scale: 0.95
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        filter: "blur(0px)",
+                        scale: 1,
+                        duration: 1,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: element,
+                            start: "top 85%", // Start when top of element is 85% down the viewport
+                            end: "top 20%",
+                            toggleActions: "play none none none", // Reveal once and stay visible
+                            // once: false // Set to false so it re-triggers when scrolling up
+                        }
+                    }
+                );
+            });
+
+            // Wavy Icons Vertical Oscillation (Enhanced Wave)
+            gsap.utils.toArray(".wavy-icon-item").forEach((item, i) => {
+                gsap.to(item, {
+                    y: 60, // Increased amplitude for more "wave"
+                    rotation: i % 2 === 0 ? 5 : -5, // Alternating tilt for dynamic feel
+                    duration: 2.5,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: "sine.inOut",
+                    delay: i * 0.15 // Smoother wave propagation
+                });
+            });
+            // Hero Text Sequential Reveal
+            gsap.from(".gsap-hero-fade", {
+                opacity: 0,
+                y: 30,
+                filter: "blur(10px)",
+                duration: 1.2,
+                stagger: 0.3,
+                ease: "power4.out",
+                clearProps: "all"
+            });
+        }
+    });
+
+    // --- Interactive Effects Canvas Logic ---
+
+    // 1. Dots Format Effect (Hero)
+    const initDotsEffect = () => {
+        const canvas = document.getElementById('dots-format-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width, height, dots = [];
+        const spacing = 35;
+        const mouse = { x: -1000, y: -1000, radius: 150 };
+
+        const resize = () => {
+            width = canvas.width = canvas.offsetWidth;
+            height = canvas.height = canvas.offsetHeight;
+            createDots();
+        };
+
+        const createDots = () => {
+            dots = [];
+            for (let x = spacing / 2; x < width; x += spacing) {
+                for (let y = spacing / 2; y < height; y += spacing) {
+                    dots.push({ x, y, baseSize: 1.5, size: 1.5, opacity: 0.15 });
+                }
+            }
+        };
+
+        const getDotColor = () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            return isDark ? '109, 93, 252' : '2, 132, 199';
+        };
+
+        const animate = () => {
+            const rgb = getDotColor();
+            ctx.clearRect(0, 0, width, height);
+            dots.forEach(dot => {
+                const dx = mouse.x - dot.x;
+                const dy = mouse.y - dot.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < mouse.radius) {
+                    const factor = 1 - dist / mouse.radius;
+                    dot.size = dot.baseSize + factor * 4;
+                    dot.opacity = 0.15 + factor * 0.6;
+                } else {
+                    dot.size += (dot.baseSize - dot.size) * 0.1;
+                    dot.opacity += (0.15 - dot.opacity) * 0.1;
+                }
+
+                ctx.beginPath();
+                ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${rgb}, ${dot.opacity})`;
+                ctx.fill();
+            });
+            requestAnimationFrame(animate);
+        };
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        });
+
+        resize();
+        animate();
+    };
+
+    // 2. Neural Effect (Bottom)
+    const initNeuralEffect = () => {
+        const canvas = document.getElementById('neural-effect-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+        const particleCount = 60;
+        const maxDist = 150;
+        const mouse = { x: -1000, y: -1000 };
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2 + 1;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(46, 230, 255, 0.5)';
+                ctx.fill();
+            }
+        }
+
+        const resize = () => {
+            const container = document.getElementById('neural-effect-container');
+            if (container) {
+                width = canvas.width = container.offsetWidth;
+                height = canvas.height = container.offsetHeight;
+                particles = Array.from({ length: particleCount }, () => new Particle());
+            }
+        };
+
+        const animate = () => {
+            ctx.clearRect(0, 0, width, height);
+
+            particles.forEach((p, i) => {
+                p.update();
+                p.draw();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < maxDist) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(46, 230, 255, ${1 - dist / maxDist})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+
+                // Mouse connection
+                const mdx = p.x - mouse.x;
+                const mdy = p.y - mouse.y;
+                const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+                if (mdist < 200) {
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(mouse.x, mouse.y);
+                    ctx.strokeStyle = `rgba(46, 230, 255, ${(1 - mdist / 200) * 0.5})`;
+                    ctx.stroke();
+                }
+            });
+            requestAnimationFrame(animate);
+        };
+
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+        });
+
+        resize();
+        animate();
+    };
+
+    // 3. Hyper-Neural Core Effect (New)
+    const initHyperNeuralCore = () => {
+        const canvas = document.getElementById('hyper-neural-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        let rotationX = 0;
+        let rotationY = 0;
+        const particleCount = 200;
+        const radius = 220;
+
+        const resize = () => {
+            width = canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+            height = canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            createSphere();
+        };
+
+        const createSphere = () => {
+            particles = [];
+            for (let i = 0; i < particleCount; i++) {
+                const phi = Math.acos(-1 + (2 * i) / particleCount);
+                const theta = Math.sqrt(particleCount * Math.PI) * phi;
+
+                // Cyber Tech Palette: Cyan, Electric Blue, White, and subtle Amber
+                let color;
+                const rand = Math.random();
+                if (rand < 0.6) {
+                    color = '6, 182, 212'; // Cyan
+                } else if (rand < 0.85) {
+                    color = '14, 165, 233'; // Electric Blue
+                } else if (rand < 0.95) {
+                    color = '255, 255, 255'; // Data Nodes (White)
+                } else {
+                    color = '245, 158, 11'; // Neural Spark (Amber)
+                }
+
+                particles.push({
+                    x: radius * Math.cos(theta) * Math.sin(phi),
+                    y: radius * Math.sin(theta) * Math.sin(phi),
+                    z: radius * Math.cos(phi),
+                    size: Math.random() * 2 + 1,
+                    color: color
+                });
+            }
+        };
+
+        const project = (x, y, z) => {
+            const scale = 400 / (400 - z);
+            return {
+                x: x * scale + 300,
+                y: y * scale + 300,
+                scale: scale
+            };
+        };
+
+        const rotate = (p, rx, ry) => {
+            // Rotate X
+            let y1 = p.y * Math.cos(rx) - p.z * Math.sin(rx);
+            let z1 = p.y * Math.sin(rx) + p.z * Math.cos(rx);
+            // Rotate Y
+            let x2 = p.x * Math.cos(ry) + z1 * Math.sin(ry);
+            let z2 = -p.x * Math.sin(ry) + z1 * Math.cos(ry);
+            return { x: x2, y: y1, z: z2 };
+        };
+
+        const animate = () => {
+            ctx.clearRect(0, 0, 600, 600);
+            rotationX += 0.003;
+            rotationY += 0.005;
+
+            // Sort particles by Z for depth
+            const rotatedParticles = particles.map(p => ({
+                ...rotate(p, rotationX, rotationY),
+                originalSize: p.size,
+                color: p.color
+            })).sort((a, b) => b.z - a.z);
+
+            // Draw connections (Neural Mesh)
+            ctx.lineWidth = 0.7;
+            for (let i = 0; i < rotatedParticles.length; i++) {
+                const p1 = rotatedParticles[i];
+                if (p1.z < 0) continue; // Only connect front half for clarity
+
+                for (let j = i + 1; j < Math.min(i + 5, rotatedParticles.length); j++) {
+                    const p2 = rotatedParticles[j];
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const dz = p1.z - p2.z;
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    if (dist < 85) {
+                        const proj1 = project(p1.x, p1.y, p1.z);
+                        const proj2 = project(p2.x, p2.y, p2.z);
+                        const opacity = (1 - dist / 85) * (p1.z + radius) / (2 * radius) * 0.3;
+                        ctx.beginPath();
+                        ctx.moveTo(proj1.x, proj1.y);
+                        ctx.lineTo(proj2.x, proj2.y);
+                        ctx.strokeStyle = `rgba(46, 230, 255, ${opacity})`; // Technical Cyan Mesh
+                        ctx.stroke();
+                    }
+                }
+
+                // Draw Particle
+                const proj = project(p1.x, p1.y, p1.z);
+                const opacity = (p1.z + radius) / (2 * radius);
+                ctx.beginPath();
+                ctx.arc(proj.x, proj.y, p1.originalSize * proj.scale, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${p1.color}, ${opacity * 0.9})`;
+                ctx.fill();
+            }
+
+            requestAnimationFrame(animate);
+        };
+
+        window.addEventListener('resize', resize);
+        resize();
+        animate();
+    };
+
+    document.addEventListener('turbo:load', () => {
+        initDotsEffect();
+        initNeuralEffect();
+        initHyperNeuralCore();
+
+        // Initialize Landing Page Theme Toggle
+        const landingToggleBtn = document.getElementById('theme-toggle-landing');
+        const landingSunIcon = document.getElementById('theme-icon-sun-landing');
+        const landingMoonIcon = document.getElementById('theme-icon-moon-landing');
+
+        if (landingToggleBtn && landingSunIcon && landingMoonIcon) {
+            // Sync icons with current theme on load
+            function updateLandingIcons(isDark) {
+                if (isDark) {
+                    landingSunIcon.classList.add('hidden');
+                    landingMoonIcon.classList.remove('hidden');
+                } else {
+                    landingSunIcon.classList.remove('hidden');
+                    landingMoonIcon.classList.add('hidden');
+                }
+            }
+
+            // Set initial state
+            const isDark = document.documentElement.classList.contains('dark');
+            updateLandingIcons(isDark);
+
+            // Listen for theme changes from base.html theme toggle
+            window.addEventListener('theme-changed', (e) => {
+                updateLandingIcons(e.detail.theme === 'dark');
+            });
+
+            // Handle click on landing page theme toggle
+            landingToggleBtn.addEventListener('click', () => {
+                const html = document.documentElement;
+                const currentlyDark = html.classList.contains('dark');
+                const newTheme = currentlyDark ? 'light' : 'dark';
+
+                // Apply theme
+                if (newTheme === 'dark') {
+                    html.classList.add('dark');
+                } else {
+                    html.classList.remove('dark');
+                }
+
+                // Update icons
+                updateLandingIcons(newTheme === 'dark');
+
+                // Save to localStorage
+                localStorage.setItem('simon_theme', newTheme);
+
+                // Dispatch event for other listeners
+                window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: newTheme } }));
+
+                // Save to server if authenticated
+                const isAuthenticated = JSON.parse('{{ current_user.is_authenticated | tojson }}');
+                if (isAuthenticated) {
+                    fetch('/api/user/theme', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ theme: newTheme })
+                    }).catch(err => console.error('Error saving theme:', err));
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

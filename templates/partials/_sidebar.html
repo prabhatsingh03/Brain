@@ -1,0 +1,195 @@
+<!-- Navigation Sidebar -->
+<aside id="sidebar"
+    class="simon-sidebar fixed top-0 left-0 h-full bg-white dark:bg-secondary border-r border-gray-200 dark:border-gray-800 transition-all duration-500 z-50 flex flex-col w-16 group">
+
+    <!-- Logo Area -->
+    <div
+        class="h-20 md:h-24 lg:h-28 flex items-center justify-center border-b border-gray-200 dark:border-gray-800 shrink-0 overflow-hidden relative px-3">
+        <a href="/" class="flex items-center justify-center w-full h-full py-3">
+            <img src="{{ url_for('static', filename='images/simon_india_logo.png') }}" alt="SIA Logo"
+                class="h-10 w-auto md:h-14 lg:h-16 simon-glow-accent transition-all duration-500 object-contain max-w-full">
+        </a>
+    </div>
+
+    <!-- Toggle Button -->
+    <button id="sidebar-toggle"
+        class="absolute -right-3 top-20 bg-accent text-primary rounded-full p-1 shadow-[0_0_10px_rgba(22,124,193,0.5)] hover:bg-white transition-all duration-500 z-50 dark:bg-gradient-to-br dark:from-cyan-400 dark:to-blue-600 dark:text-gray-900 dark:shadow-cyan-400/50">
+        <svg id="sidebar-arrow" class="w-4 h-4 transform transition-transform duration-500 rotate-180" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+    </button>
+
+    <!-- Nav Items -->
+    <div class="flex-grow py-6 flex flex-col gap-4 overflow-y-auto overflow-x-hidden custom-scrollbar">
+
+        <!-- Tools Section (Visible only on Chat Page) -->
+        {% if request.endpoint == 'main.project_view' %}
+        <div class="px-4 mb-4 sidebar-text hidden opacity-0 transition-opacity duration-500">
+            <!-- Mode Selector - Hidden, now in chat header -->
+            <!-- Mode selector moved to top-right of chat interface -->
+
+            <!-- Advance Mode Selector Removed - Now handled via '+' menu in chat interface -->
+
+            <!-- New Chat Button -->
+            <div class="mb-4">
+                <button id="sidebar-new-chat"
+                    class="w-full flex items-center justify-between px-0 py-2 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white transition-colors group/newchat">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center group-hover/newchat:bg-accent group-hover/newchat:text-primary transition-colors">
+                            <!-- Edit/New Icon -->
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                </path>
+                            </svg>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-wider">New chat</span>
+                    </div>
+
+                </button>
+            </div>
+
+
+            <!-- Visual Intelligence Toggle -->
+            <div class="flex items-center justify-between">
+                <label class="text-[10px] uppercase text-textSoft font-bold tracking-wider">Visual Intel</label>
+                <button id="vis-intel-toggle"
+                    class="w-8 h-4 bg-accent/20 rounded-full relative transition-colors duration-500 focus:outline-none">
+                    <span id="vis-intel-knob"
+                        class="absolute left-0.5 top-0.5 w-3 h-3 bg-accent rounded-full shadow transition-transform duration-500 translate-x-4"></span>
+                </button>
+            </div>
+
+            <!-- Flow Diagram Toggle -->
+            <div class="flex items-center justify-between mt-3">
+                <label class="text-[10px] uppercase text-textSoft font-bold tracking-wider">Flow Diagram</label>
+                <button id="flow-diagram-toggle"
+                    class="w-8 h-4 bg-accent/20 rounded-full relative transition-colors duration-500 focus:outline-none">
+                    <span id="flow-diagram-knob"
+                        class="absolute left-0.5 top-0.5 w-3 h-3 bg-accent rounded-full shadow transition-transform duration-500 translate-x-0"></span>
+                </button>
+            </div>
+
+
+        </div>
+        {% endif %}
+
+        {% if current_user.is_authenticated %}
+        <!-- Dashboard -->
+        <a href="{{ url_for('main.dashboard') }}"
+            class="flex items-center gap-3 px-4 py-2 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white transition-colors group/dashboard"
+            title="Dashboard">
+            <div
+                class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center group-hover/dashboard:bg-accent group-hover/dashboard:text-primary transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                    </path>
+                </svg>
+            </div>
+            <span
+                class="whitespace-nowrap opacity-0 transition-opacity duration-500 sidebar-text hidden text-xs font-bold uppercase tracking-wider">Dashboard</span>
+        </a>
+
+        <!-- Dashboard-specific options (visible only on Dashboard) -->
+        {% if request.endpoint == 'main.dashboard' %}
+        <div class="px-4 mt-2 sidebar-text hidden opacity-0 transition-opacity duration-500 space-y-2">
+            <!-- Add New Process -->
+            <a href="{{ url_for('admin.index') }}#projects"
+                class="flex items-center gap-3 px-0 py-2 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white transition-colors group/add-process w-full">
+                <div
+                    class="w-8 h-8 rounded-lg bg-green-400/10 flex items-center justify-center group-hover/add-process:bg-green-400 group-hover/add-process:text-primary border border-green-400/40 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-wider">Admin Console</span>
+            </a>
+
+            <!-- 
+            s & Information -->
+            <a href="{{ url_for('admin.index') }}#dependencies"
+                class="flex items-center gap-3 px-0 py-2 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white transition-colors group/relationships w-full">
+                <div
+                    class="w-8 h-8 rounded-lg bg-blue-400/10 flex items-center justify-center group-hover/relationships:bg-blue-400 group-hover/relationships:text-primary border border-blue-400/40 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-wider">Dependencies</span>
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Logout -->
+        <!-- Logout and Profile moved to Header -->
+
+        {% else %}
+        <!-- Login -->
+        <a href="javascript:void(0)" onclick="openAuthModal('login')"
+            class="flex items-center h-10 px-4 text-accent hover:text-white dark:hover:text-white hover:bg-accent/20 transition-all duration-500 relative group/item"
+            title="Login">
+            <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1">
+                </path>
+            </svg>
+            <span
+                class="ml-4 whitespace-nowrap opacity-0 transition-opacity duration-500 sidebar-text hidden">Login</span>
+        </a>
+        {% endif %}
+
+        <!-- Your Chats Section -->
+        {% if current_user.is_authenticated %}
+        <div class="px-4 sidebar-text hidden opacity-0 transition-opacity duration-500 mt-4">
+            <div class="flex items-center justify-between mb-3 group/chats relative">
+                <button id="your-chats-toggle" class="flex items-center gap-2">
+                    <span
+                        class="text-[10px] uppercase text-textSoft font-bold tracking-wider group-hover/chats:text-white transition-colors">Your
+                        chats</span>
+                    <svg id="your-chats-arrow" class="w-3 h-3 text-textSoft transform transition-transform duration-300"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+
+                <!-- Search Icon -->
+                <button id="chat-search-toggle"
+                    class="text-gray-600 hover:text-accent dark:text-gray-300 dark:hover:text-white transition-colors p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-white/10"
+                    title="Search chats">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Search Input (Hidden by default) -->
+            <div id="chat-search-container" class="hidden mb-3 overflow-hidden transition-all duration-300">
+                <div class="relative">
+                    <input type="text" id="chat-search-input" placeholder="Search chats..."
+                        style="padding-left: 3.5rem !important;"
+                        class="w-full bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-slate-600 rounded-md py-2 pr-3 text-sm font-medium text-black dark:text-white focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 placeholder-gray-500 dark:placeholder-gray-400 transition-all shadow-md">
+                    <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div id="your-chats-list"
+                class="hidden space-y-2 max-h-[calc(100vh-320px)] overflow-y-auto custom-scrollbar pr-1">
+                <!-- Chats will be loaded here dynamically -->
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</aside>

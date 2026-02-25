@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mb-8 pl-2 flex justify-between items-center">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-white dark:neon-text">Edit Metadata</h1>
+    <div class="flex items-center gap-3">
+        {% include 'partials/user_dropdown.html' %}
+    </div>
+</div>
+
+<div class="glass-card rounded-2xl p-8 max-w-3xl">
+    <h2 class="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
+        {{ meta.project.name }} / {{ meta.file_name }}
+    </h2>
+
+    <form action="{{ url_for('admin.update_metadata', id=meta.id) }}" method="POST" enctype="multipart/form-data"
+        class="space-y-6">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+        <div>
+            <label class="block text-sm mb-1 text-slate-600 dark:text-textSoft">Current File</label>
+            <p class="text-sm text-gray-700 dark:text-gray-200 break-all bg-gray-100 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2">
+                {{ meta.file_name }}
+            </p>
+        </div>
+
+        <div>
+            <label class="block text-sm mb-1 text-slate-600 dark:text-textSoft">Type of Data</label>
+            <input type="text" name="type_of_data" value="{{ meta.type_of_data or '' }}"
+                class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none" />
+        </div>
+
+        <div>
+            <label class="block text-sm mb-1 text-slate-600 dark:text-textSoft">Replace File (optional, PDF only)</label>
+            <input type="file" name="file" accept=".pdf,application/pdf"
+                class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-slate-600 dark:text-textSoft file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent/10 file:text-accent hover:file:bg-accent/20" />
+            <p class="text-xs text-slate-600 dark:text-textSoft mt-1">If provided, the existing file will be replaced.</p>
+        </div>
+
+        <div class="flex justify-between items-center pt-4">
+            <a href="{{ url_for('admin.index') }}"
+                class="text-sm px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-slate-600 dark:text-textSoft hover:bg-gray-100 dark:hover:bg-white/5 transition">
+                Cancel
+            </a>
+            <button type="submit"
+                class="bg-accent text-white px-6 py-2 rounded-lg font-bold hover:brightness-110 shadow-lg shadow-accent/20 transition">
+                Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
