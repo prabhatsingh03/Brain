@@ -1053,6 +1053,23 @@
     <!-- Shared context menu for chat actions -->
     <div id="session-context-menu"></div>
 
+    <!-- Cookie acceptance prompt (shown only when cookies are disabled; for authenticated users) -->
+    {% if current_user.is_authenticated %}
+    <div id="cookie-prompt-banner" role="dialog" aria-labelledby="cookie-prompt-title" aria-describedby="cookie-prompt-desc" aria-hidden="true"
+        class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] max-w-lg w-[calc(100%-2rem)] p-4 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 glass-card bg-white/95 dark:bg-secondary/95 backdrop-blur-md">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <div class="flex-1">
+                <h2 id="cookie-prompt-title" class="text-sm font-bold text-gray-900 dark:text-white mb-1">Enable cookies for the best experience</h2>
+                <p id="cookie-prompt-desc" class="text-xs text-gray-600 dark:text-textSoft">Please turn on &quot;Accept all cookies&quot; or enable cookies in your browser so your session, Your Chats, and theme preferences work correctly.</p>
+            </div>
+            <button type="button" id="cookie-prompt-accept"
+                class="shrink-0 px-4 py-2.5 rounded-xl text-sm font-semibold bg-accent text-white hover:bg-accent/90 transition-colors">
+                Accept &amp; enable cookies
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
     {% block scripts %}{% endblock %}
 
     <script>
@@ -1633,6 +1650,39 @@
             }
 
             initThemeToggle();
+
+            // Cookie prompt: show only when cookies are disabled (authenticated users only)
+            const cookieBanner = document.getElementById('cookie-prompt-banner');
+            const cookieAccept = document.getElementById('cookie-prompt-accept');
+            if (cookieBanner && cookieAccept) {
+                function cookiesEnabled() {
+                    try {
+                        document.cookie = 'simon_cookie_test=1; path=/; SameSite=Lax';
+                        var ok = document.cookie.indexOf('simon_cookie_test=') !== -1;
+                        document.cookie = 'simon_cookie_test=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                        return ok;
+                    } catch (e) { return false; }
+                }
+                if (!cookiesEnabled()) {
+                    cookieBanner.classList.remove('hidden');
+                    cookieBanner.setAttribute('aria-hidden', 'false');
+                }
+                if (!cookieAccept.dataset.cookieListenerAttached) {
+                    cookieAccept.dataset.cookieListenerAttached = '1';
+                    cookieAccept.addEventListener('click', () => {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        const headers = { 'Content-Type': 'application/json' };
+                        if (csrfToken) headers['X-CSRFToken'] = csrfToken;
+                        fetch('/api/user/dismiss-cookie-prompt', { method: 'POST', headers: headers })
+                            .then(() => {})
+                            .catch(() => {})
+                            .finally(() => {
+                                cookieBanner.classList.add('hidden');
+                                cookieBanner.setAttribute('aria-hidden', 'true');
+                            });
+                    });
+                }
+            }
         });
         // Toast notification behaviour (animations, auto-dismiss, manual close)
         document.addEventListener('turbo:load', () => {

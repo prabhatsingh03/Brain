@@ -836,5 +836,12 @@ def user_theme():
         return jsonify({'error': 'Invalid theme value. Must be "light" or "dark".'}), 400
     
     return jsonify({'theme': current_user.theme_preference or 'dark'})
-    
+
+
+@main_bp.route('/api/user/dismiss-cookie-prompt', methods=['POST'])
+@login_required
+@limiter.exempt
+def dismiss_cookie_prompt():
+    session['show_cookie_prompt'] = False
+    return jsonify({'success': True})
 
