@@ -197,7 +197,7 @@ class DotCursor {
     }
 }
 
-    document.addEventListener('turbo:load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         new NeuroBackground();
         new DotCursor();
     });

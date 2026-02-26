@@ -650,7 +650,7 @@
     }
 
     // --- Admin Dropdown Logic & Delete Modal Wiring ---
-    document.addEventListener('turbo:load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         setupCustomDropdown('admin-project-dropdown', 'admin-project-trigger', 'admin-project-options', 'admin-project-arrow', 'admin-project-select', 'admin-project-text');
         setupCustomDropdown('admin-role-dropdown', 'admin-role-trigger', 'admin-role-options', 'admin-role-arrow', 'admin-role-select', 'admin-role-text');
 

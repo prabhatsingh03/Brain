@@ -85,7 +85,7 @@
         };
 
         // Spotlight Effect Logic
-        document.addEventListener('turbo:load', () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const wrapper = document.getElementById('cards-spotlight-wrapper');
             if (wrapper) {
                 const cards = wrapper.querySelectorAll('.bento-card');
@@ -1276,7 +1276,7 @@
     }
 </script>
 <script>
-    document.addEventListener('turbo:load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         // Ensure GSAP and ScrollTrigger are available
         if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
             gsap.registerPlugin(ScrollTrigger);
@@ -1652,7 +1652,7 @@
         animate();
     };
 
-    document.addEventListener('turbo:load', () => {
+    document.addEventListener('DOMContentLoaded', () => {
         initDotsEffect();
         initNeuralEffect();
         initHyperNeuralCore();

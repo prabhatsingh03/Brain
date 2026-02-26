@@ -4,7 +4,7 @@
  * strictly additive: Does not modify original source files.
  */
 
-document.addEventListener('turbo:load', () => {
+document.addEventListener('DOMContentLoaded', () => {
     initSimonUpgrade();
     initHeroAnimations(); // [NEW] Start GSAP animations
     initTypewriterEffect(); // [NEW] Start typewriter effect for brand text
@@ -574,7 +574,7 @@ function applyGlitchEffect(element) {
 }
 
 // Ensure initCrazyChat runs
-document.addEventListener('turbo:load', () => {
+document.addEventListener('DOMContentLoaded', () => {
     initCrazyChat();
 });
 
