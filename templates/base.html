@@ -1267,7 +1267,13 @@
                     }
 
                     const res = await fetch(`/api/chat/sessions/${projectName}`);
-                    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                    if (!res.ok) {
+                        if (res.status === 401) {
+                            chatsList.innerHTML = '<div class="p-2 text-xs text-amber-600 dark:text-amber-400">Session expired or cookies disabled. Please enable cookies and refresh.</div>';
+                            return;
+                        }
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
 
                     const data = await res.json();
                     if (!Array.isArray(data)) {
@@ -1605,18 +1611,20 @@
                         });
                 }
 
-                if (themeToggleBtn) {
+                if (themeToggleBtn && !themeToggleBtn.dataset.themeListenerAttached) {
+                    themeToggleBtn.dataset.themeListenerAttached = '1';
                     themeToggleBtn.addEventListener('click', () => {
                         const isDark = html.classList.contains('dark');
                         const newTheme = isDark ? 'light' : 'dark';
                         applyTheme(newTheme);
 
                         if (isAuthenticated) {
+                            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                            const headers = { 'Content-Type': 'application/json' };
+                            if (csrfToken) headers['X-CSRFToken'] = csrfToken;
                             fetch('/api/user/theme', {
                                 method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
+                                headers: headers,
                                 body: JSON.stringify({ theme: newTheme })
                             }).catch(err => console.error('Error saving theme:', err));
                         }
