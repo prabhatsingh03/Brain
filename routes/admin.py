@@ -202,12 +202,18 @@ def upload_metadata():
     project_id = request.form.get('project_id')
     type_of_data = request.form.get('type_of_data')
     file = request.files.get('file')
+    content_length = request.content_length or 0
 
     if not file or not file.filename:
         flash('Please choose a PDF file before submitting.', 'danger')
         return redirect(url_for('admin.index', _anchor='metadata'))
     if not _is_pdf(file.filename):
         flash('Only PDF files are allowed.', 'danger')
+        return redirect(url_for('admin.index', _anchor='metadata'))
+    # Explicit server-side size check (matches global 50 MB limit)
+    max_bytes = 50 * 1024 * 1024
+    if content_length > max_bytes:
+        flash('File is too large. Maximum allowed size is 50 MB.', 'danger')
         return redirect(url_for('admin.index', _anchor='metadata'))
     if not project_id:
         flash('Project is required.', 'danger')

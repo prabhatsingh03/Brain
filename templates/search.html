@@ -2080,6 +2080,19 @@
 
     async function handleComparisonFile(file) {
         if (!file) return;
+        // Client-side size guard: enforce 50 MB max for comparison uploads
+        const maxBytes = 50 * 1024 * 1024;
+        if (file.size > maxBytes) {
+            comparisonDropText.classList.add('hidden');
+            comparisonFileName.textContent = `Error: File is too large. Maximum allowed size is 50 MB.`;
+            comparisonFileName.classList.remove('hidden');
+            comparisonFileName.classList.add('text-red-500');
+            setTimeout(() => {
+                comparisonFileName.classList.remove('text-red-500');
+                resetComparisonModal();
+            }, 3000);
+            return;
+        }
 
         comparisonDropText.classList.add('hidden');
         comparisonFileName.textContent = `Uploading ${file.name}...`;
@@ -3302,16 +3315,30 @@
 
     async function doCrossProjectCheck(question) {
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-        const res = await fetch(crossProjectCheckUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
-            body: JSON.stringify({ question: question })
-        });
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || res.statusText);
+        const controller = new AbortController();
+        const timeoutMs = 25000; // fail fast before typical gateway timeouts
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+        try {
+            const res = await fetch(crossProjectCheckUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify({ question: question }),
+                signal: controller.signal
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || res.statusText);
+            }
+            return res.json();
+        } catch (e) {
+            if (e.name === 'AbortError') {
+                throw new Error('Cross Project routing check timed out. Please try again.');
+            }
+            throw e;
+        } finally {
+            clearTimeout(timeoutId);
         }
-        return res.json();
     }
 
     function showIncludeRelatedPrompt(relatedWithHits, onConfirm, onCancel) {
@@ -3541,15 +3568,8 @@
             console.error('Error:', error);
             hideThinkingStatus();
             const errText = `Error: ${error.message || 'Unable to process your request.'}`;
-            if (bubble && typeof bubble !== 'undefined') {
-                if (streamGroupDiv) streamGroupDiv.classList.remove('streaming-bubble-hidden');
-                bubble.textContent = errText;
-                if (!messages.some(m => m.role === 'assistant' && m.text === errText)) {
-                    messages.push({ role: 'assistant', text: errText });
-                }
-            } else {
-                appendMessage('assistant', errText);
-            }
+            // Ensure the existing conversation thread remains visible and just append an error message.
+            appendMessage('assistant', errText);
         } finally {
             chatForm.dataset.isSubmitting = 'false';
             if (submitBtn) submitBtn.disabled = false;

@@ -50,7 +50,8 @@ class Config:
     
     # Uploads
     UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB max upload
+    # Allow uploads up to 50 MB across the app (metadata, comparison, etc.)
+    MAX_CONTENT_LENGTH = 50 * 1024 * 1024
 
     # Gemini
     GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')

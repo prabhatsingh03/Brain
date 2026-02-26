@@ -178,9 +178,10 @@
                                 class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none">
                         </div>
                         <div class="col-span-full">
-                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">File (PDF only)</label>
-                            <input type="file" name="file" accept=".pdf,application/pdf"
+                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">File (PDF only, max 50 MB)</label>
+                            <input type="file" name="file" id="admin-metadata-file-input" accept=".pdf,application/pdf"
                                 class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-slate-600 dark:text-textSoft file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent/10 file:text-accent hover:file:bg-accent/20">
+                            <p id="admin-metadata-file-error" class="mt-1 text-xs text-red-500 hidden"></p>
                         </div>
                     </div>
                     <button type="submit"
@@ -333,6 +334,26 @@
                             row.classList.add('hidden');
                         }
                     });
+                });
+            }
+
+            // Client-side 50 MB validation for metadata uploads
+            const metaFileInput = document.getElementById('admin-metadata-file-input');
+            const metaFileError = document.getElementById('admin-metadata-file-error');
+            const metaForm = metaFileInput ? metaFileInput.closest('form') : null;
+            if (metaFileInput && metaForm && metaFileError) {
+                metaForm.addEventListener('submit', (e) => {
+                    if (!metaFileInput.files.length) return;
+                    const file = metaFileInput.files[0];
+                    const maxBytes = 50 * 1024 * 1024;
+                    if (file.size > maxBytes) {
+                        e.preventDefault();
+                        metaFileError.textContent = 'File is too large. Maximum allowed size is 50 MB.';
+                        metaFileError.classList.remove('hidden');
+                    } else {
+                        metaFileError.textContent = '';
+                        metaFileError.classList.add('hidden');
+                    }
                 });
             }
         </script>

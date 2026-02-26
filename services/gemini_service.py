@@ -308,7 +308,8 @@ Metadata:
             response = self._generate_with_fallback(
                 models=self.routing_models,
                 contents=[{"role": "user", "parts": [{"text": prompt}]}],
-                config={"max_output_tokens": 9000}
+                # Routing step: smaller token budget is sufficient and faster
+                config={"max_output_tokens": 4000}
             )
 
             text = (response.text or "").strip()
@@ -476,8 +477,8 @@ Metadata:
                     logging.warning(f"[DEBUG] Failed to remove temp file {temp_file}: {e}")
             
             # Wait for processing
-            logging.info(f"[DEBUG] Waiting for file to become ACTIVE (max 30 seconds)...")
-            for attempt in range(30):
+            logging.info(f"[DEBUG] Waiting for file to become ACTIVE (max ~15 seconds)...")
+            for attempt in range(15):
                 file_check = self.client.files.get(name=uploaded_file.name)
                 logging.debug(f"[DEBUG] File check attempt {attempt + 1}/30: state={file_check.state}")
                 if file_check.state == "ACTIVE":
@@ -489,7 +490,7 @@ Metadata:
                     return None
                 time.sleep(1)
             
-            logging.error(f"[DEBUG] File upload timed out after 30 seconds: {local_path}")
+            logging.error(f"[DEBUG] File upload timed out after 15 seconds: {local_path}")
             return None
         except Exception as e:
             logging.error(f"[DEBUG] Exception uploading file {local_path}: {e}", exc_info=True)
@@ -508,7 +509,7 @@ Metadata:
                 uploaded_file = self.client.files.upload(file=local_path)
             except TypeError:
                 uploaded_file = self.client.files.upload(path=local_path)
-            for _ in range(30):
+            for _ in range(15):
                 fobj = self.client.files.get(name=uploaded_file.name)
                 if fobj.state == "ACTIVE":
                     return uploaded_file.name
@@ -579,18 +580,50 @@ Metadata:
             )
             import ast
             text = (response.text or "").strip()
+            original_text = text
             # Clean Markdown if any
             if text.startswith("```"):
                 text = text.strip("` \n")
                 text = text.replace("json", "", 1).strip()
 
-            pages = ast.literal_eval(text)
-            if isinstance(pages, list):
-                # Old code: 1-based page numbers, convert to 0-based
-                return [max(0, int(p) - 1) for p in pages if isinstance(p, int)]
+            parsed = None
+
+            # First try ast.literal_eval on the raw (cleaned) text
+            try:
+                parsed = ast.literal_eval(text)
+            except Exception:
+                # Fallback: try json.loads
+                try:
+                    parsed = json.loads(text)
+                except Exception:
+                    # Fallback: extract the first [...] block and parse it
+                    try:
+                        match = re.search(r'\[.*?\]', text, re.DOTALL)
+                        if match:
+                            block = match.group(0)
+                            try:
+                                parsed = json.loads(block)
+                            except Exception:
+                                parsed = ast.literal_eval(block)
+                    except Exception:
+                        parsed = None
+
+            # Last-resort fallback: pull out integers from whatever the model returned
+            if parsed is None:
+                try:
+                    nums = re.findall(r'\d+', text)
+                    parsed = [int(n) for n in nums]
+                except Exception:
+                    parsed = None
+
+            if isinstance(parsed, list):
+                return [max(0, int(p) - 1) for p in parsed if isinstance(p, int) or (isinstance(p, str) and p.isdigit())]
+
+            logging.warning(f"[Visual Intel] Failed to parse visual pages from model output: {original_text}")
         except Exception as e:
-            logging.error(f"Error identifying visual pages: {e}")
-            
+            # Log as warning so it does not look like a fatal error; visual extraction is best-effort only.
+            logging.warning(f"[Visual Intel] Error identifying visual pages: {e}")
+
         return []
 
     def generate_comparison_with_project_docs(
@@ -843,7 +876,8 @@ Answer style: {style_instruction}
             response = self._generate_with_fallback(
                 models=self.answer_models,
                 contents=api_parts,
-                config={"max_output_tokens": 9000}
+                # Cap output length to keep comparison responses fast and avoid timeouts
+                config={"max_output_tokens": 5000}
             )
             answer_text = (response.text or "").strip()
             answer_text = re.sub(r"<br\s*/?>", "\n", answer_text)
@@ -1149,7 +1183,8 @@ Answer style: {style_instruction}
         response = self._generate_with_fallback(
             models=self.answer_models,
             contents=api_contents,
-            config={"max_output_tokens": 9000},
+            # Slightly lower cap to reduce latency while keeping rich answers
+            config={"max_output_tokens": 5000},
             tools=tools
         )
 
@@ -1394,7 +1429,7 @@ Answer style: {style_instruction}
             for chunk_text in self._generate_stream_with_fallback(
                 models=self.answer_models,
                 contents=api_contents,
-                config={"max_output_tokens": 9000},
+                config={"max_output_tokens": 5000},
                 tools=tools
             ):
                 answer_text += chunk_text

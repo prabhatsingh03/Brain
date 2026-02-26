@@ -353,11 +353,16 @@ def upload_comparison(project_name):
     """Accept one file; return upload_id immediately. Previous flow (upload to Gemini) continues in background."""
     Project.query.filter_by(name=project_name).first_or_404()
     file = request.files.get('file')
+    content_length = request.content_length or 0
     if not file or not file.filename:
         return jsonify({'error': 'No file provided'}), 400
     allowed = ('.pdf', '.doc', '.docx', '.txt')
     if not file.filename.lower().endswith(allowed):
         return jsonify({'error': 'Allowed types: PDF, DOC, DOCX, TXT'}), 400
+    # Enforce a 50 MB maximum upload size for comparison files
+    max_bytes = 50 * 1024 * 1024
+    if content_length > max_bytes:
+        return jsonify({'error': 'File is too large. Maximum allowed size is 50 MB.'}), 400
     fd, temp_path = tempfile.mkstemp(suffix=os.path.splitext(file.filename)[1])
     try:
         os.close(fd)
@@ -525,8 +530,8 @@ def chat_api(project_name):
                             if entry.get('file_id'):
                                 resolved_file_ids.append(entry['file_id'])
                                 continue
-                            # Background may still be uploading; wait briefly for file_id
-                            for _ in range(30):
+                            # Background may still be uploading; wait briefly for file_id (up to ~7.5 seconds)
+                            for _ in range(15):
                                 if entry.get('file_id'):
                                     resolved_file_ids.append(entry['file_id'])
                                     break
@@ -679,7 +684,7 @@ def _chat_stream_events(project_name, question, primary_mode, advance_mode, sele
                     if entry.get('file_id'):
                         resolved_file_ids.append(entry['file_id'])
                         continue
-                    for _ in range(30):
+                    for _ in range(15):
                         if entry.get('file_id'):
                             resolved_file_ids.append(entry['file_id'])
                             break
