@@ -3543,7 +3543,7 @@
             if (currentAdvanceMode === 'cross_project') {
                 const check = await doCrossProjectCheck(question);
                 if (check.related_with_hits && check.related_with_hits.length > 0) {
-                    hideThinkingStatus();
+                    // Keep the thinking status visible while the user decides
                     showIncludeRelatedPrompt(check.related_with_hits, (incRel) => {
                         runStreamRequest(question, primaryMode, incRel, incRel ? check.related_with_hits : undefined).finally(() => {
                             chatForm.dataset.isSubmitting = 'false';
@@ -3552,6 +3552,8 @@
                             userInput.focus();
                         });
                     }, () => {
+                        // User cancelled the cross-project suggestion; stop the thinking indicator
+                        hideThinkingStatus();
                         chatForm.dataset.isSubmitting = 'false';
                         if (submitBtn) submitBtn.disabled = false;
                         userInput.disabled = false;
