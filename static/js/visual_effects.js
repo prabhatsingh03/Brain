@@ -1,9 +1,13 @@
 /**
  * Glass Neuro Background & Dot Cursor Motion
  * Premium visual effects for post-login experience.
+ * Wrapped so script is safe when re-executed (e.g. Turbo Drive navigation).
  */
+(function () {
+    if (window.__visualEffectsLoaded) return;
+    window.__visualEffectsLoaded = true;
 
-class NeuroBackground {
+    class NeuroBackground {
     constructor() {
         this.canvas = document.getElementById('neuro-bg-canvas');
         if (!this.canvas) return;
@@ -193,7 +197,8 @@ class DotCursor {
     }
 }
 
-document.addEventListener('turbo:load', () => {
-    new NeuroBackground();
-    new DotCursor();
-});
+    document.addEventListener('turbo:load', () => {
+        new NeuroBackground();
+        new DotCursor();
+    });
+})();
