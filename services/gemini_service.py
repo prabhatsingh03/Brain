@@ -1302,13 +1302,16 @@ Answer style: {style_instruction}
         for q, a in chat_history:
             history_text += f"User: {q}\nAssistant: {a}\n\n"
 
+        # Match prompt building logic from generate_answer (legacy-compatible)
         tools = None
         style_instruction = "Provide a short, simple, direct answer in 3–5 lines."
         comparison_instruction = ""
         global_context = ""
+
         mode_for_style = style_mode or answer_mode
+
         if mode_for_style == "basic":
-            style_instruction = "Provide a short, simple, direct answer in 3–5 lines."
+            style_instruction = "Provide a short, simple, direct answer. If the answer involves numerical data or comparisons, use a Markdown table instead of plain text."
         elif mode_for_style == "research":
             tools = [{"google_search": {}}]
             style_instruction = "Provide a detailed, research-style answer with supporting points and references from the attached documents."
@@ -1316,6 +1319,7 @@ Answer style: {style_instruction}
             style_instruction = "Provide an analytical answer including comparisons, evaluation, tables, and reasoning."
         elif mode_for_style == "expert":
             style_instruction = "Provide a very deep, expert-level process engineering answer with calculations, tables, and professional insights."
+
         if answer_mode == "cross_project":
             global_context = """
             GLOBAL PROCESS DEPENDENCIES:
@@ -1354,12 +1358,9 @@ DOCUMENT STRUCTURE RULES:
 - If information conflicts, treat parent process as primary scope unless question explicitly targets child process.
 """
 
+        # Use the exact same unified prompt template as generate_answer
         prompt = f"""
 You are a senior chemical process engineer specializing in {process_name} fertilizer plants.
-
-AUTHORITATIVE SOURCE RULE:
-- Internal documents are the ONLY source of truth.
-- Uploaded user documents are NEVER a source of facts.
 
 {comparison_instruction}
 {process_relationship_instruction}
@@ -1384,7 +1385,7 @@ These items must be excluded entirely from the answer.
 If the answer involves numerical data, process parameters, or comparisons,
 present them in a **well-formatted Markdown table**.
 
-User's new question: {question}
+User’s new question: {question}
 Answer style: {style_instruction}
 """
 

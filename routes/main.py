@@ -450,18 +450,24 @@ def chat_api(project_name):
         # Sanitize question (remove HTML/script tags)
         question = sanitize_input(question, max_length=5000) if question else None
         
-        # Validate mode against whitelist (align with Streamlit answer modes)
-        allowed_modes = [
-            'basic',
-            'research',
-            'analytical',
-            'expert',
-            'cross_project',  # only used when advance_mode == 'cross_project'
-            'comparison',     # only used when advance_mode == 'comparison'
-        ]
+        # Validate mode against whitelist
+        base_modes = ['basic', 'research', 'analytical', 'expert']
+        advanced_flags = ['cross_project', 'comparison']
+        allowed_modes = base_modes + advanced_flags
         if not validate_mode(mode, allowed_modes):
             return jsonify({'error': 'Invalid mode parameter'}), 400
         
+        # Enforce consistent mode / advance_mode combinations:
+        # - advanced_flags are only meaningful when advance_mode matches
+        # - style_mode (used for prompt styling) must always be one of base_modes
+        if mode == 'cross_project' and advance_mode != 'cross_project':
+            return jsonify({'error': 'Invalid mode/advance_mode combination'}), 400
+        if mode == 'comparison' and advance_mode != 'comparison':
+            return jsonify({'error': 'Invalid mode/advance_mode combination'}), 400
+
+        # Normalised style mode used for prompt styling and caching
+        style_mode = mode if mode in base_modes else 'basic'
+
         # Validate and sanitize selected files
         if selected_files:
             selected_files = validate_selected_files(selected_files)
@@ -509,7 +515,7 @@ def chat_api(project_name):
                     related_projects = [p for p in related_projects if p in all_related]
                 # else: include_related is False or not set -> related_projects stays [] -> single-project
             
-            cache_key = get_qna_cache_key(project_name, question, mode, advance_mode, selected_files, chat_history, related_projects, visual_intel)
+            cache_key = get_qna_cache_key(project_name, question, style_mode, advance_mode, selected_files, chat_history, related_projects, visual_intel)
             cached_result = QNA_CACHE.get(cache_key)
 
             if cached_result:
@@ -555,7 +561,7 @@ def chat_api(project_name):
                         project_name=project_name,
                         file_ids=resolved_file_ids,
                         chat_history=chat_history,
-                        style_mode=mode,
+                        style_mode=style_mode,
                         extract_visuals=visual_intel
                     )
                 # Cross‑project flow
@@ -565,7 +571,7 @@ def chat_api(project_name):
                         parent_project=project_name,
                         related_projects=related_projects,
                         chat_history=chat_history,
-                        style_mode=mode,  # preserve basic/research/analytical/expert style
+                        style_mode=style_mode,  # preserve basic/research/analytical/expert style
                         extract_visuals=visual_intel
                     )
                 else:
@@ -574,7 +580,7 @@ def chat_api(project_name):
                         question=question,
                         project_name=project_name,
                         chat_history=chat_history,
-                        answer_mode=mode,
+                        answer_mode=style_mode,
                         extract_visuals=visual_intel
                     )
                     
@@ -616,7 +622,7 @@ def chat_api(project_name):
             log = AuditLog(
                 user_id=current_user.email,
                 action='QUERY',
-                details=f"Project: {project_name} | Session: {chat_session.id} | Mode: {mode} | Q: {question[:100]}..."
+                details=f"Project: {project_name} | Session: {chat_session.id} | Mode: {style_mode} | AdvanceMode: {advance_mode} | Q: {question[:100]}..."
             )
             db.session.add(log)
             
@@ -833,9 +839,21 @@ def chat_stream_api(project_name):
 
     try:
         question = sanitize_input(question, max_length=5000) if question else None
-        allowed_modes = ['basic', 'research', 'analytical', 'expert', 'cross_project', 'comparison']
+
+        base_modes = ['basic', 'research', 'analytical', 'expert']
+        advanced_flags = ['cross_project', 'comparison']
+        allowed_modes = base_modes + advanced_flags
         if not validate_mode(primary_mode, allowed_modes):
             return jsonify({'error': 'Invalid mode parameter'}), 400
+
+        if primary_mode == 'cross_project' and advance_mode != 'cross_project':
+            return jsonify({'error': 'Invalid mode/advance_mode combination'}), 400
+        if primary_mode == 'comparison' and advance_mode != 'comparison':
+            return jsonify({'error': 'Invalid mode/advance_mode combination'}), 400
+
+        # Normalised style mode used for prompt styling and caching
+        style_mode = primary_mode if primary_mode in base_modes else 'basic'
+
         if selected_files:
             selected_files = validate_selected_files(selected_files)
     except ValueError as ve:
@@ -872,7 +890,7 @@ def chat_stream_api(project_name):
 
     return Response(
         stream_with_context(_chat_stream_events(
-            project_name, question, primary_mode, advance_mode, selected_files, session_id,
+            project_name, question, style_mode, advance_mode, selected_files, session_id,
             service, chat_session, history_msgs, chat_history, proj, related_projects, visual_intel
         )),
         content_type='text/event-stream',
