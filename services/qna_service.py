@@ -131,6 +131,8 @@ class QnAService:
         question: str,
         project_name: str,
         file_ids: List[str],
+        chat_history: List[Tuple[str, str]] | None = None,
+        style_mode: str = "basic",
         extract_visuals: bool = True,
     ) -> Dict:
         """
@@ -140,6 +142,8 @@ class QnAService:
             question=question,
             process_name=project_name,
             user_file_ids=file_ids or [],
+            chat_history=chat_history or [],
+            style_mode=style_mode,
             extract_visuals=extract_visuals,
         )
 

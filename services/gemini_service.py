@@ -598,6 +598,8 @@ Metadata:
         question: str,
         process_name: str,
         user_file_ids: List[str],
+        chat_history: Optional[List[Tuple[str, str]]] = None,
+        style_mode: Optional[str] = None,
         extract_visuals: bool = True,
     ) -> Dict:
         """
@@ -629,7 +631,14 @@ Metadata:
                 "relevant_files": [],
                 "visuals": [],
             }
-        return self.generate_comparison(question, process_name, internal_file_ids=project_gemini_ids, user_file_ids=user_file_ids)
+        return self.generate_comparison(
+            question=question,
+            process_name=process_name,
+            internal_file_ids=project_gemini_ids,
+            user_file_ids=user_file_ids,
+            chat_history=chat_history or [],
+            style_mode=style_mode,
+        )
 
     def generate_comparison(
         self,
@@ -637,6 +646,8 @@ Metadata:
         process_name: str,
         internal_file_ids: Optional[List[str]] = None,
         user_file_ids: Optional[List[str]] = None,
+        chat_history: Optional[List[Tuple[str, str]]] = None,
+        style_mode: Optional[str] = None,
     ) -> Dict:
         """
         Compare documents. When user_file_ids is provided, follows old_code authority rule:
@@ -646,6 +657,20 @@ Metadata:
         internal_file_ids = [f for f in (internal_file_ids or []) if f]
         user_file_ids = [f for f in (user_file_ids or []) if f]
         has_user_doc = len(user_file_ids) > 0
+        history_list = chat_history or []
+        history_text = ""
+        for q, a in history_list:
+            try:
+                history_text += f"User: {q}\nAssistant: {a}\n\n"
+            except Exception:
+                continue
+        style_instruction = "Provide a short, simple, direct answer in 3–5 lines."
+        if style_mode == "research":
+            style_instruction = "Provide a detailed, research-style answer with supporting points and references from the attached documents."
+        elif style_mode == "analytical":
+            style_instruction = "Provide an analytical answer including comparisons, evaluation, tables, and reasoning."
+        elif style_mode == "expert":
+            style_instruction = "Provide a very deep, expert-level process engineering answer with calculations, tables, and professional insights."
 
         valid_files = []
         contents_payload = []
@@ -780,13 +805,26 @@ You are a senior chemical process engineer specializing in {process_name} fertil
 
 {comparison_instruction}
 
-Use ONLY the INTERNAL process documents to answer. Compare or contrast with the user-uploaded document only for context; do not state facts from the user document unless they match internal documents.
+Below is the ongoing chat history between the user and you (if any):
+{history_text}
 
-If the answer involves numerical data, process parameters, or comparisons, present them in a well-formatted Markdown table.
+Use ONLY the INTERNAL process documents (if provided) to answer the question.
+If no INTERNAL documents are attached, do not provide any information and say "Relevant documents missing."
 
-User's question: {question}
+Provide a clear, technically accurate answer.
+Respond with a clean, direct answer only—
+do not include any explanation, reasoning, or background information
+unless the question explicitly asks for it (e.g., starts with or contains words like "why", "how", or "explain").
 
-Provide a clear, technically accurate answer. Do not quote or mention reference documents, tag numbers, equipment or instrument tags, document or drawing numbers, unless the question explicitly asks for it.
+Do not quote or mention any reference documents, tag numbers, equipment or instrument tags, document or drawing numbers,
+equipment codes, line numbers, stream numbers, fluid codes, or pipe specification information in your response.
+These items must be excluded entirely from the answer.
+
+If the answer involves numerical data, process parameters, or comparisons,
+present them in a **well-formatted Markdown table**.
+
+User's new question: {question}
+Answer style: {style_instruction}
 """
 
         # 3. Add prompt last (same order as old_code)

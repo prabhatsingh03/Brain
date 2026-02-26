@@ -1304,9 +1304,11 @@
                     }
 
                     chatsList.innerHTML = '';
+                    const currentChatId = new URLSearchParams(window.location.search).get('chat');
                     data.forEach(chat => {
                         const chatItem = document.createElement('div');
-                        chatItem.className = 'sidebar-chat-item group/chatitem flex items-center justify-between gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors';
+                        const isActive = currentChatId != null && String(chat.id) === String(currentChatId);
+                        chatItem.className = 'sidebar-chat-item group/chatitem flex items-center justify-between gap-2 p-2 rounded-lg transition-colors ' + (isActive ? 'bg-accent/10 border-l-2 border-accent' : 'hover:bg-white/5');
                         chatItem.dataset.chatId = chat.id;
 
                         const pinIconRight = chat.is_pinned

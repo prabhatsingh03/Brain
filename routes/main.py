@@ -380,6 +380,53 @@ def upload_comparison(project_name):
             pass
         return jsonify({'error': str(e)}), 500
 
+
+@main_bp.route('/api/chat/<project_name>/cross-project-check', methods=['POST'])
+@login_required
+def cross_project_check(project_name):
+    """
+    Routing-only check for cross-project mode: which related projects have relevant content for this question.
+    Returns related_with_hits (list of related project names that have at least one relevant file) and parent_has_hits.
+    No answer generation; used by frontend to decide whether to prompt user to include related processes.
+    """
+    data = request.json or {}
+    question = data.get('question')
+    try:
+        question = sanitize_input(question, max_length=5000) if question else None
+    except ValueError:
+        question = None
+    if not question:
+        return jsonify({'error': 'No question provided'}), 400
+
+    api_key = current_app.config.get('GEMINI_API_KEY')
+    if not api_key:
+        return jsonify({'error': 'Gemini API Key not configured'}), 500
+
+    proj = Project.query.filter_by(name=project_name).first_or_404()
+    deps = ProjectDependency.query.filter_by(project_name=proj.name).all()
+    related_names = [d.dependency_name for d in deps]
+
+    related_with_hits = []
+    parent_has_hits = False
+
+    try:
+        service = QnAService(api_key=api_key)
+        parent_files = service.get_relevant_files(question, project_name, max_files=3)
+        parent_has_hits = len(parent_files) > 0
+        for rel_name in related_names:
+            files = service.get_relevant_files(question, rel_name, max_files=3)
+            if files:
+                related_with_hits.append(rel_name)
+    except Exception as e:
+        debug_logger.error(f"cross_project_check error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+    return jsonify({
+        'related_with_hits': related_with_hits,
+        'parent_has_hits': parent_has_hits,
+    })
+
+
 @main_bp.route('/api/chat/<project_name>', methods=['POST'])
 @login_required
 def chat_api(project_name):
@@ -390,6 +437,8 @@ def chat_api(project_name):
     selected_files = data.get('selected_files', [])
     session_id = data.get('session_id')
     visual_intel = data.get('visual_intel', True)
+    include_related = data.get('include_related')
+    related_projects_to_include = data.get('related_projects_to_include')
     
     # Input sanitization and validation
     try:
@@ -444,10 +493,16 @@ def chat_api(project_name):
             chat_history = [(m.question, m.answer) for m in history_msgs]
 
             # Determine related projects if cross‑project mode is enabled
+            # When include_related is False (or not set), use single-project; when True, use related_projects_to_include or all from DB
             related_projects: list[str] = []
             if advance_mode == 'cross_project':
                 deps = ProjectDependency.query.filter_by(project_name=proj.name).all()
-                related_projects = [d.dependency_name for d in deps]
+                all_related = [d.dependency_name for d in deps]
+                if include_related is True and all_related:
+                    related_projects = list(related_projects_to_include) if isinstance(related_projects_to_include, list) and related_projects_to_include else all_related
+                    # Keep only those that are actually in DB dependencies
+                    related_projects = [p for p in related_projects if p in all_related]
+                # else: include_related is False or not set -> related_projects stays [] -> single-project
             
             cache_key = get_qna_cache_key(project_name, question, mode, advance_mode, selected_files, chat_history, related_projects, visual_intel)
             cached_result = QNA_CACHE.get(cache_key)
@@ -494,6 +549,8 @@ def chat_api(project_name):
                         question=question,
                         project_name=project_name,
                         file_ids=resolved_file_ids,
+                        chat_history=chat_history,
+                        style_mode=mode,
                         extract_visuals=visual_intel
                     )
                 # Cross‑project flow
@@ -644,7 +701,10 @@ def _chat_stream_events(project_name, question, primary_mode, advance_mode, sele
             result = service.generate_comparison_answer(
                 question=question,
                 project_name=project_name,
-                file_ids=resolved_file_ids
+                file_ids=resolved_file_ids,
+                chat_history=chat_history,
+                style_mode=primary_mode,
+                extract_visuals=visual_intel
             )
             if 'answer' in result:
                 QNA_CACHE.put(cache_key, result)
@@ -763,6 +823,8 @@ def chat_stream_api(project_name):
     selected_files = data.get('selected_files', [])
     session_id = data.get('session_id')
     visual_intel = data.get('visual_intel', True)
+    include_related = data.get('include_related')
+    related_projects_to_include = data.get('related_projects_to_include')
 
     try:
         question = sanitize_input(question, max_length=5000) if question else None
@@ -796,7 +858,10 @@ def chat_stream_api(project_name):
     related_projects = []
     if advance_mode == 'cross_project':
         deps = ProjectDependency.query.filter_by(project_name=proj.name).all()
-        related_projects = [d.dependency_name for d in deps]
+        all_related = [d.dependency_name for d in deps]
+        if include_related is True and all_related:
+            related_projects = list(related_projects_to_include) if isinstance(related_projects_to_include, list) and related_projects_to_include else all_related
+            related_projects = [p for p in related_projects if p in all_related]
 
     service = QnAService(api_key=api_key)
 

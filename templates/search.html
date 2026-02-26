@@ -3298,6 +3298,71 @@
         loadingInd.classList.add('hidden');
     }
 
+    const crossProjectCheckUrl = "{{ url_for('main.cross_project_check', project_name=project.name) }}";
+
+    async function doCrossProjectCheck(question) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const res = await fetch(crossProjectCheckUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+            body: JSON.stringify({ question: question })
+        });
+        if (!res.ok) {
+            const err = await res.json().catch(() => ({}));
+            throw new Error(err.error || res.statusText);
+        }
+        return res.json();
+    }
+
+    function showIncludeRelatedPrompt(relatedWithHits, onConfirm, onCancel) {
+        const names = Array.isArray(relatedWithHits) ? relatedWithHits.join(', ') : '';
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'simon-message-group assistant';
+        groupDiv.setAttribute('data-cross-project-prompt', 'true');
+        let selectedInclude = false;
+        groupDiv.innerHTML = `
+            <div class="simon-avatar assistant reactor-avatar-wrapper">${REACTOR_AVATAR_HTML}</div>
+            <div class="simon-chat-bubble assistant">
+                <p class="text-textPrimary font-medium mb-2">Related metadata also found in: ${escapeHtml(names)}</p>
+                <p class="text-textSoft text-sm mb-3">Do you want to include these processes?</p>
+                <div class="flex flex-col gap-2 mb-3">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="include_related_choice" value="no" checked>
+                        <span>No, continue with current process only</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="include_related_choice" value="yes">
+                        <span>Yes, include them</span>
+                    </label>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" class="cross-project-confirm px-3 py-1.5 rounded bg-primary text-white text-sm font-medium">Confirm</button>
+                    <button type="button" class="cross-project-cancel px-3 py-1.5 rounded border border-border text-textSoft text-sm">Cancel</button>
+                </div>
+            </div>
+        `;
+        messagesDiv.appendChild(groupDiv);
+        groupDiv.classList.add('visible');
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        groupDiv.querySelector('.cross-project-confirm').addEventListener('click', () => {
+            const choice = groupDiv.querySelector('input[name="include_related_choice"]:checked');
+            const includeRelated = choice && choice.value === 'yes';
+            groupDiv.remove();
+            onConfirm(includeRelated);
+        });
+        groupDiv.querySelector('.cross-project-cancel').addEventListener('click', () => {
+            groupDiv.remove();
+            onCancel();
+        });
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     // --- Chat Submit ---
     chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -3333,27 +3398,30 @@
 
         const streamUrl = "{{ url_for('main.chat_stream_api', project_name=project.name) }}";
         const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-        const { groupDiv: streamGroupDiv, bubble, contentDiv } = createStreamingAssistantBubble(true);
-        let accumulatedText = '';
-        let data = { session_id: currentSessionId, session_title: null, visuals: [] };
+        let includeRelated = undefined;
+        let relatedProjectsToInclude = undefined;
 
-        try {
+        async function runStreamRequest(question, primaryMode, includeRelatedVal, relatedProjectsToIncludeVal) {
+            const { groupDiv: streamGroupDiv, bubble, contentDiv } = createStreamingAssistantBubble(true);
+            let accumulatedText = '';
+            let data = { session_id: currentSessionId, session_title: null, visuals: [] };
+            const body = {
+                question: question,
+                mode: primaryMode,
+                advance_mode: currentAdvanceMode,
+                selected_files: currentAdvanceMode === 'comparison' && comparisonFileId ? [comparisonFileId] : (typeof window.comparisonFileId !== 'undefined' ? [window.comparisonFileId] : []),
+                session_id: currentSessionId,
+                visual_intel: localStorage.getItem('simon_vis_enabled') !== 'false'
+            };
+            if (currentAdvanceMode === 'cross_project') {
+                body.include_related = includeRelatedVal !== undefined ? includeRelatedVal : false;
+                body.related_projects_to_include = relatedProjectsToIncludeVal || [];
+            }
             const response = await fetch(streamUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
-                body: JSON.stringify({
-                    question: question,
-                    mode: primaryMode,
-                    advance_mode: currentAdvanceMode,
-                    selected_files: currentAdvanceMode === 'comparison' && comparisonFileId ? [comparisonFileId] : "comparison_file_id" in window ? [window.comparisonFileId] : [], // fallback
-                    session_id: currentSessionId,
-                    visual_intel: localStorage.getItem('simon_vis_enabled') !== 'false'
-                })
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                body: JSON.stringify(body)
             });
-
             if (!response.ok) {
                 const errBody = await response.text();
                 let errMsg = 'Network response was not ok';
@@ -3365,108 +3433,109 @@
                 hideThinkingStatus();
                 contentDiv.textContent = 'Error: ' + errMsg;
                 messages.push({ role: 'assistant', text: contentDiv.textContent });
-            } else {
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let buffer = '';
-                let firstChunk = true;
-                let visualRenderer = null;
-
-                function processEvent(line) {
-                    if (!line.startsWith('data: ')) return;
-                    try {
-                        const payload = JSON.parse(line.slice(6));
-                        if (payload.type === 'chunk' && payload.text) {
-                            if (firstChunk) {
-                                streamGroupDiv.classList.remove('streaming-bubble-hidden');
-                                hideThinkingStatus();
-                                firstChunk = false;
-                                // Start materialization effect early for better flow
-                                visualRenderer = renderVisuals(null, bubble, true);
-                                if (visualRenderer) visualRenderer.startTimer();
-                            }
-                            accumulatedText += payload.text;
-                            try {
-                                contentDiv.innerHTML = renderMarkdown(accumulatedText);
-                            } catch (_) {
-                                contentDiv.textContent = accumulatedText;
-                            }
-                            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                        } else if (payload.type === 'done') {
-                            streamGroupDiv.classList.remove('streaming-bubble-hidden');
-                            data = payload;
-                            accumulatedText = payload.answer != null ? payload.answer : accumulatedText;
-                            contentDiv.innerHTML = renderMarkdown(accumulatedText);
-                            messages.push({ role: 'assistant', text: accumulatedText });
-                            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-                            window.__streaming_complete = true;
-
-                            // Trigger visuals with data from 'done' event
-                            if (payload.visuals && payload.visuals.length > 0) {
-                                if (visualRenderer) {
-                                    visualRenderer.complete(payload.visuals);
-                                } else {
-                                    // Fallback if no chunks received (unlikely but possible)
-                                    renderVisuals(payload.visuals, bubble);
-                                }
-                            } else if (visualRenderer) {
-                                // Clear processing if no visuals
-                                visualRenderer.complete(null);
-                            }
-
-                            // Render flow diagram if enabled
-                            renderFlowDiagram(accumulatedText, bubble);
-                        }
-                        else if (payload.type === 'error') {
+                return;
+            }
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let firstChunk = true;
+            let visualRenderer = null;
+            function processEvent(line) {
+                if (!line.startsWith('data: ')) return;
+                try {
+                    const payload = JSON.parse(line.slice(6));
+                    if (payload.type === 'chunk' && payload.text) {
+                        if (firstChunk) {
                             streamGroupDiv.classList.remove('streaming-bubble-hidden');
                             hideThinkingStatus();
-
-                            const flowProcessingDivError = bubble.querySelector('.flow-processing-status');
-                            if (flowProcessingDivError) flowProcessingDivError.remove();
-
-                            contentDiv.textContent = 'Error: ' + (payload.message || 'Unknown error');
-                            messages.push({ role: 'assistant', text: contentDiv.textContent });
+                            firstChunk = false;
+                            visualRenderer = renderVisuals(null, bubble, true);
+                            if (visualRenderer) visualRenderer.startTimer();
                         }
-                    } catch (parseErr) {
-                        console.warn('SSE parse:', parseErr);
+                        accumulatedText += payload.text;
+                        try {
+                            contentDiv.innerHTML = renderMarkdown(accumulatedText);
+                        } catch (_) {
+                            contentDiv.textContent = accumulatedText;
+                        }
+                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    } else if (payload.type === 'done') {
+                        streamGroupDiv.classList.remove('streaming-bubble-hidden');
+                        data = payload;
+                        accumulatedText = payload.answer != null ? payload.answer : accumulatedText;
+                        contentDiv.innerHTML = renderMarkdown(accumulatedText);
+                        messages.push({ role: 'assistant', text: accumulatedText });
+                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                        window.__streaming_complete = true;
+                        if (payload.visuals && payload.visuals.length > 0) {
+                            if (visualRenderer) visualRenderer.complete(payload.visuals);
+                            else renderVisuals(payload.visuals, bubble);
+                        } else if (visualRenderer) visualRenderer.complete(null);
+                        renderFlowDiagram(accumulatedText, bubble);
+                    } else if (payload.type === 'error') {
+                        streamGroupDiv.classList.remove('streaming-bubble-hidden');
+                        hideThinkingStatus();
+                        const flowProcessingDivError = bubble.querySelector('.flow-processing-status');
+                        if (flowProcessingDivError) flowProcessingDivError.remove();
+                        contentDiv.textContent = 'Error: ' + (payload.message || 'Unknown error');
+                        messages.push({ role: 'assistant', text: contentDiv.textContent });
                     }
+                } catch (parseErr) {
+                    console.warn('SSE parse:', parseErr);
                 }
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    buffer += decoder.decode(value, { stream: true });
-                    const parts = buffer.split('\n\n');
-                    buffer = parts.pop() || '';
-                    for (const part of parts) {
-                        const line = part.trim();
-                        if (line.startsWith('data: ')) processEvent(line);
-                    }
-                }
-                if (buffer.trim().startsWith('data: ')) {
-                    processEvent(buffer.trim());
-                }
-                if (accumulatedText && !bubble.innerHTML) {
-                    streamGroupDiv.classList.remove('streaming-bubble-hidden');
-                    bubble.innerHTML = renderMarkdown(accumulatedText);
-                    messages.push({ role: 'assistant', text: accumulatedText });
-                    renderMermaidDiagrams();
-                }
-
-                if (chatHeaderTitle) chatHeaderTitle.innerText = "SIA";
-                if (chatHeaderSubtitleText) {
-                    chatHeaderSubtitleText.textContent = data.session_title || "New chat";
-                }
-                if (!currentSessionId && data.session_id) {
-                    currentSessionId = data.session_id;
-                    window.dispatchEvent(new CustomEvent('chat-updated'));
-                } else if (data.session_title) {
-                    window.dispatchEvent(new CustomEvent('chat-updated'));
-                }
-
-                // Visual rendering now handled inside processEvent for snappier response
             }
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const parts = buffer.split('\n\n');
+                buffer = parts.pop() || '';
+                for (const part of parts) {
+                    const line = part.trim();
+                    if (line.startsWith('data: ')) processEvent(line);
+                }
+            }
+            if (buffer.trim().startsWith('data: ')) processEvent(buffer.trim());
+            if (accumulatedText && !bubble.innerHTML) {
+                streamGroupDiv.classList.remove('streaming-bubble-hidden');
+                bubble.innerHTML = renderMarkdown(accumulatedText);
+                messages.push({ role: 'assistant', text: accumulatedText });
+                renderMermaidDiagrams();
+            }
+            if (chatHeaderTitle) chatHeaderTitle.innerText = "SIA";
+            if (chatHeaderSubtitleText) chatHeaderSubtitleText.textContent = data.session_title || "New chat";
+            if (!currentSessionId && data.session_id) {
+                currentSessionId = data.session_id;
+                window.dispatchEvent(new CustomEvent('chat-updated'));
+            } else if (data.session_title) {
+                window.dispatchEvent(new CustomEvent('chat-updated'));
+            }
+        }
+
+        try {
+            if (currentAdvanceMode === 'cross_project') {
+                const check = await doCrossProjectCheck(question);
+                if (check.related_with_hits && check.related_with_hits.length > 0) {
+                    hideThinkingStatus();
+                    showIncludeRelatedPrompt(check.related_with_hits, (incRel) => {
+                        runStreamRequest(question, primaryMode, incRel, incRel ? check.related_with_hits : undefined).finally(() => {
+                            chatForm.dataset.isSubmitting = 'false';
+                            if (submitBtn) submitBtn.disabled = false;
+                            userInput.disabled = false;
+                            userInput.focus();
+                        });
+                    }, () => {
+                        chatForm.dataset.isSubmitting = 'false';
+                        if (submitBtn) submitBtn.disabled = false;
+                        userInput.disabled = false;
+                        userInput.focus();
+                    });
+                    return;
+                }
+                includeRelated = false;
+            }
+
+            await runStreamRequest(question, primaryMode, includeRelated, relatedProjectsToInclude);
 
         } catch (error) {
             console.error('Error:', error);

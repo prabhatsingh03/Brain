@@ -69,6 +69,4 @@ def create_app(config_class=Config):
 
 if __name__ == '__main__':
     app = create_app()
-    from waitress import serve
-    print("Starting Waitress server on http://0.0.0.0:5000 (Multi-threaded)")
-    serve(app, host='0.0.0.0', port=5000, threads=6)
+    app.run(host='0.0.0.0', port=5000, debug=True)
