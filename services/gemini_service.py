@@ -677,13 +677,35 @@ STRICT RULES:
                 config={"max_output_tokens": 150},
             )
 
-            if not response or not getattr(response, "text", None):
-                logging.error("[Doc Summary] Empty response from Gemini for description generation")
+            if not response:
+                logging.error("[Doc Summary] Empty response object from Gemini for description generation")
                 return None
 
-            text = (response.text or "").strip()
-            text = re.sub(r"<br\\s*/?>", " ", text)
-            text = re.sub(r"\\s+", " ", text).strip()
+            # Prefer the convenience .text property, but fall back to candidates if needed.
+            raw_text = getattr(response, "text", None)
+
+            if not raw_text and hasattr(response, "candidates"):
+                try:
+                    parts_text: List[str] = []
+                    for cand in getattr(response, "candidates", []) or []:
+                        content = getattr(cand, "content", None)
+                        if not content:
+                            continue
+                        for part in getattr(content, "parts", []) or []:
+                            part_text = getattr(part, "text", None)
+                            if part_text:
+                                parts_text.append(str(part_text))
+                    raw_text = " ".join(parts_text)
+                except Exception as extract_err:
+                    logging.warning(f"[Doc Summary] Failed to extract text from candidates: {extract_err}", exc_info=True)
+
+            if not raw_text:
+                logging.error("[Doc Summary] Gemini returned no text for description generation")
+                return None
+
+            text = str(raw_text).strip()
+            text = re.sub(r"<br\s*/?>", " ", text)
+            text = re.sub(r"\s+", " ", text).strip()
 
             # Enforce word limit
             words = text.split()
