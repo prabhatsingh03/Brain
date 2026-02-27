@@ -174,8 +174,21 @@
                         </div>
                         <div>
                             <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">Description</label>
-                            <input type="text" name="type_of_data" placeholder="e.g. PFD, Manual, Image"
-                                class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none">
+                            <div class="flex gap-2">
+                                <input type="text" name="type_of_data" id="admin-metadata-description-input"
+                                    placeholder="e.g. PFD, Manual, Image"
+                                    class="flex-1 bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none">
+                                <button type="button" id="admin-generate-description-btn"
+                                    class="inline-flex items-center gap-1 bg-accent text-white px-3 py-2 rounded-lg text-xs font-semibold shadow-md shadow-accent/30 hover:brightness-110 disabled:opacity-60 disabled:cursor-not-allowed"
+                                    title="Generate description from document using AI">
+                                    <svg class="w-4 h-4 text-gray-800 dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 11a1 1 0 011-1h1.586l1.707-1.707a1 1 0 011.414 0L13.414 10H15a1 1 0 011 1v1.586l1.707 1.707a1 1 0 010 1.414L16 17.414V19a1 1 0 01-1 1h-1.586l-1.707 1.707a1 1 0 01-1.414 0L8.586 20H7a1 1 0 01-1-1v-1.586l-1.707-1.707a1 1 0 010-1.414L6 12.586V11z" />
+                                    </svg>
+                                    <span>AI</span>
+                                </button>
+                            </div>
+                            <p id="admin-generate-description-error" class="mt-1 text-xs text-red-500 hidden"></p>
                         </div>
                         <div class="col-span-full">
                             <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">File (PDF only, max 50 MB)</label>
@@ -649,7 +662,7 @@
         activeBtn.classList.add('bg-accent/10', 'border-accent/20', 'text-gray-900', 'dark:text-white', 'border');
     }
 
-    // --- Admin Dropdown Logic & Delete Modal Wiring ---
+    // --- Admin Dropdown Logic, Delete Modal Wiring, and AI Description Button ---
     document.addEventListener('DOMContentLoaded', () => {
         setupCustomDropdown('admin-project-dropdown', 'admin-project-trigger', 'admin-project-options', 'admin-project-arrow', 'admin-project-select', 'admin-project-text');
         setupCustomDropdown('admin-role-dropdown', 'admin-role-trigger', 'admin-role-options', 'admin-role-arrow', 'admin-role-select', 'admin-role-text');
@@ -744,6 +757,96 @@
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
                     closeModal();
+                }
+            });
+        }
+
+        // AI Description Generation for Metadata Upload
+        const aiButton = document.getElementById('admin-generate-description-btn');
+        const descriptionInput = document.getElementById('admin-metadata-description-input');
+        const fileInput = document.getElementById('admin-metadata-file-input');
+        const errorEl = document.getElementById('admin-generate-description-error');
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : null;
+
+        if (aiButton && descriptionInput && fileInput) {
+            const updateButtonState = () => {
+                const hasFile = fileInput.files && fileInput.files.length > 0;
+                aiButton.disabled = !hasFile;
+            };
+
+            updateButtonState();
+            fileInput.addEventListener('change', updateButtonState);
+
+            aiButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                if (errorEl) {
+                    errorEl.classList.add('hidden');
+                    errorEl.textContent = '';
+                }
+
+                const hasFile = fileInput.files && fileInput.files.length > 0;
+                if (!hasFile) {
+                    if (errorEl) {
+                        errorEl.textContent = 'Please select a PDF file before generating a description.';
+                        errorEl.classList.remove('hidden');
+                    } else {
+                        alert('Please select a PDF file before generating a description.');
+                    }
+                    updateButtonState();
+                    return;
+                }
+
+                const originalHtml = aiButton.innerHTML;
+                aiButton.disabled = true;
+                aiButton.innerHTML = 'Generating...';
+
+                try {
+                    const formData = new FormData();
+                    formData.append('file', fileInput.files[0]);
+
+                    const headers = {};
+                    if (csrfToken) {
+                        headers['X-CSRFToken'] = csrfToken;
+                    }
+
+                    const response = await fetch('{{ url_for("admin.generate_description") }}', {
+                        method: 'POST',
+                        body: formData,
+                        headers: headers
+                    });
+
+                    let data = {};
+                    try {
+                        data = await response.json();
+                    } catch (parseError) {
+                        data = {};
+                    }
+
+                    if (!response.ok || !data.description) {
+                        const message = data.error || 'Could not generate description from the document.';
+                        if (errorEl) {
+                            errorEl.textContent = message;
+                            errorEl.classList.remove('hidden');
+                        } else {
+                            alert(message);
+                        }
+                        return;
+                    }
+
+                    descriptionInput.value = data.description;
+                } catch (err) {
+                    const message = 'Failed to generate description using AI.';
+                    if (errorEl) {
+                        errorEl.textContent = message;
+                        errorEl.classList.remove('hidden');
+                    } else {
+                        alert(message);
+                    }
+                } finally {
+                    aiButton.innerHTML = originalHtml;
+                    updateButtonState();
                 }
             });
         }

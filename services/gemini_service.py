@@ -637,6 +637,64 @@ Metadata:
 
         return []
 
+    def generate_document_description(self, local_path: str, max_words: int = 50) -> Optional[str]:
+        """
+        Generate a short description for a document strictly based on its content.
+        Returns a description with at most `max_words` words, or None on failure.
+        """
+        try:
+            if not os.path.exists(local_path):
+                logging.error(f"[Doc Summary] File not found for description generation: {local_path}")
+                return None
+
+            file_id = self.upload_user_file_for_comparison(local_path)
+            if not file_id:
+                logging.error(f"[Doc Summary] Failed to upload file for description: {local_path}")
+                return None
+
+            file_obj = self.client.files.get(name=file_id)
+
+            prompt = f"""
+You are analyzing a single PDF document that an internal admin has uploaded.
+
+TASK:
+- Generate a concise description of what this document contains.
+
+STRICT RULES:
+- Base your description STRICTLY on the document content only.
+- Maximum {max_words} words.
+- Use neutral, professional wording.
+- Do NOT include any information that is not clearly implied by the document.
+- Output ONLY the description text. No quotes, no labels, no bullet points, no explanation.
+"""
+
+            response = self._generate_with_fallback(
+                models=self.answer_models,
+                contents=[
+                    prompt,
+                    types.Part.from_uri(file_uri=file_obj.uri, mime_type=file_obj.mime_type),
+                ],
+                config={"max_output_tokens": 150},
+            )
+
+            if not response or not getattr(response, "text", None):
+                logging.error("[Doc Summary] Empty response from Gemini for description generation")
+                return None
+
+            text = (response.text or "").strip()
+            text = re.sub(r"<br\\s*/?>", " ", text)
+            text = re.sub(r"\\s+", " ", text).strip()
+
+            # Enforce word limit
+            words = text.split()
+            if len(words) > max_words:
+                text = " ".join(words[:max_words])
+
+            return text
+        except Exception as e:
+            logging.error(f"[Doc Summary] Error generating document description: {e}", exc_info=True)
+            return None
+
     def generate_comparison_with_project_docs(
         self,
         question: str,

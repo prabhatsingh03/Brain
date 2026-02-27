@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_file
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, send_file, jsonify
 from flask_login import login_required, current_user
 from models.project import Project, ProjectMetadata, ProjectDependency
 from models.user import User
@@ -8,8 +8,10 @@ from flask_wtf.csrf import CSRFError
 import os
 import werkzeug.utils
 import io
+import tempfile
 
 from services.document_storage import get_document_storage
+from services.gemini_service import GeminiService
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -195,6 +197,52 @@ def delete_project(id):
 def _is_pdf(filename: str) -> bool:
     """Allow only PDFs, matching old_code metadata_admin_panel."""
     return bool(filename) and filename.lower().endswith('.pdf')
+
+
+@admin_bp.route('/generate-description', methods=['POST'])
+def generate_description():
+    """
+    Generate a short AI description for an uploaded PDF.
+    Returns JSON with a `description` field based strictly on the document content.
+    """
+    file = request.files.get('file')
+    content_length = request.content_length or 0
+
+    if not file or not file.filename:
+        return jsonify({'error': 'Please choose a PDF file before generating a description.'}), 400
+
+    if not _is_pdf(file.filename):
+        return jsonify({'error': 'Only PDF files are allowed for description generation.'}), 400
+
+    max_bytes = 50 * 1024 * 1024
+    if content_length > max_bytes:
+        return jsonify({'error': 'File is too large. Maximum allowed size is 50 MB.'}), 400
+
+    api_key = current_app.config.get('GEMINI_API_KEY')
+    if not api_key:
+        return jsonify({'error': 'Gemini API Key not configured.'}), 500
+
+    fd, temp_path = tempfile.mkstemp(suffix=os.path.splitext(file.filename)[1])
+    try:
+        os.close(fd)
+        file.save(temp_path)
+
+        service = GeminiService(api_key=api_key)
+        description = service.generate_document_description(temp_path, max_words=50)
+
+        if not description:
+            return jsonify({'error': 'Failed to generate description from the document.'}), 500
+
+        return jsonify({'description': description})
+    except Exception as e:
+        current_app.logger.error(f"Error generating document description: {e}", exc_info=True)
+        return jsonify({'error': 'An unexpected error occurred while generating the description.'}), 500
+    finally:
+        try:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+        except Exception as cleanup_error:
+            current_app.logger.warning(f"Failed to remove temporary file {temp_path}: {cleanup_error}")
 
 
 @admin_bp.route('/upload', methods=['POST'])
