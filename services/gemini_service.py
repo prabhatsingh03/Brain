@@ -21,6 +21,8 @@ try:
 except ImportError:
     Config = None
 
+debug_logger = logging.getLogger("debug_logger")
+
 # Match old_code process_qna/generic_process_qna.py
 RELEVANT_FILES_PROMPT_MAX = 3
 MAX_ATTACHMENTS = 3
@@ -912,6 +914,14 @@ STRICT RULES:
         Gets project files via routing, uploads them to Gemini, then runs comparison.
         """
         user_file_ids = [f for f in (user_file_ids or []) if f]
+        debug_logger.info(
+            "GeminiService.generate_comparison_with_project_docs: start | process=%s | user_file_ids=%s | history_len=%d | style_mode=%s | extract_visuals=%s",
+            process_name,
+            user_file_ids,
+            len(chat_history or []),
+            style_mode,
+            extract_visuals,
+        )
         project_filenames = self.get_relevant_files(question, process_name, max_files=MAX_ATTACHMENTS)
         project_gemini_ids: List[str] = []
         project = Project.query.filter_by(name=process_name).first()
@@ -938,13 +948,25 @@ STRICT RULES:
         # Order as in old_code: internal (project) docs first, then user-uploaded doc
         all_ids = list(dict.fromkeys(project_gemini_ids + user_file_ids))
         if len(all_ids) < 2:
+            debug_logger.warning(
+                "GeminiService.generate_comparison_with_project_docs: insufficient docs for comparison | process=%s | internal_count=%d | user_count=%d",
+                process_name,
+                len(project_gemini_ids),
+                len(user_file_ids),
+            )
             return {
                 "answer": "Comparison requires at least one uploaded document and at least one relevant project document. No relevant project documents were found for your question.",
                 "files": [],
                 "relevant_files": [],
                 "visuals": [],
             }
-        return self.generate_comparison(
+        debug_logger.info(
+            "GeminiService.generate_comparison_with_project_docs: invoking generate_comparison | process=%s | internal_ids=%s | user_ids=%s",
+            process_name,
+            project_gemini_ids,
+            user_file_ids,
+        )
+        result = self.generate_comparison(
             question=question,
             process_name=process_name,
             internal_file_ids=project_gemini_ids,
@@ -952,6 +974,13 @@ STRICT RULES:
             chat_history=chat_history or [],
             style_mode=style_mode,
         )
+        debug_logger.info(
+            "GeminiService.generate_comparison_with_project_docs: end | process=%s | files=%s | answer_preview=%s",
+            process_name,
+            result.get("files"),
+            (result.get("answer") or "")[:200],
+        )
+        return result
 
     def generate_comparison(
         self,
@@ -969,6 +998,14 @@ STRICT RULES:
         """
         internal_file_ids = [f for f in (internal_file_ids or []) if f]
         user_file_ids = [f for f in (user_file_ids or []) if f]
+        debug_logger.info(
+            "GeminiService.generate_comparison: start | process=%s | internal_count=%d | user_count=%d | history_len=%d | style_mode=%s",
+            process_name,
+            len(internal_file_ids),
+            len(user_file_ids),
+            len(chat_history or []),
+            style_mode,
+        )
         has_user_doc = len(user_file_ids) > 0
         history_list = chat_history or []
         history_text = ""
@@ -1028,6 +1065,11 @@ STRICT RULES:
                     logging.error(f"Error accessing user file {fid} for comparison: {e}")
 
         if len(contents_payload) < 2:
+            debug_logger.warning(
+                "GeminiService.generate_comparison: not enough ACTIVE files in contents_payload | process=%s | payload_len=%d",
+                process_name,
+                len(contents_payload),
+            )
             return {
                 "answer": "Please provide at least two valid documents to compare (e.g. one uploaded file and project documents).",
                 "files": valid_files,
@@ -1152,6 +1194,11 @@ Answer style: {style_instruction}
                     else:
                         api_parts.append(p["text"])
             api_parts.append(comparison_prompt)
+            debug_logger.info(
+                "GeminiService.generate_comparison: sending comparison prompt to Gemini | process=%s | files=%s",
+                process_name,
+                valid_files,
+            )
             response = self._generate_with_fallback(
                 models=self.answer_models,
                 contents=api_parts,
@@ -1172,6 +1219,11 @@ Answer style: {style_instruction}
             }
         except Exception as e:
             logging.error(f"Comparison generation failed: {e}")
+            debug_logger.error(
+                "GeminiService.generate_comparison: exception during comparison generation | process=%s | error=%s",
+                process_name,
+                e,
+            )
             return {"answer": f"Error generating comparison: {str(e)}", "files": valid_files, "relevant_files": valid_files, "visuals": []}
     def generate_answer(
         self,

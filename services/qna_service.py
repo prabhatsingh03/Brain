@@ -138,7 +138,16 @@ class QnAService:
         """
         Generate a comparison answer: one user-uploaded file + project-relevant documents.
         """
-        return self._gemini.generate_comparison_with_project_docs(
+        logger = logging.getLogger("debug_logger")
+        logger.info(
+            "QnAService.generate_comparison_answer: start | project=%s | user_files=%s | history_len=%d | style_mode=%s | extract_visuals=%s",
+            project_name,
+            file_ids,
+            len(chat_history or []),
+            style_mode,
+            extract_visuals,
+        )
+        result = self._gemini.generate_comparison_with_project_docs(
             question=question,
             process_name=project_name,
             user_file_ids=file_ids or [],
@@ -146,6 +155,13 @@ class QnAService:
             style_mode=style_mode,
             extract_visuals=extract_visuals,
         )
+        logger.info(
+            "QnAService.generate_comparison_answer: end | project=%s | user_files_count=%d | answer_preview=%s",
+            project_name,
+            len(file_ids or []),
+            (result.get("answer") or "")[:200],
+        )
+        return result
 
     # -------------------------------------------------------------------------
     # Helper accessors (kept for parity with the original Streamlit module)

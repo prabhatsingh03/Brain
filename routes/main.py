@@ -525,6 +525,12 @@ def chat_api(project_name):
                 debug_logger.info(f"QnA Cache MISS for chat_api: {cache_key}")
                 # Comparison flow (explicit advanced mode)
                 if advance_mode == 'comparison':
+                    debug_logger.info(
+                        "chat_api(comparison): entering comparison branch | project=%s | session_id=%s | selected_files=%s",
+                        project_name,
+                        chat_session.id,
+                        selected_files,
+                    )
                     # Resolve upload:uuid to Gemini file_id (upload to Gemini when user sends question)
                     resolved_file_ids = []
                     for fid in (selected_files or []):
@@ -532,18 +538,27 @@ def chat_api(project_name):
                             upload_id = fid[7:]
                             entry = COMPARISON_UPLOADS.get(upload_id)
                             if not entry or entry.get('user_id') != current_user.id:
+                                debug_logger.warning(
+                                    "chat_api(comparison): skipping upload_id=%s (missing entry or user mismatch)",
+                                    upload_id,
+                                )
                                 continue
                             if entry.get('file_id'):
                                 resolved_file_ids.append(entry['file_id'])
                                 continue
                             # Background may still be uploading; wait briefly for file_id (up to ~7.5 seconds)
-                            for _ in range(15):
+                            for attempt in range(15):
                                 if entry.get('file_id'):
                                     resolved_file_ids.append(entry['file_id'])
                                     break
                                 time.sleep(0.5)
                             else:
                                 temp_path = entry.get('path')
+                                debug_logger.info(
+                                    "chat_api(comparison): no file_id after wait, attempting direct upload | upload_id=%s | temp_path=%s",
+                                    upload_id,
+                                    temp_path,
+                                )
                                 if temp_path and os.path.exists(temp_path):
                                     gemini_file_id = service.upload_user_file_for_comparison(temp_path)
                                     if gemini_file_id:
@@ -556,6 +571,11 @@ def chat_api(project_name):
                                         entry['path'] = None
                         else:
                             resolved_file_ids.append(fid)
+                    debug_logger.info(
+                        "chat_api(comparison): resolved_file_ids=%s (count=%d)",
+                        resolved_file_ids,
+                        len(resolved_file_ids),
+                    )
                     result = service.generate_comparison_answer(
                         question=question,
                         project_name=project_name,
@@ -563,6 +583,10 @@ def chat_api(project_name):
                         chat_history=chat_history,
                         style_mode=style_mode,
                         extract_visuals=visual_intel
+                    )
+                    debug_logger.info(
+                        "chat_api(comparison): backend comparison completed | answer_preview=%s",
+                        (result.get('answer') or '')[:200],
                     )
                 # Cross‑project flow
                 elif advance_mode == 'cross_project' and related_projects:
