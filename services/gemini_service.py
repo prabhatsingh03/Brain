@@ -410,15 +410,26 @@ Metadata:
         logging.warning(f"[DEBUG] Returning empty list - no relevant files found")
         return []
 
-    def upload_file_if_needed(self, local_path: str, process_name: str) -> Optional[str]:
-        logging.info(f"[DEBUG] upload_file_if_needed called: local_path='{local_path}', process_name='{process_name}'")
+    def upload_file_if_needed(self, local_path: str, process_name: str, cache_key: Optional[str] = None) -> Optional[str]:
+        """
+        Upload a file to Gemini if not already cached for this project.
+
+        - local_path: concrete filesystem path used for existence checks and upload.
+        - cache_key: stable identifier used for caching (defaults to local_path).
+          In local filesystem mode this is typically the resolved absolute path.
+          In S3 mode this should be the underlying storage identifier (e.g. S3 key)
+          so that multiple temp downloads of the same object reuse the same Gemini file.
+        """
+        logging.info(f"[DEBUG] upload_file_if_needed called: local_path='{local_path}', process_name='{process_name}', cache_key='{cache_key}'")
+
+        key = cache_key or local_path
         
-        # Check cache first (load specific entry for this path)
-        cache = self._load_upload_cache(process_name, local_path=local_path)
-        logging.debug(f"[DEBUG] Cache lookup result: {cache}")
+        # Check cache first (load specific entry for this path/identifier)
+        cache = self._load_upload_cache(process_name, local_path=key)
+        logging.debug(f"[DEBUG] Cache lookup result for key '{key}': {cache}")
         
-        if local_path in cache:
-            file_id = cache[local_path]
+        if key in cache:
+            file_id = cache[key]
             logging.info(f"[DEBUG] Found cached file ID: {file_id}")
             try:
                 file_obj = self.client.files.get(name=file_id)
@@ -483,7 +494,7 @@ Metadata:
                 logging.debug(f"[DEBUG] File check attempt {attempt + 1}/30: state={file_check.state}")
                 if file_check.state == "ACTIVE":
                     logging.info(f"[DEBUG] File is ACTIVE, saving to cache and returning: {uploaded_file.name}")
-                    self._save_upload_cache(process_name, local_path, uploaded_file.name)
+                    self._save_upload_cache(process_name, key, uploaded_file.name)
                     return uploaded_file.name
                 elif file_check.state == "FAILED":
                     logging.error(f"[DEBUG] File upload failed (state=FAILED): {local_path}")
@@ -644,6 +655,13 @@ Metadata:
         project_gemini_ids: List[str] = []
         project = Project.query.filter_by(name=process_name).first()
         if project:
+            # Determine whether project documents are stored in S3 so we can use a stable cache key (storage identifier)
+            try:
+                storage = get_document_storage()
+                use_s3_for_docs = storage.use_s3
+            except Exception:
+                use_s3_for_docs = False
+
             for fname in project_filenames:
                 meta = ProjectMetadata.query.filter(
                     ProjectMetadata.project_id == project.id,
@@ -652,7 +670,8 @@ Metadata:
                 if meta:
                     resolved_path, found = self._resolve_file_path(meta.file_path, process_name)
                     if found and resolved_path:
-                        fid = self.upload_file_if_needed(resolved_path, process_name)
+                        cache_key = meta.file_path if use_s3_for_docs else None
+                        fid = self.upload_file_if_needed(resolved_path, process_name, cache_key=cache_key)
                         if fid and fid not in project_gemini_ids:
                             project_gemini_ids.append(fid)
         # Order as in old_code: internal (project) docs first, then user-uploaded doc
@@ -932,6 +951,13 @@ Answer style: {style_instruction}
             if relevant_filenames:
                 project = Project.query.filter_by(name=process_name).first()
                 if project:
+                    # Decide cache key strategy once per call based on storage mode
+                    try:
+                        storage = get_document_storage()
+                        use_s3_for_docs = storage.use_s3
+                    except Exception:
+                        use_s3_for_docs = False
+
                     for fname in relevant_filenames:
                         logging.info(f"[DEBUG] Searching for file matching: '{fname}' in project {process_name}")
                         meta = ProjectMetadata.query.filter(
@@ -943,7 +969,8 @@ Answer style: {style_instruction}
                             resolved_path, found = self._resolve_file_path(meta.file_path, process_name)
                             if found and resolved_path:
                                 logging.info(f"[DEBUG] File resolved successfully: {resolved_path}")
-                                fid = self.upload_file_if_needed(resolved_path, process_name)
+                                cache_key = meta.file_path if use_s3_for_docs else None
+                                fid = self.upload_file_if_needed(resolved_path, process_name, cache_key=cache_key)
                                 if fid:
                                     logging.info(f"[DEBUG] File uploaded to Gemini with ID: {fid}")
                                     attachment_ids.append(fid)
@@ -975,6 +1002,13 @@ Answer style: {style_instruction}
                 if not project:
                     continue
 
+                # Decide cache key strategy once per project based on storage mode
+                try:
+                    storage = get_document_storage()
+                    use_s3_for_docs = storage.use_s3
+                except Exception:
+                    use_s3_for_docs = False
+
                 logging.info(f"[DEBUG] Processing {len(files_for_project)} files for project {pname}: {files_for_project}")
                 
                 for fname in files_for_project:
@@ -999,7 +1033,8 @@ Answer style: {style_instruction}
                     seen_paths.add(resolved_path)
 
                     logging.info(f"[DEBUG] Uploading file: {resolved_path}")
-                    fid = self.upload_file_if_needed(resolved_path, pname)
+                    cache_key = meta.file_path if use_s3_for_docs else None
+                    fid = self.upload_file_if_needed(resolved_path, pname, cache_key=cache_key)
                     if fid:
                         logging.info(f"[DEBUG] File uploaded to Gemini with ID: {fid}")
                         attachment_ids.append(fid)
@@ -1249,6 +1284,13 @@ Answer style: {style_instruction}
             if relevant_filenames:
                 project = Project.query.filter_by(name=process_name).first()
                 if project:
+                    # Decide cache key strategy once per call based on storage mode
+                    try:
+                        storage = get_document_storage()
+                        use_s3_for_docs = storage.use_s3
+                    except Exception:
+                        use_s3_for_docs = False
+
                     for fname in relevant_filenames:
                         meta = ProjectMetadata.query.filter(
                             ProjectMetadata.project_id == project.id,
@@ -1257,7 +1299,8 @@ Answer style: {style_instruction}
                         if meta:
                             resolved_path, found = self._resolve_file_path(meta.file_path, process_name)
                             if found and resolved_path:
-                                fid = self.upload_file_if_needed(resolved_path, process_name)
+                                cache_key = meta.file_path if use_s3_for_docs else None
+                                fid = self.upload_file_if_needed(resolved_path, process_name, cache_key=cache_key)
                                 if fid:
                                     attachment_ids.append(fid)
                                     full_file_paths.append(resolved_path)
@@ -1273,6 +1316,14 @@ Answer style: {style_instruction}
                 project = Project.query.filter_by(name=pname).first()
                 if not project:
                     continue
+
+                # Decide cache key strategy once per project based on storage mode
+                try:
+                    storage = get_document_storage()
+                    use_s3_for_docs = storage.use_s3
+                except Exception:
+                    use_s3_for_docs = False
+
                 for fname in files_for_project:
                     meta = ProjectMetadata.query.filter(
                         ProjectMetadata.project_id == project.id,
@@ -1286,7 +1337,8 @@ Answer style: {style_instruction}
                     if resolved_path in seen_paths:
                         continue
                     seen_paths.add(resolved_path)
-                    fid = self.upload_file_if_needed(resolved_path, pname)
+                    cache_key = meta.file_path if use_s3_for_docs else None
+                    fid = self.upload_file_if_needed(resolved_path, pname, cache_key=cache_key)
                     if fid:
                         attachment_ids.append(fid)
                         full_file_paths.append(resolved_path)
