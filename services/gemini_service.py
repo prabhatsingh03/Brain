@@ -1035,7 +1035,6 @@ STRICT RULES:
                 "visuals": [],
             }
 
-        # Full comparison instruction from old_code generic_process_qna.py (when use_uploaded_doc and user_pdf_id)
         comparison_instruction = ""
         if has_user_doc:
             comparison_instruction = """
@@ -1310,7 +1309,7 @@ Answer style: {style_instruction}
         logging.info(f"[DEBUG] Total attachment IDs collected: {len(attachment_ids)}")
         logging.info(f"[DEBUG] Attachment IDs: {attachment_ids}")
         logging.info(f"[DEBUG] Full file paths: {full_file_paths}")
-        
+
         if not attachment_ids:
             logging.warning(f"[DEBUG] No attachments found - returning early with error message")
             return {
@@ -1465,15 +1464,6 @@ Answer style: {style_instruction}
         # Note: tools usually requires a specific config structure in newer SDKs, 
         # but pure dict `[{"google_search": {}}]` is often supported or `types.Tool(google_search=...)`
         # We will pass it to `generate_content` via our helper.
-        
-        # For fallback helper, we need to update it to accept tools/tool_config if we haven't already.
-        # But wait, `_generate_with_fallback` passes `config` as `generation_config`. Tools are a separate arg.
-        # Let's adjust `_generate_with_fallback` call to pass `tools` inside `config` or modify `_generate_with_fallback`?
-        # `genai` SDK usually takes `tools` as a separate argument to `generate_content`.
-        # I will modify client.models.generate_content call in `_generate_with_fallback` implicitly? 
-        # No, better to pass strictly what is needed.
-        # Actually `generate_content` signature is (model, contents, config, tools, ...).
-        # I need to update `_generate_with_fallback` to accept `tools`.
         
         response = self._generate_with_fallback(
             models=self.answer_models,
@@ -1735,6 +1725,29 @@ Answer style: {style_instruction}
             api_contents = [prompt]
             if attachments:
                 api_contents.extend(attachments)
+
+        # region agent log
+        try:
+            with open("debug-db50b1.log", "a", encoding="utf-8") as _f:
+                _f.write(json.dumps({
+                    "sessionId": "db50b1",
+                    "runId": "pre-fix-1-stream",
+                    "hypothesisId": "H3",
+                    "location": "services/gemini_service.py:1829",
+                    "message": "Calling _generate_stream_with_fallback in generate_answer_stream",
+                    "data": {
+                        "process_name": process_name,
+                        "answer_mode": answer_mode,
+                        "style_mode": style_mode,
+                        "api_contents_count": len(api_contents),
+                        "attachments_count": len(attachments),
+                        "tools_enabled": bool(tools),
+                    },
+                    "timestamp": int(time.time() * 1000),
+                }) + "\n")
+        except Exception:
+            pass
+        # endregion
 
         answer_text = ""
         try:
