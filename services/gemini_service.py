@@ -25,6 +25,11 @@ except ImportError:
 RELEVANT_FILES_PROMPT_MAX = 3
 MAX_ATTACHMENTS = 3
 
+# Match old_code token limits for Gemini calls
+ROUTING_MAX_OUTPUT_TOKENS = 9000
+ANSWER_MAX_OUTPUT_TOKENS = 9000
+VISUAL_PAGES_MAX_OUTPUT_TOKENS = 300
+
 
 class GeminiService:
     def __init__(self, api_key: str):
@@ -317,8 +322,7 @@ Metadata:
             response = self._generate_with_fallback(
                 models=self.routing_models,
                 contents=[{"role": "user", "parts": [{"text": prompt}]}],
-                # Routing step: smaller token budget is sufficient and faster
-                config={"max_output_tokens": 4000}
+                config={"max_output_tokens": ROUTING_MAX_OUTPUT_TOKENS}
             )
 
             text = (response.text or "").strip()
@@ -1152,8 +1156,7 @@ Answer style: {style_instruction}
             response = self._generate_with_fallback(
                 models=self.answer_models,
                 contents=api_parts,
-                # Cap output length to keep comparison responses fast and avoid timeouts
-                config={"max_output_tokens": 5000}
+                config={"max_output_tokens": ANSWER_MAX_OUTPUT_TOKENS}
             )
             answer_text = (response.text or "").strip()
             answer_text = re.sub(r"<br\s*/?>", "\n", answer_text)
@@ -1475,8 +1478,7 @@ Answer style: {style_instruction}
         response = self._generate_with_fallback(
             models=self.answer_models,
             contents=api_contents,
-            # Slightly lower cap to reduce latency while keeping rich answers
-            config={"max_output_tokens": 5000},
+            config={"max_output_tokens": ANSWER_MAX_OUTPUT_TOKENS},
             tools=tools
         )
 
@@ -1739,7 +1741,7 @@ Answer style: {style_instruction}
             for chunk_text in self._generate_stream_with_fallback(
                 models=self.answer_models,
                 contents=api_contents,
-                config={"max_output_tokens": 5000},
+                config={"max_output_tokens": ANSWER_MAX_OUTPUT_TOKENS},
                 tools=tools
             ):
                 answer_text += chunk_text
