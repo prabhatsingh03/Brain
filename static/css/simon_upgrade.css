@@ -2575,7 +2575,7 @@ body.dashboard-mode .crazy-card .live-indicator {
     border-radius: 14px;
     padding: 10px 14px !important;
     /* Overriding Tailwind padding */
-    margin-bottom: 12px;
+    margin-bottom: 6px;
     box-shadow: var(--simon-shadow-md);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;

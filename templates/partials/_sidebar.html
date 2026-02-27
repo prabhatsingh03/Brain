@@ -21,13 +21,13 @@
     </button>
 
     <!-- Nav Items -->
-    <div class="flex-grow py-6 flex flex-col gap-4 overflow-y-auto overflow-x-hidden custom-scrollbar">
+    <div class="flex-grow py-6 flex flex-col gap-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
 
         {% if current_user.is_authenticated %}
         <!-- Dashboard -->
         <div class="px-4 sidebar-text hidden opacity-0 transition-opacity duration-500">
             <a id="sidebar-dashboard" href="{{ url_for('main.dashboard') }}"
-                class="w-full flex items-center justify-between px-0 py-2 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white transition-colors group/dashboard"
+                class="w-full flex items-center gap-2 px-0 py-2 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white transition-colors group/dashboard"
                 title="Dashboard">
                 <div
                     class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center group-hover/dashboard:bg-accent group-hover/dashboard:text-primary transition-colors">
@@ -97,12 +97,12 @@
 
         <!-- Tools Section (visible only on Process/Project view, below Dashboard) -->
         {% if current_user.is_authenticated and request.endpoint == 'main.project_view' %}
-        <div class="px-4 mt-4 sidebar-text hidden opacity-0 transition-opacity duration-500">
+        <div class="px-4 mt-2 sidebar-text hidden opacity-0 transition-opacity duration-500">
             <!-- New Chat Button -->
-            <div class="mb-4">
+            <div class="mb-2">
                 <button id="sidebar-new-chat"
                     class="w-full flex items-center justify-between px-0 py-2 text-gray-600 dark:text-textSoft hover:text-accent dark:hover:text-white transition-colors group/newchat">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
                         <div
                             class="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center group-hover/newchat:bg-accent group-hover/newchat:text-primary transition-colors">
                             <!-- Edit/New Icon -->
