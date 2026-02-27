@@ -2567,7 +2567,8 @@ body.dashboard-mode .crazy-card .live-indicator {
     height: auto !important;
 }
 
-/* --- Enhanced New Chat Button (added via AI) --- */
+/* --- Enhanced Dashboard & New Chat Buttons (added via AI) --- */
+#sidebar-dashboard,
 #sidebar-new-chat {
     background: linear-gradient(145deg, var(--simon-bg-panel), var(--simon-bg-secondary));
     border: 1px solid var(--simon-border-medium);
@@ -2581,11 +2582,13 @@ body.dashboard-mode .crazy-card .live-indicator {
     overflow: hidden;
 }
 
+html.dark #sidebar-dashboard,
 html.dark #sidebar-new-chat {
     background: rgba(255, 255, 255, 0.03);
     border-color: rgba(255, 255, 255, 0.08);
 }
 
+#sidebar-dashboard:hover,
 #sidebar-new-chat:hover {
     border-color: var(--simon-accent);
     box-shadow: 0 8px 25px -5px var(--simon-accent-glow);
@@ -2593,6 +2596,7 @@ html.dark #sidebar-new-chat {
 }
 
 /* Text Styling */
+#sidebar-dashboard span.text-xs,
 #sidebar-new-chat span.text-xs {
     font-family: 'Outfit', sans-serif;
     font-size: 0.85rem;
@@ -2606,6 +2610,7 @@ html.dark #sidebar-new-chat {
     transition: all 0.3s ease;
 }
 
+html.dark #sidebar-dashboard span.text-xs,
 html.dark #sidebar-new-chat span.text-xs {
     background: linear-gradient(90deg, #fff, #cbd5e1);
     -webkit-background-clip: text;
@@ -2613,6 +2618,7 @@ html.dark #sidebar-new-chat span.text-xs {
     -webkit-text-fill-color: transparent;
 }
 
+#sidebar-dashboard:hover span.text-xs,
 #sidebar-new-chat:hover span.text-xs {
     background: var(--simon-gradient-accent);
     -webkit-background-clip: text;
@@ -2621,6 +2627,7 @@ html.dark #sidebar-new-chat span.text-xs {
 }
 
 /* Icon Container Styling */
+#sidebar-dashboard .w-8.h-8,
 #sidebar-new-chat .w-8.h-8 {
     background: var(--simon-accent) !important;
     color: white !important;
@@ -2629,10 +2636,12 @@ html.dark #sidebar-new-chat span.text-xs {
     transition: all 0.3s ease;
 }
 
+html.dark #sidebar-dashboard .w-8.h-8,
 html.dark #sidebar-new-chat .w-8.h-8 {
     background: linear-gradient(135deg, var(--simon-accent), var(--cyber-secondary)) !important;
 }
 
+#sidebar-dashboard:hover .w-8.h-8,
 #sidebar-new-chat:hover .w-8.h-8 {
     transform: scale(1.1) rotate(5deg);
     box-shadow: 0 0 15px var(--simon-accent-glow);

@@ -1127,6 +1127,21 @@
                     text.classList.add('opacity-0');
                     setTimeout(() => text.classList.add('hidden'), 300);
                 });
+
+                // Ensure Your Chats panel is fully closed and cleared when the sidebar collapses
+                try {
+                    if (typeof yourChatsList !== 'undefined' && yourChatsList && typeof yourChatsArrow !== 'undefined' && yourChatsArrow) {
+                        yourChatsList.classList.add('hidden');
+                        yourChatsList.innerHTML = '';
+                        yourChatsArrow.classList.remove('rotate-90');
+                    }
+                    if (typeof yourChatsExpanded !== 'undefined') {
+                        yourChatsExpanded = false;
+                        localStorage.setItem('simon_your_chats_expanded', 'false');
+                    }
+                } catch (e) {
+                    // Ignore errors (e.g. storage issues or elements not yet available)
+                }
             }
 
             // --- Sidebar Mode Selector Removed (now in chat header) ---
@@ -1233,7 +1248,11 @@
             const yourChatsToggle = document.getElementById('your-chats-toggle');
             const yourChatsList = document.getElementById('your-chats-list');
             const yourChatsArrow = document.getElementById('your-chats-arrow');
-            let yourChatsExpanded = localStorage.getItem('simon_your_chats_expanded') === 'true';
+            const isProjectView = '{{ request.endpoint }}' === 'main.project_view';
+            // Default: open by default on process/project pages, otherwise respect stored preference
+            let yourChatsExpanded = isProjectView
+                ? true
+                : localStorage.getItem('simon_your_chats_expanded') === 'true';
 
             const sidebarContextMenu = document.getElementById('session-context-menu');
             let activeSidebarChatId = null;
@@ -1243,6 +1262,13 @@
                 if (yourChatsExpanded) {
                     yourChatsList.classList.remove('hidden');
                     yourChatsArrow.classList.add('rotate-90');
+                    // Ensure chats are loaded when we auto-open on process pages
+                    loadYourChats();
+                    try {
+                        localStorage.setItem('simon_your_chats_expanded', 'true');
+                    } catch (e) {
+                        // ignore storage errors
+                    }
                 }
 
                 yourChatsToggle.addEventListener('click', () => {
@@ -1256,6 +1282,8 @@
                     } else {
                         yourChatsList.classList.add('hidden');
                         yourChatsArrow.classList.remove('rotate-90');
+                        // Clear any previously rendered chats so nothing remains visible when closed
+                        yourChatsList.innerHTML = '';
                     }
                 });
 
