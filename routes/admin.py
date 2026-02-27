@@ -9,6 +9,8 @@ import os
 import werkzeug.utils
 import io
 import tempfile
+import json
+import time
 
 from services.document_storage import get_document_storage
 from services.gemini_service import GeminiService
@@ -208,6 +210,27 @@ def generate_description():
     file = request.files.get('file')
     content_length = request.content_length or 0
 
+    # region agent log
+    try:
+        with open("debug-0484fb.log", "a", encoding="utf-8") as _f:
+            _f.write(json.dumps({
+                "sessionId": "0484fb",
+                "runId": "pre-fix-1",
+                "hypothesisId": "H1-H3",
+                "location": "routes/admin.py:208",
+                "message": "Entered generate_description with upload metadata",
+                "data": {
+                    "has_file": bool(file and getattr(file, "filename", "")),
+                    "filename": getattr(file, "filename", None),
+                    "content_length": content_length,
+                    "content_type": getattr(file, "mimetype", None),
+                },
+                "timestamp": int(time.time() * 1000),
+            }) + "\n")
+    except Exception:
+        pass
+    # endregion
+
     if not file or not file.filename:
         return jsonify({'error': 'Please choose a PDF file before generating a description.'}), 400
 
@@ -230,8 +253,30 @@ def generate_description():
         service = GeminiService(api_key=api_key)
         description = service.generate_document_description(temp_path, max_words=50)
 
+        # region agent log
+        try:
+            with open("debug-0484fb.log", "a", encoding="utf-8") as _f:
+                _f.write(json.dumps({
+                    "sessionId": "0484fb",
+                    "runId": "pre-fix-1",
+                    "hypothesisId": "H3",
+                    "location": "routes/admin.py:231",
+                    "message": "GeminiService.generate_document_description result in admin route",
+                    "data": {
+                        "description_is_none": description is None,
+                        "description_len": len(description) if isinstance(description, str) else None,
+                    },
+                    "timestamp": int(time.time() * 1000),
+                }) + "\n")
+        except Exception:
+            pass
+        # endregion
+
         if not description:
-            return jsonify({'error': 'Failed to generate description from the document.'}), 500
+            # If Gemini could not generate a description (empty response), treat this as
+            # a graceful application-level failure rather than a server error so that
+            # the UI shows a helpful message without a 500 status code.
+            return jsonify({'error': 'Could not generate description from the document. Please enter it manually.'}), 200
 
         return jsonify({'description': description})
     except Exception as e:

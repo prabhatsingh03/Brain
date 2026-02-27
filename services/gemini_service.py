@@ -172,6 +172,15 @@ class GeminiService:
                     contents=contents,
                     config=final_config
                 )
+                
+                # Log response details for debugging
+                logging.info(f"Model {model} returned response. Has text attr: {hasattr(response, 'text')}, Has candidates: {hasattr(response, 'candidates')}")
+                if hasattr(response, 'candidates') and response.candidates:
+                    logging.info(f"Number of candidates: {len(response.candidates)}")
+                    for idx, cand in enumerate(response.candidates):
+                        finish_reason = getattr(cand, 'finish_reason', 'UNKNOWN')
+                        logging.info(f"Candidate {idx} finish_reason: {finish_reason}")
+                
                 return response
             except Exception as e:
                 error_str = str(e)
@@ -647,7 +656,45 @@ Metadata:
                 logging.error(f"[Doc Summary] File not found for description generation: {local_path}")
                 return None
 
+            # region agent log
+            try:
+                with open("debug-0484fb.log", "a", encoding="utf-8") as _f:
+                    _f.write(json.dumps({
+                        "sessionId": "0484fb",
+                        "runId": "pre-fix-1",
+                        "hypothesisId": "H1",
+                        "location": "services/gemini_service.py:646",
+                        "message": "generate_document_description starting upload",
+                        "data": {
+                            "local_path_exists": True,
+                            "local_path": local_path,
+                        },
+                        "timestamp": int(time.time() * 1000),
+                    }) + "\n")
+            except Exception:
+                pass
+            # endregion
+
             file_id = self.upload_user_file_for_comparison(local_path)
+
+            # region agent log
+            try:
+                with open("debug-0484fb.log", "a", encoding="utf-8") as _f:
+                    _f.write(json.dumps({
+                        "sessionId": "0484fb",
+                        "runId": "pre-fix-1",
+                        "hypothesisId": "H1",
+                        "location": "services/gemini_service.py:651",
+                        "message": "Result of upload_user_file_for_comparison in generate_document_description",
+                        "data": {
+                            "got_file_id": bool(file_id),
+                        },
+                        "timestamp": int(time.time() * 1000),
+                    }) + "\n")
+            except Exception:
+                pass
+            # endregion
+
             if not file_id:
                 logging.error(f"[Doc Summary] Failed to upload file for description: {local_path}")
                 return None
@@ -668,39 +715,169 @@ STRICT RULES:
 - Output ONLY the description text. No quotes, no labels, no bullet points, no explanation.
 """
 
+            # region agent log
+            try:
+                with open("debug-0484fb.log", "a", encoding="utf-8") as _f:
+                    _f.write(json.dumps({
+                        "sessionId": "0484fb",
+                        "runId": "pre-fix-1",
+                        "hypothesisId": "H2",
+                        "location": "services/gemini_service.py:671",
+                        "message": "Calling _generate_with_fallback for document description",
+                        "data": {
+                            "file_id": file_id,
+                            "file_mime_type": getattr(file_obj, "mime_type", None),
+                        },
+                        "timestamp": int(time.time() * 1000),
+                    }) + "\n")
+            except Exception:
+                pass
+            # endregion
+
+            # Try to configure safety settings to be more permissive for internal documents
+            # Use higher token limit (500) to allow model to fully read the PDF and generate description
+            # Even though we ask for 50 words, the model needs tokens to process the document
+            generation_config = {"max_output_tokens": 2000}
+            
+            try:
+                from google.genai.types import HarmCategory, HarmBlockThreshold
+                
+                generation_config["safety_settings"] = [
+                    {
+                        "category": HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                        "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                    },
+                    {
+                        "category": HarmCategory.HARM_CATEGORY_HARASSMENT,
+                        "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                    },
+                    {
+                        "category": HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                        "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                    },
+                    {
+                        "category": HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                        "threshold": HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                    },
+                ]
+                logging.info("[Doc Summary] Using relaxed safety settings for internal document")
+            except Exception as e:
+                logging.warning(f"[Doc Summary] Could not configure safety settings: {e}")
+
             response = self._generate_with_fallback(
                 models=self.answer_models,
                 contents=[
                     prompt,
                     types.Part.from_uri(file_uri=file_obj.uri, mime_type=file_obj.mime_type),
                 ],
-                config={"max_output_tokens": 150},
+                config=generation_config,
             )
 
             if not response:
                 logging.error("[Doc Summary] Empty response object from Gemini for description generation")
                 return None
 
-            # Prefer the convenience .text property, but fall back to candidates if needed.
-            raw_text = getattr(response, "text", None)
+            # Check for prompt feedback (e.g., safety issues at prompt level)
+            if hasattr(response, "prompt_feedback"):
+                prompt_feedback = response.prompt_feedback
+                logging.info(f"[Doc Summary] Prompt feedback: {prompt_feedback}")
+                if hasattr(prompt_feedback, "block_reason"):
+                    block_reason = prompt_feedback.block_reason
+                    if block_reason and str(block_reason) != "BLOCK_REASON_UNSPECIFIED":
+                        logging.error(f"[Doc Summary] Prompt was blocked: {block_reason}")
+                        return None
 
-            if not raw_text and hasattr(response, "candidates"):
+            # Check for safety filters or blocks at candidate level
+            raw_text = None
+            if hasattr(response, "candidates") and response.candidates:
+                for idx, cand in enumerate(response.candidates):
+                    finish_reason = getattr(cand, "finish_reason", None)
+                    logging.info(f"[Doc Summary] Candidate {idx}: finish_reason={finish_reason}")
+                    
+                    # Check safety ratings
+                    if hasattr(cand, "safety_ratings") and cand.safety_ratings:
+                        for rating in cand.safety_ratings:
+                            category = getattr(rating, "category", "UNKNOWN")
+                            probability = getattr(rating, "probability", "UNKNOWN")
+                            blocked = getattr(rating, "blocked", False)
+                            logging.info(f"[Doc Summary] Candidate {idx} safety: {category}={probability}, blocked={blocked}")
+                            if blocked:
+                                logging.error(f"[Doc Summary] Content blocked by safety filter: {category}")
+                    
+                    # Try to extract text from this candidate
+                    content = getattr(cand, "content", None)
+                    if content:
+                        parts = getattr(content, "parts", [])
+                        if parts:
+                            for part in parts:
+                                part_text = getattr(part, "text", None)
+                                if part_text:
+                                    raw_text = str(part_text).strip()
+                                    logging.info(f"[Doc Summary] Found text in candidate {idx}, length={len(raw_text)}")
+                                    break
+                            if raw_text:
+                                break
+            
+            # Fallback: try the convenience .text property
+            if not raw_text:
                 try:
-                    parts_text: List[str] = []
-                    for cand in getattr(response, "candidates", []) or []:
-                        content = getattr(cand, "content", None)
-                        if not content:
-                            continue
-                        for part in getattr(content, "parts", []) or []:
-                            part_text = getattr(part, "text", None)
-                            if part_text:
-                                parts_text.append(str(part_text))
-                    raw_text = " ".join(parts_text)
-                except Exception as extract_err:
-                    logging.warning(f"[Doc Summary] Failed to extract text from candidates: {extract_err}", exc_info=True)
+                    text_prop = getattr(response, "text", None)
+                    if text_prop:
+                        raw_text = str(text_prop).strip()
+                        logging.info(f"[Doc Summary] Extracted text from response.text property")
+                except Exception as e:
+                    logging.warning(f"[Doc Summary] Could not access response.text: {e}")
+
+            # region agent log
+            try:
+                with open("debug-0484fb.log", "a", encoding="utf-8") as _f:
+                    _f.write(json.dumps({
+                        "sessionId": "0484fb",
+                        "runId": "pre-fix-1",
+                        "hypothesisId": "H3",
+                        "location": "services/gemini_service.py:702",
+                        "message": "Raw text extracted from Gemini response for document description",
+                        "data": {
+                            "has_raw_text": bool(raw_text),
+                            "raw_text_preview": str(raw_text)[:120] if raw_text else None,
+                        },
+                        "timestamp": int(time.time() * 1000),
+                    }) + "\n")
+            except Exception:
+                pass
+            # endregion
 
             if not raw_text:
-                logging.error("[Doc Summary] Gemini returned no text for description generation")
+                # Provide more detailed error information
+                error_details = {
+                    "has_response": bool(response),
+                    "has_candidates": hasattr(response, "candidates") and bool(response.candidates),
+                    "candidate_count": len(response.candidates) if hasattr(response, "candidates") and response.candidates else 0,
+                }
+                
+                if hasattr(response, "candidates") and response.candidates:
+                    for idx, cand in enumerate(response.candidates):
+                        finish_reason = getattr(cand, "finish_reason", "UNKNOWN")
+                        error_details[f"candidate_{idx}_finish_reason"] = str(finish_reason)
+                        
+                        # Check if the issue is hitting token limit
+                        if "MAX_TOKENS" in str(finish_reason):
+                            logging.error(f"[Doc Summary] Response was truncated due to MAX_TOKENS limit. This should not happen with increased token limit.")
+                        
+                        if hasattr(cand, "safety_ratings"):
+                            blocked_categories = []
+                            for sr in getattr(cand, "safety_ratings", []):
+                                if getattr(sr, "blocked", False):
+                                    blocked_categories.append(str(getattr(sr, "category", "UNKNOWN")))
+                            if blocked_categories:
+                                error_details[f"candidate_{idx}_blocked_categories"] = blocked_categories
+                
+                logging.error(f"[Doc Summary] Gemini returned no text for description generation. Details: {error_details}")
+                
+                # Check if content was blocked by safety filters
+                if any(key.endswith("_blocked_categories") for key in error_details):
+                    logging.error("[Doc Summary] Content was blocked by safety filters. This may indicate the document contains sensitive content.")
+                
                 return None
 
             text = str(raw_text).strip()
