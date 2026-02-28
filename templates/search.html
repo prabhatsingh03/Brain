@@ -1313,65 +1313,59 @@
         color: white !important;
     }
 
-    /* Comparison Modal Light Mode */
-    html:not(.dark) #comparison-modal {
-        background: rgba(255, 255, 255, 0.8) !important;
-        backdrop-filter: blur(8px) !important;
+    /* Comparison Modal */
+    @keyframes comparison-modal-in {
+        from { opacity: 0; transform: scale(0.96) translateY(8px); }
+        to   { opacity: 1; transform: scale(1)    translateY(0);   }
+    }
+    @keyframes comparison-backdrop-in {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+    #comparison-modal-card {
+        animation: comparison-modal-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    #comparison-backdrop {
+        animation: comparison-backdrop-in 0.2s ease both;
     }
 
-    html:not(.dark) #comparison-modal .bg-primary {
+    /* Comparison Modal Light Mode */
+    html:not(.dark) #comparison-backdrop {
+        background: rgba(15, 23, 42, 0.45) !important;
+        backdrop-filter: blur(6px) !important;
+    }
+
+    html:not(.dark) #comparison-modal-card {
         background: #FFFFFF !important;
         border: 1px solid #E2E8F0 !important;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
-    }
-
-    html:not(.dark) #comparison-modal .border-b {
-        border-color: #F1F5F9 !important;
-    }
-
-    html:not(.dark) #comparison-modal h3 {
-        color: #0F172A !important;
-    }
-
-    html:not(.dark) #comparison-modal p.text-textSoft {
-        color: #64748B !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2),
+                    0 0 0 1px rgba(0, 0, 0, 0.03) !important;
     }
 
     html:not(.dark) #comparison-drop-zone {
-        background: #F8FAFC !important;
-        border-color: #CBD5E1 !important;
+        background: #FAFBFC !important;
+        border-color: #D1D5DB !important;
     }
 
     html:not(.dark) #comparison-drop-zone:hover {
+        background: #EFF6FF !important;
+        border-color: #3B82F6 !important;
+    }
+
+    html:not(.dark) .comparison-format-badge {
         background: #F1F5F9 !important;
-        border-color: #0066FF !important;
-    }
-
-    html:not(.dark) #comparison-drop-text {
-        color: #64748B !important;
-    }
-
-    html:not(.dark) #comparison-modal-close {
-        color: #64748B !important;
-    }
-
-    html:not(.dark) #comparison-modal-close:hover {
-        background: #F1F5F9 !important;
-        color: #0F172A !important;
-    }
-
-    html:not(.dark) #comparison-modal-cancel {
-        color: #64748B !important;
-    }
-
-    html:not(.dark) #comparison-modal-cancel:hover {
-        background: #F1F5F9 !important;
-        color: #0F172A !important;
+        color: #475569 !important;
     }
 
     html:not(.dark) #comparison-modal-done {
-        background: #0066FF !important;
+        background: #2563EB !important;
         color: white !important;
+        box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3) !important;
+    }
+
+    html:not(.dark) #comparison-modal-done:disabled {
+        background: #CBD5E1 !important;
+        box-shadow: none !important;
     }
 
     /* Visual Intelligence Card Controls */
@@ -1503,42 +1497,122 @@
 
     <!-- Comparison Modal: single file upload for comparison with project docs -->
     <div id="comparison-modal"
-        class="fixed inset-0 bg-black/70 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-primary border border-white/10 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-            <div class="p-4 border-b border-white/10">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Comparison</h3>
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center p-6">
+        <!-- Backdrop -->
+        <div id="comparison-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-md"></div>
+        <!-- Modal Card -->
+        <div id="comparison-modal-card" class="relative bg-primary border border-white/10 rounded-2xl shadow-2xl w-full overflow-hidden" style="max-width: 440px;">
+            <!-- Accent gradient bar -->
+            <div class="h-[3px] bg-gradient-to-r from-blue-500 via-accent to-cyan-400"></div>
+
+            <!-- Header -->
+            <div class="px-6 pt-7 pb-5">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-[15px] font-bold text-gray-900 dark:text-white leading-tight">Document Comparison</h3>
+                            <p class="text-textSoft text-xs mt-1">Compare a document against project knowledge</p>
+                        </div>
+                    </div>
                     <button type="button" id="comparison-modal-close"
-                        class="text-gray-600 dark:text-textSoft hover:text-gray-900 dark:hover:text-white p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
+                        class="text-gray-400 dark:text-textSoft hover:text-gray-900 dark:hover:text-white p-1.5 -mr-1.5 -mt-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition flex-shrink-0">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
                 </div>
-                <p class="text-textSoft text-xs mt-1.5">
-                    Upload a document to compare with project knowledge.
-                </p>
             </div>
-            <div class="p-4">
+
+            <!-- Divider -->
+            <div class="mx-6 h-px bg-gray-200 dark:bg-white/10"></div>
+
+            <!-- Body -->
+            <div class="px-6 pt-5 pb-4">
+                <!-- Drop zone -->
                 <div id="comparison-drop-zone"
-                    class="border-2 border-dashed border-white/20 rounded-xl p-4 text-center cursor-pointer hover:border-accent/50 hover:bg-white/5 transition min-h-[100px] flex flex-col items-center justify-center gap-2">
+                    class="border-2 border-dashed border-gray-300 dark:border-white/15 rounded-xl py-10 px-6 text-center cursor-pointer hover:border-accent/60 hover:bg-accent/5 dark:hover:bg-white/5 transition-all duration-200 flex flex-col items-center justify-center group">
                     <input type="file" id="comparison-file-input" accept=".pdf,.doc,.docx,.txt" class="hidden">
-                    <svg class="w-8 h-8 text-textSoft mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                        </path>
+                    <!-- Idle state -->
+                    <div id="comparison-state-idle" class="flex flex-col items-center gap-3">
+                        <div class="w-14 h-14 rounded-2xl bg-accent/10 group-hover:bg-accent/20 flex items-center justify-center transition-colors duration-200">
+                            <svg class="w-7 h-7 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <p id="comparison-drop-text" class="text-sm font-semibold text-gray-800 dark:text-white/90">Drop your file here</p>
+                            <p class="text-textSoft text-xs">or <span class="text-accent font-medium cursor-pointer hover:underline">click to browse</span></p>
+                        </div>
+                    </div>
+                    <!-- Loading state -->
+                    <div id="comparison-state-loading" class="hidden flex flex-col items-center gap-3">
+                        <div class="w-14 h-14 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                            <svg class="w-7 h-7 text-blue-500 dark:text-blue-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-sm font-semibold text-blue-500 dark:text-blue-400">Uploading file…</p>
+                            <p id="comparison-file-name" class="text-textSoft text-xs max-w-[280px] truncate"></p>
+                        </div>
+                    </div>
+                    <!-- Success state -->
+                    <div id="comparison-state-success" class="hidden flex flex-col items-center gap-3">
+                        <div class="w-14 h-14 rounded-2xl bg-green-500/10 flex items-center justify-center">
+                            <svg class="w-7 h-7 text-green-500 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <p id="comparison-success-filename" class="text-sm font-semibold text-gray-900 dark:text-white max-w-[280px] truncate"></p>
+                            <p class="text-xs"><span class="text-green-500 dark:text-green-400">Ready to compare</span> <span class="text-textSoft">· click to change</span></p>
+                        </div>
+                    </div>
+                    <!-- Error state -->
+                    <div id="comparison-state-error" class="hidden flex flex-col items-center gap-3">
+                        <div class="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center">
+                            <svg class="w-7 h-7 text-red-500 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <p id="comparison-error-text" class="text-sm font-semibold text-red-500 dark:text-red-400">Upload failed</p>
+                            <p class="text-textSoft text-xs">Click to try again</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supported formats row -->
+                <div class="flex items-center gap-1.5 mt-4 flex-wrap">
+                    <span class="text-textSoft text-[11px]">Supports</span>
+                    <span class="comparison-format-badge text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-textSoft font-mono font-medium tracking-wide">PDF</span>
+                    <span class="comparison-format-badge text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-textSoft font-mono font-medium tracking-wide">DOCX</span>
+                    <span class="comparison-format-badge text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-textSoft font-mono font-medium tracking-wide">DOC</span>
+                    <span class="comparison-format-badge text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-textSoft font-mono font-medium tracking-wide">TXT</span>
+                    <span class="text-textSoft text-[11px] ml-auto opacity-70">Max 50 MB</span>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 flex justify-end items-center gap-3 border-t border-gray-200 dark:border-white/10 bg-gray-50/50 dark:bg-white/[0.02]">
+                <button type="button" id="comparison-modal-cancel"
+                    class="px-4 py-2.5 text-sm text-gray-600 dark:text-textSoft hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition font-medium">Cancel</button>
+                <button type="button" id="comparison-modal-done"
+                    class="px-6 py-3 text-sm bg-accent text-primary font-semibold rounded-lg hover:opacity-90 active:scale-[0.97] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm shadow-accent/20 disabled:shadow-none"
+                    disabled>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
-                    <span id="comparison-drop-text" class="text-textSoft text-xs">Drag & drop or click to upload</span>
-                    <span id="comparison-file-name" class="text-accent text-xs font-medium hidden"></span>
-                </div>
-                <div class="flex justify-end gap-2 mt-3">
-                    <button type="button" id="comparison-modal-cancel"
-                        class="px-3 py-1.5 text-xs text-gray-600 dark:text-textSoft hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition">Cancel</button>
-                    <button type="button" id="comparison-modal-done"
-                        class="px-3 py-1.5 text-xs bg-accent text-primary font-medium rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled>Done</button>
-                </div>
+                    Start Comparing
+                </button>
             </div>
         </div>
     </div>
@@ -1694,7 +1768,7 @@
                             </div>
                         </div>
                         <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-3 font-display">Hello, {{
-                            current_user.email.split('@')[0] }}</h3>
+                            (current_user.email.split('@')[0]) | replace('.', ' ') | title }}</h3>
                         <p class="text-xl text-textSoft mb-6 font-medium">Where should we start?</p>
                     </div>
                     <div id="input-slot-center" class="w-full max-w-4xl flex justify-center px-4">
@@ -2010,16 +2084,32 @@
     }
 
     // --- Comparison Modal Logic ---
-    const comparisonModal = document.getElementById('comparison-modal');
-    const comparisonDropZone = document.getElementById('comparison-drop-zone');
-    const comparisonFileInput = document.getElementById('comparison-file-input');
-    const comparisonFileName = document.getElementById('comparison-file-name');
-    const comparisonDropText = document.getElementById('comparison-drop-text');
-    const comparisonModalClose = document.getElementById('comparison-modal-close');
-    const comparisonModalCancel = document.getElementById('comparison-modal-cancel');
-    const comparisonModalDone = document.getElementById('comparison-modal-done');
+    const comparisonModal        = document.getElementById('comparison-modal');
+    const comparisonBackdrop     = document.getElementById('comparison-backdrop');
+    const comparisonDropZone     = document.getElementById('comparison-drop-zone');
+    const comparisonFileInput    = document.getElementById('comparison-file-input');
+    const comparisonFileName     = document.getElementById('comparison-file-name');
+    const comparisonDropText     = document.getElementById('comparison-drop-text');
+    const comparisonModalClose   = document.getElementById('comparison-modal-close');
+    const comparisonModalCancel  = document.getElementById('comparison-modal-cancel');
+    const comparisonModalDone    = document.getElementById('comparison-modal-done');
+    const comparisonStateIdle    = document.getElementById('comparison-state-idle');
+    const comparisonStateLoading = document.getElementById('comparison-state-loading');
+    const comparisonStateSuccess = document.getElementById('comparison-state-success');
+    const comparisonStateError   = document.getElementById('comparison-state-error');
+    const comparisonSuccessFilename = document.getElementById('comparison-success-filename');
+    const comparisonErrorText    = document.getElementById('comparison-error-text');
 
     let pendingComparisonUploadId = null;
+
+    function showComparisonState(state) {
+        [comparisonStateIdle, comparisonStateLoading, comparisonStateSuccess, comparisonStateError].forEach(el => {
+            if (el) el.classList.add('hidden');
+        });
+        const map = { idle: comparisonStateIdle, loading: comparisonStateLoading, success: comparisonStateSuccess, error: comparisonStateError };
+        const target = map[state];
+        if (target) target.classList.remove('hidden');
+    }
 
     function openComparisonModal() {
         if (comparisonModal) {
@@ -2036,34 +2126,31 @@
 
     function resetComparisonModal() {
         if (comparisonFileInput) comparisonFileInput.value = '';
-        if (comparisonFileName) {
-            comparisonFileName.textContent = '';
-            comparisonFileName.classList.add('hidden');
-        }
-        if (comparisonDropText) comparisonDropText.classList.remove('hidden');
+        showComparisonState('idle');
         if (comparisonModalDone) comparisonModalDone.disabled = true;
         pendingComparisonUploadId = null;
     }
 
-    if (comparisonModalClose) comparisonModalClose.addEventListener('click', closeComparisonModal);
+    if (comparisonModalClose)  comparisonModalClose.addEventListener('click', closeComparisonModal);
     if (comparisonModalCancel) comparisonModalCancel.addEventListener('click', closeComparisonModal);
+    if (comparisonBackdrop)    comparisonBackdrop.addEventListener('click', closeComparisonModal);
 
     if (comparisonDropZone) {
         comparisonDropZone.addEventListener('click', () => comparisonFileInput.click());
 
         comparisonDropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            comparisonDropZone.classList.add('border-accent');
+            comparisonDropZone.classList.add('border-accent', '!bg-accent/5');
         });
 
         comparisonDropZone.addEventListener('dragleave', (e) => {
             e.preventDefault();
-            comparisonDropZone.classList.remove('border-accent');
+            comparisonDropZone.classList.remove('border-accent', '!bg-accent/5');
         });
 
         comparisonDropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            comparisonDropZone.classList.remove('border-accent');
+            comparisonDropZone.classList.remove('border-accent', '!bg-accent/5');
             if (e.dataTransfer.files.length) {
                 handleComparisonFile(e.dataTransfer.files[0]);
             }
@@ -2083,20 +2170,14 @@
         // Client-side size guard: enforce 50 MB max for comparison uploads
         const maxBytes = 50 * 1024 * 1024;
         if (file.size > maxBytes) {
-            comparisonDropText.classList.add('hidden');
-            comparisonFileName.textContent = `Error: File is too large. Maximum allowed size is 50 MB.`;
-            comparisonFileName.classList.remove('hidden');
-            comparisonFileName.classList.add('text-red-500');
-            setTimeout(() => {
-                comparisonFileName.classList.remove('text-red-500');
-                resetComparisonModal();
-            }, 3000);
+            if (comparisonErrorText) comparisonErrorText.textContent = 'File too large — maximum size is 50 MB.';
+            showComparisonState('error');
+            setTimeout(() => resetComparisonModal(), 3500);
             return;
         }
 
-        comparisonDropText.classList.add('hidden');
-        comparisonFileName.textContent = `Uploading ${file.name}...`;
-        comparisonFileName.classList.remove('hidden');
+        showComparisonState('loading');
+        if (comparisonFileName) comparisonFileName.textContent = file.name;
 
         const formData = new FormData();
         formData.append('file', file);
@@ -2115,17 +2196,15 @@
             if (!res.ok) throw new Error(data.error || 'Upload failed');
 
             pendingComparisonUploadId = data.upload_id;
-            comparisonFileName.textContent = file.name;
-            comparisonModalDone.disabled = false;
+            if (comparisonSuccessFilename) comparisonSuccessFilename.textContent = file.name;
+            showComparisonState('success');
+            if (comparisonModalDone) comparisonModalDone.disabled = false;
 
         } catch (e) {
             console.error("Comparison upload error:", e);
-            comparisonFileName.textContent = "Error: " + e.message;
-            comparisonFileName.classList.add('text-red-500');
-            setTimeout(() => {
-                comparisonFileName.classList.remove('text-red-500');
-                resetComparisonModal();
-            }, 3000);
+            if (comparisonErrorText) comparisonErrorText.textContent = e.message || 'Upload failed';
+            showComparisonState('error');
+            setTimeout(() => resetComparisonModal(), 3500);
         }
     }
 

@@ -157,7 +157,7 @@
                 <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Upload New Document</h3>
                 <form action="{{ url_for('admin.upload_metadata') }}" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 gap-6">
                         <div>
                             <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">Select Project</label>
                             <div class="simon-custom-dropdown w-full" id="admin-project-dropdown">
@@ -188,13 +188,20 @@
                             </div>
                         </div>
                         <div>
+                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">File (PDF only, max 50 MB)</label>
+                            <input type="file" name="file" id="admin-metadata-file-input" accept=".pdf,application/pdf"
+                                class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-slate-600 dark:text-textSoft file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent/10 file:text-accent hover:file:bg-accent/20">
+                            <p id="admin-metadata-file-error" class="mt-1 text-xs text-red-500 hidden"></p>
+                        </div>
+                        <div>
                             <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">Description</label>
-                            <div class="flex gap-2">
-                                <input type="text" name="type_of_data" id="admin-metadata-description-input"
+                            <div class="flex gap-2 items-start">
+                                <textarea name="type_of_data" id="admin-metadata-description-input" rows="3"
                                     placeholder="e.g. PFD, Manual, Image"
-                                    class="flex-1 bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none">
+                                    class="flex-1 min-h-[80px] resize-y bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none whitespace-pre-wrap break-words"
+                                    style="word-wrap: break-word;"></textarea>
                                 <button type="button" id="admin-generate-description-btn"
-                                    class="inline-flex items-center gap-2 bg-accent text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-accent/30 hover:brightness-110 hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+                                    class="inline-flex items-center gap-2 bg-accent text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-accent/30 hover:brightness-110 hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed transition-all shrink-0"
                                     title="Generate description from document using AI">
                                     <!-- Sparkles Icon -->
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -205,12 +212,6 @@
                                 </button>
                             </div>
                             <p id="admin-generate-description-error" class="mt-1 text-xs text-red-500 hidden"></p>
-                        </div>
-                        <div class="col-span-full">
-                            <label class="block text-sm mb-2 text-slate-600 dark:text-textSoft">File (PDF only, max 50 MB)</label>
-                            <input type="file" name="file" id="admin-metadata-file-input" accept=".pdf,application/pdf"
-                                class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-slate-600 dark:text-textSoft file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-accent/10 file:text-accent hover:file:bg-accent/20">
-                            <p id="admin-metadata-file-error" class="mt-1 text-xs text-red-500 hidden"></p>
                         </div>
                     </div>
                     <button type="submit"

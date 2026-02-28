@@ -25,9 +25,10 @@
         </div>
 
         <div>
-            <label class="block text-sm mb-1 text-slate-600 dark:text-textSoft">Type of Data</label>
-            <input type="text" name="type_of_data" value="{{ meta.type_of_data or '' }}"
-                class="w-full bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none" />
+            <label class="block text-sm mb-1 text-slate-600 dark:text-textSoft">Description (Type of Data)</label>
+            <textarea name="type_of_data" rows="3"
+                class="w-full min-h-[80px] resize-y bg-white dark:bg-black/30 border border-gray-300 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:border-accent outline-none whitespace-pre-wrap break-words"
+                placeholder="e.g. PFD, Manual, Image">{{ meta.type_of_data or '' }}</textarea>
         </div>
 
         <div>
