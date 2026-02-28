@@ -585,7 +585,7 @@ function initTypewriterEffect() {
     // Target landing page hero title
     const heroTitle = document.querySelector('.antigravity-text');
     if (heroTitle && window.location.pathname === '/') {
-        const fullText = "Simon Intelligence\nAssistant";
+        const fullText = "Simon  Intelligence\nAccelerator";
         heroTitle.innerHTML = ''; // Clear for animation
         typeWriter(heroTitle, fullText, 80);
     }
@@ -593,7 +593,7 @@ function initTypewriterEffect() {
     // Target search/chat page header
     const chatTitle = document.getElementById('chat-header-title');
     if (chatTitle && (window.location.pathname.includes('/search') || window.location.pathname.includes('/chat'))) {
-        const fullText = "Simon Intelligence\nAssistant";
+        const fullText = "Simon  Intelligence\nAccelerator";
         chatTitle.innerHTML = ''; // Clear for animation
         typeWriter(chatTitle, fullText, 60);
     }
