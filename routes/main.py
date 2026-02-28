@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from models.project import Project, ProjectMetadata, ProjectDependency
 from models.conversation import Conversation, ChatSession
 from models.audit import AuditLog
+from models.comparison_upload import ComparisonUpload
 from extensions import db, limiter
 from services.qna_service import QnAService
 from utils.security import sanitize_input, validate_file_path, validate_mode, validate_selected_files
@@ -16,7 +17,7 @@ import threading
 import time
 import fitz # PyMuPDF
 import bleach
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import OrderedDict
 import hashlib
 
@@ -54,26 +55,25 @@ def get_qna_cache_key(project_name, question, primary_mode, advance_mode, select
 
 main_bp = Blueprint('main', __name__)
 
-# In-memory store for comparison uploads: upload_id -> {path, user_id, file_id?}
-# Backend returns immediately; Gemini upload continues in background (previous flow)
-COMPARISON_UPLOADS = {}
-
-
 def _upload_comparison_to_gemini(upload_id: str, temp_path: str, app):
-    """Background: upload temp file to Gemini and store file_id. Runs after response is sent."""
+    """Background: upload temp file to Gemini and update DB so any worker can resolve upload_id -> gemini_file_id."""
     with app.app_context():
         try:
-            api_key = app.config.get('GEMINI_API_KEY')
-            if api_key and temp_path and os.path.exists(temp_path):
-                service = QnAService(api_key=api_key)
-                file_id = service.upload_user_file_for_comparison(temp_path)
-                if upload_id in COMPARISON_UPLOADS and COMPARISON_UPLOADS[upload_id].get('path') == temp_path:
-                    COMPARISON_UPLOADS[upload_id]['file_id'] = file_id
-                    COMPARISON_UPLOADS[upload_id]['path'] = None
-                try:
-                    os.remove(temp_path)
-                except Exception:
-                    pass
+            api_key = app.config.get("GEMINI_API_KEY")
+            if not api_key or not temp_path or not os.path.exists(temp_path):
+                return
+            service = QnAService(api_key=api_key)
+            file_id = service.upload_user_file_for_comparison(temp_path)
+            if file_id:
+                row = ComparisonUpload.query.filter_by(upload_id=upload_id).first()
+                if row:
+                    row.gemini_file_id = file_id
+                    db.session.commit()
+                    debug_logger.info("Comparison upload completed for upload_id=%s -> gemini_file_id=%s", upload_id, file_id)
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
         except Exception as e:
             debug_logger.exception("Comparison background upload failed: %s", e)
 
@@ -367,23 +367,34 @@ def upload_comparison(project_name):
     try:
         os.close(fd)
         file.save(temp_path)
+        # Remove old comparison uploads for this user (older than 24h) so the table does not grow indefinitely
+        try:
+            cutoff = datetime.utcnow() - timedelta(hours=24)
+            ComparisonUpload.query.filter(
+                ComparisonUpload.user_id == current_user.id,
+                ComparisonUpload.created_at < cutoff,
+            ).delete(synchronize_session=False)
+        except Exception:
+            pass
         upload_id = str(uuid.uuid4())
-        COMPARISON_UPLOADS[upload_id] = {'path': temp_path, 'user_id': current_user.id, 'file_id': None}
-        # Continue previous flow in background: upload to Gemini
+        row = ComparisonUpload(upload_id=upload_id, user_id=current_user.id, gemini_file_id=None)
+        db.session.add(row)
+        db.session.commit()
         thread = threading.Thread(
             target=_upload_comparison_to_gemini,
             args=(upload_id, temp_path, current_app._get_current_object()),
-            daemon=True
+            daemon=True,
         )
         thread.start()
-        return jsonify({'upload_id': upload_id})
+        return jsonify({"upload_id": upload_id})
     except Exception as e:
+        db.session.rollback()
         try:
             if os.path.exists(temp_path):
                 os.remove(temp_path)
         except Exception:
             pass
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 @main_bp.route('/api/chat/<project_name>/cross-project-check', methods=['POST'])
@@ -531,44 +542,38 @@ def chat_api(project_name):
                         chat_session.id,
                         selected_files,
                     )
-                    # Resolve upload:uuid to Gemini file_id (upload to Gemini when user sends question)
+                    # Resolve upload:uuid to Gemini file_id (DB-backed so any worker can resolve).
+                    # Rows are kept so the same uploaded file can be reused for follow-up questions in this conversation.
                     resolved_file_ids = []
                     for fid in (selected_files or []):
-                        if fid.startswith('upload:'):
+                        if fid.startswith("upload:"):
                             upload_id = fid[7:]
-                            entry = COMPARISON_UPLOADS.get(upload_id)
-                            if not entry or entry.get('user_id') != current_user.id:
+                            row = ComparisonUpload.query.filter_by(
+                                upload_id=upload_id, user_id=current_user.id
+                            ).first()
+                            if not row:
                                 debug_logger.warning(
-                                    "chat_api(comparison): skipping upload_id=%s (missing entry or user mismatch)",
+                                    "chat_api(comparison): skipping upload_id=%s (not found or user mismatch)",
                                     upload_id,
                                 )
                                 continue
-                            if entry.get('file_id'):
-                                resolved_file_ids.append(entry['file_id'])
+                            if row.gemini_file_id:
+                                resolved_file_ids.append(row.gemini_file_id)
                                 continue
-                            # Background may still be uploading; wait briefly for file_id (up to ~7.5 seconds)
-                            for attempt in range(15):
-                                if entry.get('file_id'):
-                                    resolved_file_ids.append(entry['file_id'])
+                            # Background may still be uploading; poll DB (up to ~7.5 s)
+                            for _ in range(15):
+                                row = ComparisonUpload.query.filter_by(
+                                    upload_id=upload_id, user_id=current_user.id
+                                ).first()
+                                if row and row.gemini_file_id:
+                                    resolved_file_ids.append(row.gemini_file_id)
                                     break
                                 time.sleep(0.5)
                             else:
-                                temp_path = entry.get('path')
-                                debug_logger.info(
-                                    "chat_api(comparison): no file_id after wait, attempting direct upload | upload_id=%s | temp_path=%s",
+                                debug_logger.warning(
+                                    "chat_api(comparison): upload_id=%s still no gemini_file_id after wait",
                                     upload_id,
-                                    temp_path,
                                 )
-                                if temp_path and os.path.exists(temp_path):
-                                    gemini_file_id = service.upload_user_file_for_comparison(temp_path)
-                                    if gemini_file_id:
-                                        entry['file_id'] = gemini_file_id
-                                        resolved_file_ids.append(gemini_file_id)
-                                        try:
-                                            os.remove(temp_path)
-                                        except Exception:
-                                            pass
-                                        entry['path'] = None
                         else:
                             resolved_file_ids.append(fid)
                     debug_logger.info(
@@ -708,29 +713,22 @@ def _chat_stream_events(project_name, question, primary_mode, advance_mode, sele
             for fid in (selected_files or []):
                 if fid.startswith('upload:'):
                     upload_id = fid[7:]
-                    entry = COMPARISON_UPLOADS.get(upload_id)
-                    if not entry or entry.get('user_id') != current_user.id:
+                    row = ComparisonUpload.query.filter_by(
+                        upload_id=upload_id, user_id=current_user.id
+                    ).first()
+                    if not row:
                         continue
-                    if entry.get('file_id'):
-                        resolved_file_ids.append(entry['file_id'])
+                    if row.gemini_file_id:
+                        resolved_file_ids.append(row.gemini_file_id)
                         continue
                     for _ in range(15):
-                        if entry.get('file_id'):
-                            resolved_file_ids.append(entry['file_id'])
+                        row = ComparisonUpload.query.filter_by(
+                            upload_id=upload_id, user_id=current_user.id
+                        ).first()
+                        if row and row.gemini_file_id:
+                            resolved_file_ids.append(row.gemini_file_id)
                             break
                         time.sleep(0.5)
-                    else:
-                        temp_path = entry.get('path')
-                        if temp_path and os.path.exists(temp_path):
-                            gemini_file_id = service.upload_user_file_for_comparison(temp_path)
-                            if gemini_file_id:
-                                entry['file_id'] = gemini_file_id
-                                resolved_file_ids.append(gemini_file_id)
-                                try:
-                                    os.remove(temp_path)
-                                except Exception:
-                                    pass
-                                entry['path'] = None
                 else:
                     resolved_file_ids.append(fid)
             result = service.generate_comparison_answer(
