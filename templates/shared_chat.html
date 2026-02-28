@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}?v=4">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/simon_upgrade.css') }}?v=4">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         html,
         body {
@@ -29,6 +30,13 @@
             color: var(--simon-text-main, #e2e8f0);
         }
 
+        #shared-pdf-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
         .shared-header {
             flex-shrink: 0;
             padding: 1rem 1.5rem;
@@ -36,7 +44,22 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 1rem;
             background: rgba(15, 23, 42, 0.9);
+        }
+
+        .shared-logo {
+            height: 2rem;
+            width: auto;
+            object-fit: contain;
+            flex-shrink: 0;
+            margin-right: 0.5rem;
+        }
+
+        .shared-title-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .shared-header h1 {
@@ -50,13 +73,49 @@
             color: var(--simon-text-muted, #94a3b8);
         }
 
+        .shared-download-btn {
+            padding: 0.4rem 0.9rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            background: transparent;
+            color: var(--simon-text-main, #e2e8f0);
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .shared-download-btn:hover:not(:disabled) {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(148, 163, 184, 0.9);
+        }
+
+        .shared-download-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
         #chat-messages {
             flex: 1;
             overflow-y: auto;
             padding: 1.5rem 2rem;
-            max-width: 56rem;
+            max-width: 80rem;
             margin: 0 auto;
             width: 100%;
+        }
+
+        /* Slight zoom-out used only during PDF capture */
+        .shared-print-scale {
+            transform: scale(1);
+            transform-origin: top;
+        }
+
+        /* Hide Download PDF button in generated PDF */
+        .shared-print-scale .shared-download-btn {
+            display: none !important;
         }
 
         .shared-error {
@@ -119,6 +178,24 @@
         .simon-markdown pre code {
             background: transparent;
             padding: 0;
+        }
+
+        .simon-markdown table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.25rem 0;
+            font-size: 0.95rem;
+        }
+
+        .simon-markdown th,
+        .simon-markdown td {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            text-align: left;
+        }
+
+        .simon-markdown thead {
+            background: rgba(15, 23, 42, 0.85);
         }
 
         @keyframes spin {
@@ -340,6 +417,15 @@
             color: #0F172A;
         }
 
+        html:not(.dark) .simon-markdown th,
+        html:not(.dark) .simon-markdown td {
+            border-color: #E2E8F0;
+        }
+
+        html:not(.dark) .simon-markdown thead {
+            background: #E5F0FF;
+        }
+
         html:not(.dark) .shared-error {
             color: #64748B;
         }
@@ -347,11 +433,19 @@
 </head>
 
 <body data-token="{{ token if token else '' }}" data-invalid="{{ 'true' if invalid else 'false' }}">
-    <header class="shared-header">
-        <h1 id="shared-title">Shared chat</h1>
-        <span class="shared-badge">View only</span>
-    </header>
-    <div id="chat-messages" role="region" aria-label="Chat messages"></div>
+    <div id="shared-pdf-wrapper">
+        <header class="shared-header">
+            <img src="{{ url_for('static', filename='images/simon_india_logo.png') }}" alt="Simon India" class="shared-logo">
+            <div class="shared-title-group">
+                <h1 id="shared-title">Shared chat</h1>
+                <span class="shared-badge">View only</span>
+            </div>
+            <button id="download-pdf" class="shared-download-btn" type="button" disabled>
+                <span>Download PDF</span>
+            </button>
+        </header>
+        <div id="chat-messages" role="region" aria-label="Chat messages"></div>
+    </div>
     <div id="shared-error" class="shared-error" style="display: none;">
         <p>This link is invalid or has expired.</p>
     </div>
@@ -453,6 +547,69 @@
                     messagesEl.style.display = 'none';
                     errorEl.style.display = 'flex';
                 });
+        })();
+    </script>
+    <script>
+        (function () {
+            const body = document.body;
+            const token = body.getAttribute('data-token') || null;
+            const invalid = body.getAttribute('data-invalid') === 'true';
+            const downloadBtn = document.getElementById('download-pdf');
+
+            if (!downloadBtn) return;
+
+            if (invalid || !token) {
+                downloadBtn.disabled = true;
+                return;
+            }
+
+            function getFileName() {
+                const titleEl = document.getElementById('shared-title');
+                const titleText = titleEl ? (titleEl.textContent || '').trim() : '';
+                const base = titleText || 'shared_chat';
+                return base.replace(/[^a-z0-9_\-]+/gi, '_').toLowerCase() + '.pdf';
+            }
+
+            downloadBtn.disabled = false;
+
+            downloadBtn.addEventListener('click', function () {
+                if (typeof html2pdf === 'undefined') {
+                    alert('PDF generator is not available.');
+                    return;
+                }
+
+                const element = document.getElementById('shared-pdf-wrapper');
+                if (!element) {
+                    alert('Chat content not found.');
+                    return;
+                }
+
+                const opt = {
+                    margin: [10, 10, 10, 10],
+                    filename: getFileName(),
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'pt', format: 'a3', orientation: 'landscape' },
+                    pagebreak: { mode: 'legacy', avoid: ['tr', 'td', 'th', '.simon-message-group'] }
+                };
+
+                downloadBtn.disabled = true;
+                element.classList.add('shared-print-scale');
+
+                var worker = html2pdf().set(opt).from(element);
+                worker.toPdf().get('pdf').then(function (pdf) {
+                    var n = pdf.internal.getNumberOfPages();
+                    if (n > 1) {
+                        pdf.deletePage(n);
+                    }
+                    pdf.save(opt.filename);
+                }).catch(function () {
+                    alert('Could not download chat as PDF.');
+                }).finally(function () {
+                    element.classList.remove('shared-print-scale');
+                    downloadBtn.disabled = false;
+                });
+            });
         })();
     </script>
 </body>
